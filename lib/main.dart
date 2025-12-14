@@ -7,6 +7,7 @@ import 'core/theme/app_theme.dart';
 import 'data/services/auth_service.dart';
 import 'presentation/screens/splash/splash_screen.dart';
 import 'presentation/screens/login/login_screen.dart';
+import 'presentation/screens/home/home_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -47,9 +48,7 @@ final _router = GoRouter(
     ),
     GoRoute(
       path: '/home',
-      builder: (context, state) => const Scaffold(
-        body: Center(child: Text('Home Screen - To be migrated')),
-      ),
+      builder: (context, state) => const HomeScreen(),
     ),
   ],
 );
