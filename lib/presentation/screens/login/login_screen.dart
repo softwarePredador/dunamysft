@@ -50,7 +50,7 @@ class LoginScreen extends StatelessWidget {
               children: [
                 // Top Section (Logo & Welcome Text)
                 SizedBox(
-                  height: size.height * 0.42,
+                  height: size.height * 0.4,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
