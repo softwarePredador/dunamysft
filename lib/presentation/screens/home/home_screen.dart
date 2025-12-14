@@ -103,7 +103,15 @@ class HomeScreen extends StatelessWidget {
               icon: Icons.calendar_today,
               title: AppStrings.myReservations,
               description: 'Gerencie suas reservas',
-              onTap: () => _showPlaceholder(context, 'Tela de reservas'),
+              onTap: () => context.go('/orders'),
+            ),
+            const SizedBox(height: 12),
+
+            _ActionCard(
+              icon: Icons.shopping_cart,
+              title: 'Carrinho',
+              description: 'Ver itens no carrinho',
+              onTap: () => context.go('/cart'),
             ),
             const SizedBox(height: 12),
 

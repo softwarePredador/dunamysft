@@ -9,6 +9,8 @@ import 'presentation/screens/splash/splash_screen.dart';
 import 'presentation/screens/login/login_screen.dart';
 import 'presentation/screens/home/home_screen.dart';
 import 'presentation/screens/menu/menu_screen.dart';
+import 'presentation/screens/cart/cart_screen.dart';
+import 'presentation/screens/orders/my_orders_screen.dart';
 import 'presentation/providers/menu_provider.dart';
 import 'presentation/providers/category_provider.dart';
 import 'presentation/providers/cart_provider.dart';
@@ -62,6 +64,14 @@ final _router = GoRouter(
     GoRoute(
       path: '/menu',
       builder: (context, state) => const MenuScreen(),
+    ),
+    GoRoute(
+      path: '/cart',
+      builder: (context, state) => const CartScreen(),
+    ),
+    GoRoute(
+      path: '/orders',
+      builder: (context, state) => const MyOrdersScreen(),
     ),
   ],
 );
