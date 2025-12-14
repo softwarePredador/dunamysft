@@ -108,7 +108,7 @@ class FirebaseUserRepository implements UserRepository {
   }
 
   // Convert entity to model (for updates, preserve existing created/updated times if available)
-  UserModel _entityToModel(User entity, {DateTime? existingCreatedAt, DateTime? existingUpdatedAt}) {
+  UserModel _entityToModel(User entity, {DateTime? existingCreatedAt}) {
     return UserModel(
       id: entity.id,
       email: entity.email,

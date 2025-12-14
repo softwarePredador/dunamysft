@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+// App Theme Definition
 class AppTheme {
   // Primary colors from FlutterFlow
   static const Color primary = Color(0xFF4B39EF);

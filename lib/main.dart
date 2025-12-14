@@ -18,6 +18,8 @@ import 'presentation/providers/category_provider.dart';
 import 'presentation/providers/cart_provider.dart';
 import 'presentation/providers/order_provider.dart';
 import 'presentation/providers/faq_provider.dart';
+import 'presentation/providers/home_provider.dart';
+import 'data/repositories/home_repository_impl.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -44,6 +46,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => CartProvider()),
         ChangeNotifierProvider(create: (_) => OrderProvider()),
         ChangeNotifierProvider(create: (_) => FAQProvider()),
+        ChangeNotifierProvider(create: (_) => HomeProvider(HomeRepositoryImpl())),
       ],
       child: const MyApp(),
     ),

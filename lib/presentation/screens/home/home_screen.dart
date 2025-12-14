@@ -1,230 +1,203 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import '../../../core/constants/strings.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+
 import '../../../core/theme/app_theme.dart';
 import '../../../data/services/auth_service.dart';
+import '../../../domain/entities/category.dart';
+import '../../../domain/entities/gallery_item.dart';
+import '../../../domain/entities/menu_item.dart';
+import '../../providers/home_provider.dart';
 
-/// Home screen demonstrating Clean Architecture
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  final PageController _pageController = PageController();
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final homeProvider = Provider.of<HomeProvider>(context, listen: false);
     final authService = Provider.of<AuthService>(context, listen: false);
     final user = authService.currentUser;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(AppStrings.appName),
-        backgroundColor: AppTheme.primaryText,
-        foregroundColor: Colors.white,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () async {
-              await authService.signOut();
-              if (context.mounted) {
-                context.go('/login');
-              }
-            },
-            tooltip: AppStrings.logout,
-          ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // Welcome Section
-            Card(
-              elevation: 2,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  children: [
-                    if (user?.photoURL != null)
-                      CircleAvatar(
-                        radius: 40,
-                        backgroundImage: NetworkImage(user!.photoURL!),
-                      )
-                    else
-                      const CircleAvatar(
-                        radius: 40,
-                        child: Icon(Icons.person, size: 40),
-                      ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Bem-vindo!',
-                      style: Theme.of(context).textTheme.headlineSmall,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      user?.displayName ?? user?.email ?? 'Visitante',
-                      style: Theme.of(context).textTheme.bodyLarge,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 24),
-
-            // Quick Actions
-            Text(
-              'Ações Rápidas',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-            ),
-            const SizedBox(height: 16),
-
-            // Action Cards
-            _ActionCard(
-              icon: Icons.restaurant_menu,
-              title: 'Cardápio',
-              description: 'Veja nosso cardápio e faça seu pedido',
-              onTap: () => context.go('/menu'),
-            ),
-            const SizedBox(height: 12),
-
-            _ActionCard(
-              icon: Icons.hotel,
-              title: AppStrings.availableRooms,
-              description: 'Veja os quartos disponíveis',
-              onTap: () => _showPlaceholder(context, 'Tela de quartos'),
-            ),
-            const SizedBox(height: 12),
-
-            _ActionCard(
-              icon: Icons.calendar_today,
-              title: AppStrings.myReservations,
-              description: 'Gerencie suas reservas',
-              onTap: () => context.go('/orders'),
-            ),
-            const SizedBox(height: 12),
-
-            _ActionCard(
-              icon: Icons.shopping_cart,
-              title: 'Carrinho',
-              description: 'Ver itens no carrinho',
-              onTap: () => context.go('/cart'),
-            ),
-            const SizedBox(height: 12),
-
-            _ActionCard(
-              icon: Icons.person,
-              title: AppStrings.profile,
-              description: 'Edite seu perfil',
-              onTap: () => context.go('/profile'),
-            ),
-
-            const SizedBox(height: 32),
-
-            // Architecture Info
-            Card(
-              color: AppTheme.primaryText.withOpacity(0.05),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  children: [
-                    const Icon(
-                      Icons.architecture,
-                      size: 48,
-                      color: AppTheme.primaryText,
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      'Clean Architecture',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                    ),
-                    const SizedBox(height: 8),
-                    const Text(
-                      'Este projeto segue os princípios de Clean Architecture, garantindo código manutenível, testável e escalável.',
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// Action card widget for the home screen
-class _ActionCard extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String description;
-  final VoidCallback onTap;
-
-  const _ActionCard({
-    required this.icon,
-    required this.title,
-    required this.description,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 1,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: AppTheme.primaryText.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(
-                  icon,
-                  size: 32,
-                  color: AppTheme.primaryText,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+              // Header
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 0.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      title,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Olá!',
+                          style: AppTheme.lightTheme.textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.w500,
+                            fontSize: 18.0,
                           ),
+                        ),
+                        Text(
+                          user?.displayName ?? 'Visitante',
+                          style: AppTheme.lightTheme.textTheme.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.w500,
+                            fontSize: 18.0,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      description,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppTheme.secondaryText,
+                    Row(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(right: 15.0),
+                          child: Text(
+                            'Seu pedido',
+                            style: AppTheme.lightTheme.textTheme.titleMedium?.copyWith(
+                              fontSize: 12.0,
+                            ),
                           ),
+                        ),
+                        // Notification Bell (Placeholder logic)
+                        InkWell(
+                          onTap: () {
+                            // Navigate to orders or cart
+                            context.push('/orders');
+                          },
+                          child: Image.asset(
+                            'assets/images/campainha.png',
+                            width: 23.0,
+                            height: 23.0,
+                            fit: BoxFit.contain,
+                            errorBuilder: (context, error, stackTrace) =>
+                                const Icon(Icons.notifications_none, size: 24),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
               ),
-              const Icon(
-                Icons.arrow_forward_ios,
-                size: 16,
-                color: AppTheme.secondaryText,
+
+              const SizedBox(height: 20),
+
+              // Gallery Carousel
+              SizedBox(
+                height: 235.0,
+                child: StreamBuilder<List<GalleryItem>>(
+                  stream: homeProvider.galleryItemsStream,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      return const SizedBox.shrink();
+                    }
+
+                    final items = snapshot.data!;
+
+                    return Column(
+                      children: [
+                        Expanded(
+                          child: PageView.builder(
+                            controller: _pageController,
+                            itemCount: items.length,
+                            itemBuilder: (context, index) {
+                              final item = items[index];
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(20.0),
+                                  child: CachedNetworkImage(
+                                    imageUrl: item.image,
+                                    fit: BoxFit.fill,
+                                    placeholder: (context, url) => const Center(
+                                      child: CircularProgressIndicator(),
+                                    ),
+                                    errorWidget: (context, url, error) =>
+                                        const Icon(Icons.error),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        SmoothPageIndicator(
+                          controller: _pageController,
+                          count: items.length,
+                          effect: const ExpandingDotsEffect(
+                            expansionFactor: 4.0,
+                            spacing: 8.0,
+                            radius: 8.0,
+                            dotWidth: 8.0,
+                            dotHeight: 8.0,
+                            dotColor: AppTheme.disabled,
+                            activeDotColor: AppTheme.amarelo,
+                          ),
+                          onDotClicked: (index) {
+                            _pageController.animateToPage(
+                              index,
+                              duration: const Duration(milliseconds: 500),
+                              curve: Curves.ease,
+                            );
+                          },
+                        ),
+                      ],
+                    );
+                  },
+                ),
               ),
+
+              const SizedBox(height: 20),
+
+              // Categories List
+              StreamBuilder<List<Category>>(
+                stream: homeProvider.categoriesStream,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Center(child: Text('Nenhuma categoria encontrada.'));
+                  }
+
+                  final categories = snapshot.data!;
+
+                  return ListView.builder(
+                    padding: EdgeInsets.zero,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: categories.length,
+                    itemBuilder: (context, index) {
+                      final category = categories[index];
+                      return _CategorySection(category: category);
+                    },
+                  );
+                },
+              ),
+              
+              // Bottom padding for navbar
+              const SizedBox(height: 80),
             ],
           ),
         ),
@@ -233,13 +206,158 @@ class _ActionCard extends StatelessWidget {
   }
 }
 
-/// Shows placeholder message for screens in development
-void _showPlaceholder(BuildContext context, String screenName) {
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      content: Text('$screenName em desenvolvimento'),
-      duration: const Duration(seconds: 2),
-    ),
-  );
+class _CategorySection extends StatelessWidget {
+  final Category category;
+
+  const _CategorySection({required this.category});
+
+  @override
+  Widget build(BuildContext context) {
+    final homeProvider = Provider.of<HomeProvider>(context, listen: false);
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 20.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Category Header
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  category.name,
+                  style: AppTheme.lightTheme.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 16.0,
+                    color: const Color(0xFF543434),
+                  ),
+                ),
+                InkWell(
+                  onTap: () {
+                    // Navigate to category details
+                    context.push('/menu?category=${category.id}');
+                  },
+                  child: Row(
+                    children: [
+                      Text(
+                        'ver todos',
+                        style: AppTheme.lightTheme.textTheme.bodyMedium?.copyWith(
+                          fontSize: 12.0,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                      const SizedBox(width: 2),
+                      const Icon(
+                        Icons.arrow_forward_ios_sharp,
+                        size: 14.0,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // Menu Items Horizontal List
+          SizedBox(
+            height: 180.0,
+            child: StreamBuilder<List<MenuItem>>(
+              stream: homeProvider.getMenuItemsStream(category.id),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Padding(
+                    padding: EdgeInsets.only(left: 20.0),
+                    child: Text('Nenhum item nesta categoria.'),
+                  );
+                }
+
+                final menuItems = snapshot.data!;
+
+                return ListView.separated(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  scrollDirection: Axis.horizontal,
+                  itemCount: menuItems.length,
+                  separatorBuilder: (_, __) => const SizedBox(width: 8.0),
+                  itemBuilder: (context, index) {
+                    final item = menuItems[index];
+                    return _MenuItemCard(item: item);
+                  },
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MenuItemCard extends StatelessWidget {
+  final MenuItem item;
+
+  const _MenuItemCard({required this.item});
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () {
+        // Navigate to item details
+        // context.push('/item_details/${item.id}');
+        // For now just print
+        print('Tapped on ${item.name}');
+      },
+      child: SizedBox(
+        width: 130.0,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(20.0),
+              child: CachedNetworkImage(
+                imageUrl: item.photo,
+                width: 126.0,
+                height: 128.0,
+                fit: BoxFit.cover,
+                errorWidget: (context, url, error) => Image.asset(
+                  'assets/images/error_image.png',
+                  width: 126.0,
+                  height: 128.0,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => Container(
+                    width: 126.0,
+                    height: 128.0,
+                    color: Colors.grey[300],
+                    child: const Icon(Icons.image_not_supported),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              item.name,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: AppTheme.lightTheme.textTheme.bodyLarge?.copyWith(
+                fontWeight: FontWeight.w500,
+                fontSize: 14.0,
+              ),
+            ),
+            Text(
+              'R\$ ${item.price.toStringAsFixed(2).replaceAll('.', ',')}',
+              style: AppTheme.lightTheme.textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w500,
+                color: AppTheme.amarelo,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
