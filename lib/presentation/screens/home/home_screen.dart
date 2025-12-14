@@ -84,6 +84,14 @@ class HomeScreen extends StatelessWidget {
 
             // Action Cards
             _ActionCard(
+              icon: Icons.restaurant_menu,
+              title: 'Cardápio',
+              description: 'Veja nosso cardápio e faça seu pedido',
+              onTap: () => context.go('/menu'),
+            ),
+            const SizedBox(height: 12),
+
+            _ActionCard(
               icon: Icons.hotel,
               title: AppStrings.availableRooms,
               description: 'Veja os quartos disponíveis',
@@ -95,7 +103,15 @@ class HomeScreen extends StatelessWidget {
               icon: Icons.calendar_today,
               title: AppStrings.myReservations,
               description: 'Gerencie suas reservas',
-              onTap: () => _showPlaceholder(context, 'Tela de reservas'),
+              onTap: () => context.go('/orders'),
+            ),
+            const SizedBox(height: 12),
+
+            _ActionCard(
+              icon: Icons.shopping_cart,
+              title: 'Carrinho',
+              description: 'Ver itens no carrinho',
+              onTap: () => context.go('/cart'),
             ),
             const SizedBox(height: 12),
 
@@ -103,7 +119,7 @@ class HomeScreen extends StatelessWidget {
               icon: Icons.person,
               title: AppStrings.profile,
               description: 'Edite seu perfil',
-              onTap: () => _showPlaceholder(context, 'Tela de perfil'),
+              onTap: () => context.go('/profile'),
             ),
 
             const SizedBox(height: 32),
