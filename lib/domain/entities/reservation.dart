@@ -27,17 +27,21 @@ class Reservation {
     return checkOut.difference(checkIn).inDays;
   }
 
-  /// Checks if reservation is active
-  bool get isActive {
-    final now = DateTime.now();
-    return checkIn.isBefore(now) && checkOut.isAfter(now);
+  /// Checks if reservation is active (currently happening)
+  bool isActiveAt(DateTime currentTime) {
+    return checkIn.isBefore(currentTime) && checkOut.isAfter(currentTime);
   }
 
-  /// Checks if reservation is upcoming
-  bool get isUpcoming {
-    final now = DateTime.now();
-    return checkIn.isAfter(now);
+  /// Checks if reservation is active now
+  bool get isActive => isActiveAt(DateTime.now());
+
+  /// Checks if reservation is upcoming (hasn't started yet)
+  bool isUpcomingAt(DateTime currentTime) {
+    return checkIn.isAfter(currentTime);
   }
+
+  /// Checks if reservation is upcoming now
+  bool get isUpcoming => isUpcomingAt(DateTime.now());
 
   @override
   bool operator ==(Object other) {

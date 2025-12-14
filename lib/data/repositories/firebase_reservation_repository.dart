@@ -46,7 +46,7 @@ class FirebaseReservationRepository implements ReservationRepository {
   @override
   Future<String> createReservation(Reservation reservation) async {
     try {
-      final model = _entityToModel(reservation);
+      final model = _entityToModel(reservation, isNew: true);
       final docRef = await _firestore.collection(_collection).add(
             model.toJson()..remove('id'),
           );
@@ -59,7 +59,7 @@ class FirebaseReservationRepository implements ReservationRepository {
   @override
   Future<void> updateReservation(Reservation reservation) async {
     try {
-      final model = _entityToModel(reservation);
+      final model = _entityToModel(reservation, isNew: false);
       await _firestore.collection(_collection).doc(reservation.id).update(
             model.toJson()..remove('id'),
           );
@@ -136,7 +136,8 @@ class FirebaseReservationRepository implements ReservationRepository {
   }
 
   // Convert entity to model
-  ReservationModel _entityToModel(Reservation entity) {
+  ReservationModel _entityToModel(Reservation entity, {required bool isNew}) {
+    final now = DateTime.now();
     return ReservationModel(
       id: entity.id,
       userId: entity.userId,
@@ -147,8 +148,8 @@ class FirebaseReservationRepository implements ReservationRepository {
       totalPrice: entity.totalPrice,
       status: ReservationStatus.fromString(entity.status),
       specialRequests: entity.specialRequests,
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
+      createdAt: isNew ? now : now, // For existing, this should be preserved from DB
+      updatedAt: now,
     );
   }
 }

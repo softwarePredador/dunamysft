@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../core/constants/strings.dart';
 import '../../core/theme/app_theme.dart';
 
 /// Custom card widget
@@ -165,7 +166,7 @@ class ErrorState extends StatelessWidget {
             ElevatedButton.icon(
               onPressed: onRetry,
               icon: const Icon(Icons.refresh),
-              label: const Text('Tentar Novamente'),
+              label: const Text(AppStrings.retry),
             ),
           ],
         ],

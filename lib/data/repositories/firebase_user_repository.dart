@@ -54,7 +54,17 @@ class FirebaseUserRepository implements UserRepository {
   @override
   Future<void> updateUser(User user) async {
     try {
-      final model = _entityToModel(user);
+      // Get existing user to preserve createdAt
+      final existingDoc = await _firestore.collection(_collection).doc(user.id).get();
+      DateTime? existingCreatedAt;
+      if (existingDoc.exists) {
+        final data = existingDoc.data();
+        if (data?['createdAt'] != null) {
+          existingCreatedAt = DateTime.parse(data!['createdAt'] as String);
+        }
+      }
+      
+      final model = _entityToModel(user, existingCreatedAt: existingCreatedAt);
       await _firestore.collection(_collection).doc(user.id).update(
             model.toJson()..remove('id'),
           );
@@ -75,7 +85,7 @@ class FirebaseUserRepository implements UserRepository {
   @override
   Future<void> saveUser(User user) async {
     try {
-      final model = _entityToModel(user);
+      final model = _entityToModel(user, existingCreatedAt: user.createdAt);
       await _firestore.collection(_collection).doc(user.id).set(
             model.toJson()..remove('id'),
             SetOptions(merge: true),
@@ -97,16 +107,16 @@ class FirebaseUserRepository implements UserRepository {
     );
   }
 
-  // Convert entity to model
-  UserModel _entityToModel(User entity) {
+  // Convert entity to model (for updates, preserve existing created/updated times if available)
+  UserModel _entityToModel(User entity, {DateTime? existingCreatedAt, DateTime? existingUpdatedAt}) {
     return UserModel(
       id: entity.id,
       email: entity.email,
       name: entity.name,
       photoUrl: entity.photoUrl,
       phone: entity.phone,
-      createdAt: entity.createdAt,
-      updatedAt: DateTime.now(),
+      createdAt: existingCreatedAt ?? entity.createdAt,
+      updatedAt: DateTime.now(), // Always update this on changes
     );
   }
 }

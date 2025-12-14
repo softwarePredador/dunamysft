@@ -66,4 +66,7 @@ class AppStrings {
   static const String email = 'Email';
   static const String phone = 'Telefone';
   static const String updateProfile = 'Atualizar Perfil';
+
+  // UI
+  static const String refresh = 'Atualizar';
 }
