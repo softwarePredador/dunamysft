@@ -11,10 +11,13 @@ import 'presentation/screens/home/home_screen.dart';
 import 'presentation/screens/menu/menu_screen.dart';
 import 'presentation/screens/cart/cart_screen.dart';
 import 'presentation/screens/orders/my_orders_screen.dart';
+import 'presentation/screens/faq/faq_screen.dart';
+import 'presentation/screens/profile/profile_screen.dart';
 import 'presentation/providers/menu_provider.dart';
 import 'presentation/providers/category_provider.dart';
 import 'presentation/providers/cart_provider.dart';
 import 'presentation/providers/order_provider.dart';
+import 'presentation/providers/faq_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,6 +43,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => CategoryProvider()),
         ChangeNotifierProvider(create: (_) => CartProvider()),
         ChangeNotifierProvider(create: (_) => OrderProvider()),
+        ChangeNotifierProvider(create: (_) => FAQProvider()),
       ],
       child: const MyApp(),
     ),
@@ -72,6 +76,14 @@ final _router = GoRouter(
     GoRoute(
       path: '/orders',
       builder: (context, state) => const MyOrdersScreen(),
+    ),
+    GoRoute(
+      path: '/faq',
+      builder: (context, state) => const FAQScreen(),
+    ),
+    GoRoute(
+      path: '/profile',
+      builder: (context, state) => const ProfileScreen(),
     ),
   ],
 );

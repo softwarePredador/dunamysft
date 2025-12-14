@@ -119,7 +119,7 @@ class HomeScreen extends StatelessWidget {
               icon: Icons.person,
               title: AppStrings.profile,
               description: 'Edite seu perfil',
-              onTap: () => _showPlaceholder(context, 'Tela de perfil'),
+              onTap: () => context.go('/profile'),
             ),
 
             const SizedBox(height: 32),
