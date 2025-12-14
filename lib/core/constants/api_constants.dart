@@ -24,8 +24,12 @@ class ApiConstants {
 }
 
 /// Firebase configuration constants
+/// NOTE: In production, these should be loaded from environment variables
+/// or a secure configuration file that is NOT committed to version control.
+/// Add firebase_config.dart to .gitignore and use a template file instead.
 class FirebaseConstants {
   // Web configuration
+  // TODO: Move to environment variables or secure config file
   static const String webApiKey = 'AIzaSyD1pui2pXaHAwKZx4g8EgcrajUk5J69AI8';
   static const String webAuthDomain = 'hotel-dunamys-ay9x21.firebaseapp.com';
   static const String webProjectId = 'hotel-dunamys-ay9x21';

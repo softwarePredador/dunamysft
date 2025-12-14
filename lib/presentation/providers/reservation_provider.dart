@@ -1,33 +1,30 @@
 import 'package:flutter/foundation.dart';
-import '../../data/models/reservation_model.dart';
+import '../../domain/entities/reservation.dart';
 import '../../domain/repositories/reservation_repository.dart';
 
 /// Provider for managing reservation state
 class ReservationProvider extends ChangeNotifier {
   final ReservationRepository _reservationRepository;
   
-  List<ReservationModel> _reservations = [];
-  ReservationModel? _selectedReservation;
+  List<Reservation> _reservations = [];
+  Reservation? _selectedReservation;
   bool _isLoading = false;
   String? _error;
 
   ReservationProvider(this._reservationRepository);
 
   // Getters
-  List<ReservationModel> get reservations => _reservations;
-  ReservationModel? get selectedReservation => _selectedReservation;
+  List<Reservation> get reservations => _reservations;
+  Reservation? get selectedReservation => _selectedReservation;
   bool get isLoading => _isLoading;
   String? get error => _error;
   
-  List<ReservationModel> get upcomingReservations {
-    final now = DateTime.now();
-    return _reservations
-        .where((r) => r.checkIn.isAfter(now))
-        .toList()
+  List<Reservation> get upcomingReservations {
+    return _reservations.where((r) => r.isUpcoming).toList()
       ..sort((a, b) => a.checkIn.compareTo(b.checkIn));
   }
 
-  List<ReservationModel> get pastReservations {
+  List<Reservation> get pastReservations {
     final now = DateTime.now();
     return _reservations
         .where((r) => r.checkOut.isBefore(now))
@@ -52,7 +49,7 @@ class ReservationProvider extends ChangeNotifier {
   }
 
   /// Creates a new reservation
-  Future<String> createReservation(ReservationModel reservation) async {
+  Future<String> createReservation(Reservation reservation) async {
     _setLoading(true);
     _error = null;
 
@@ -87,7 +84,7 @@ class ReservationProvider extends ChangeNotifier {
   }
 
   /// Selects a reservation for details view
-  void selectReservation(ReservationModel? reservation) {
+  void selectReservation(Reservation? reservation) {
     _selectedReservation = reservation;
     notifyListeners();
   }

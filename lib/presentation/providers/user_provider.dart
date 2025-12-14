@@ -1,19 +1,19 @@
 import 'package:flutter/foundation.dart';
-import '../../data/models/user_model.dart';
+import '../../domain/entities/user.dart';
 import '../../domain/repositories/user_repository.dart';
 
 /// Provider for managing user state
 class UserProvider extends ChangeNotifier {
   final UserRepository _userRepository;
   
-  UserModel? _currentUser;
+  User? _currentUser;
   bool _isLoading = false;
   String? _error;
 
   UserProvider(this._userRepository);
 
   // Getters
-  UserModel? get currentUser => _currentUser;
+  User? get currentUser => _currentUser;
   bool get isLoading => _isLoading;
   String? get error => _error;
   bool get isAuthenticated => _currentUser != null;
@@ -35,7 +35,7 @@ class UserProvider extends ChangeNotifier {
   }
 
   /// Updates the user profile
-  Future<void> updateProfile(UserModel user) async {
+  Future<void> updateProfile(User user) async {
     _setLoading(true);
     _error = null;
 
@@ -53,7 +53,7 @@ class UserProvider extends ChangeNotifier {
   }
 
   /// Sets the current user
-  void setUser(UserModel? user) {
+  void setUser(User? user) {
     _currentUser = user;
     notifyListeners();
   }

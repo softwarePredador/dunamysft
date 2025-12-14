@@ -88,14 +88,7 @@ class HomeScreen extends StatelessWidget {
               icon: Icons.hotel,
               title: AppStrings.availableRooms,
               description: 'Veja os quartos disponíveis',
-              onTap: () {
-                // TODO: Navigate to rooms screen
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Tela de quartos em desenvolvimento'),
-                  ),
-                );
-              },
+              onTap: () => _showPlaceholder(context, 'Tela de quartos'),
             ),
             const SizedBox(height: 12),
 
@@ -103,14 +96,7 @@ class HomeScreen extends StatelessWidget {
               icon: Icons.calendar_today,
               title: AppStrings.myReservations,
               description: 'Gerencie suas reservas',
-              onTap: () {
-                // TODO: Navigate to reservations screen
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Tela de reservas em desenvolvimento'),
-                  ),
-                );
-              },
+              onTap: () => _showPlaceholder(context, 'Tela de reservas'),
             ),
             const SizedBox(height: 12),
 
@@ -118,14 +104,7 @@ class HomeScreen extends StatelessWidget {
               icon: Icons.person,
               title: AppStrings.profile,
               description: 'Edite seu perfil',
-              onTap: () {
-                // TODO: Navigate to profile screen
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Tela de perfil em desenvolvimento'),
-                  ),
-                );
-              },
+              onTap: () => _showPlaceholder(context, 'Tela de perfil'),
             ),
 
             const SizedBox(height: 32),
@@ -238,3 +217,14 @@ class _ActionCard extends StatelessWidget {
     );
   }
 }
+
+/// Shows placeholder message for screens in development
+void _showPlaceholder(BuildContext context, String screenName) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text('$screenName em desenvolvimento'),
+      duration: const Duration(seconds: 2),
+    ),
+  );
+}
+
