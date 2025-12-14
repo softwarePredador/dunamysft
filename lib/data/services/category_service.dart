@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/category_model.dart';
 
@@ -25,7 +26,7 @@ class CategoryService {
       }
       return null;
     } catch (e) {
-      print('Error getting category: $e');
+      debugPrint('Error getting category: $e');
       return null;
     }
   }
@@ -38,7 +39,7 @@ class CategoryService {
           .add(category.toFirestore());
       return docRef.id;
     } catch (e) {
-      print('Error creating category: $e');
+      debugPrint('Error creating category: $e');
       return null;
     }
   }
@@ -52,7 +53,7 @@ class CategoryService {
           .update(category.toFirestore());
       return true;
     } catch (e) {
-      print('Error updating category: $e');
+      debugPrint('Error updating category: $e');
       return false;
     }
   }
@@ -65,7 +66,7 @@ class CategoryService {
       });
       return true;
     } catch (e) {
-      print('Error deleting category: $e');
+      debugPrint('Error deleting category: $e');
       return false;
     }
   }

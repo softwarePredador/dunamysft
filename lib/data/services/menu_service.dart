@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/menu_item_model.dart';
 
@@ -38,7 +39,7 @@ class MenuService {
       }
       return null;
     } catch (e) {
-      print('Error getting menu item: $e');
+      debugPrint('Error getting menu item: $e');
       return null;
     }
   }
@@ -51,7 +52,7 @@ class MenuService {
           .add(menuItem.toFirestore());
       return docRef.id;
     } catch (e) {
-      print('Error creating menu item: $e');
+      debugPrint('Error creating menu item: $e');
       return null;
     }
   }
@@ -65,7 +66,7 @@ class MenuService {
           .update(menuItem.toFirestore());
       return true;
     } catch (e) {
-      print('Error updating menu item: $e');
+      debugPrint('Error updating menu item: $e');
       return false;
     }
   }
@@ -78,7 +79,7 @@ class MenuService {
       });
       return true;
     } catch (e) {
-      print('Error deleting menu item: $e');
+      debugPrint('Error deleting menu item: $e');
       return false;
     }
   }
@@ -91,7 +92,7 @@ class MenuService {
       });
       return true;
     } catch (e) {
-      print('Error updating quantity: $e');
+      debugPrint('Error updating quantity: $e');
       return false;
     }
   }

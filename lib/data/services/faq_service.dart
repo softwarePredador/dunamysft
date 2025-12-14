@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/faq_model.dart';
 
@@ -25,7 +26,7 @@ class FAQService {
       }
       return null;
     } catch (e) {
-      print('Error getting FAQ: $e');
+      debugPrint('Error getting FAQ: $e');
       return null;
     }
   }
@@ -38,7 +39,7 @@ class FAQService {
           .add(faq.toFirestore());
       return docRef.id;
     } catch (e) {
-      print('Error creating FAQ: $e');
+      debugPrint('Error creating FAQ: $e');
       return null;
     }
   }
@@ -52,7 +53,7 @@ class FAQService {
           .update(faq.toFirestore());
       return true;
     } catch (e) {
-      print('Error updating FAQ: $e');
+      debugPrint('Error updating FAQ: $e');
       return false;
     }
   }
@@ -65,7 +66,7 @@ class FAQService {
       });
       return true;
     } catch (e) {
-      print('Error deleting FAQ: $e');
+      debugPrint('Error deleting FAQ: $e');
       return false;
     }
   }

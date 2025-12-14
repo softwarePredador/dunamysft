@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/order_model.dart';
 
@@ -49,7 +50,7 @@ class OrderService {
       }
       return null;
     } catch (e) {
-      print('Error getting order: $e');
+      debugPrint('Error getting order: $e');
       return null;
     }
   }
@@ -62,7 +63,7 @@ class OrderService {
           .add(order.toFirestore());
       return docRef.id;
     } catch (e) {
-      print('Error creating order: $e');
+      debugPrint('Error creating order: $e');
       return null;
     }
   }
@@ -75,7 +76,7 @@ class OrderService {
       });
       return true;
     } catch (e) {
-      print('Error updating order status: $e');
+      debugPrint('Error updating order status: $e');
       return false;
     }
   }
@@ -88,7 +89,7 @@ class OrderService {
       });
       return true;
     } catch (e) {
-      print('Error marking order as finished: $e');
+      debugPrint('Error marking order as finished: $e');
       return false;
     }
   }
@@ -109,7 +110,7 @@ class OrderService {
       final lastOrder = OrderModel.fromFirestore(snapshot.docs.first);
       return lastOrder.codigo + 1;
     } catch (e) {
-      print('Error generating order code: $e');
+      debugPrint('Error generating order code: $e');
       return DateTime.now().millisecondsSinceEpoch % 10000;
     }
   }

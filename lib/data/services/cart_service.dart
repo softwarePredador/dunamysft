@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/product_cart_model.dart';
 
@@ -24,7 +25,7 @@ class CartService {
           .add(cartItem.toFirestore());
       return docRef.id;
     } catch (e) {
-      print('Error adding to cart: $e');
+      debugPrint('Error adding to cart: $e');
       return null;
     }
   }
@@ -37,7 +38,7 @@ class CartService {
       });
       return true;
     } catch (e) {
-      print('Error updating cart item quantity: $e');
+      debugPrint('Error updating cart item quantity: $e');
       return false;
     }
   }
@@ -48,7 +49,7 @@ class CartService {
       await _firestore.collection(_collection).doc(id).delete();
       return true;
     } catch (e) {
-      print('Error removing from cart: $e');
+      debugPrint('Error removing from cart: $e');
       return false;
     }
   }
@@ -68,7 +69,7 @@ class CartService {
       await batch.commit();
       return true;
     } catch (e) {
-      print('Error clearing cart: $e');
+      debugPrint('Error clearing cart: $e');
       return false;
     }
   }
@@ -88,7 +89,7 @@ class CartService {
       }
       return total;
     } catch (e) {
-      print('Error getting cart total: $e');
+      debugPrint('Error getting cart total: $e');
       return 0;
     }
   }
