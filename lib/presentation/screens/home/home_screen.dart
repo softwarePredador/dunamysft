@@ -84,6 +84,14 @@ class HomeScreen extends StatelessWidget {
 
             // Action Cards
             _ActionCard(
+              icon: Icons.restaurant_menu,
+              title: 'Cardápio',
+              description: 'Veja nosso cardápio e faça seu pedido',
+              onTap: () => context.go('/menu'),
+            ),
+            const SizedBox(height: 12),
+
+            _ActionCard(
               icon: Icons.hotel,
               title: AppStrings.availableRooms,
               description: 'Veja os quartos disponíveis',

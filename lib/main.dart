@@ -8,6 +8,11 @@ import 'data/services/auth_service.dart';
 import 'presentation/screens/splash/splash_screen.dart';
 import 'presentation/screens/login/login_screen.dart';
 import 'presentation/screens/home/home_screen.dart';
+import 'presentation/screens/menu/menu_screen.dart';
+import 'presentation/providers/menu_provider.dart';
+import 'presentation/providers/category_provider.dart';
+import 'presentation/providers/cart_provider.dart';
+import 'presentation/providers/order_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,6 +34,10 @@ void main() async {
     MultiProvider(
       providers: [
         Provider<AuthService>(create: (_) => FirebaseAuthService()),
+        ChangeNotifierProvider(create: (_) => MenuProvider()),
+        ChangeNotifierProvider(create: (_) => CategoryProvider()),
+        ChangeNotifierProvider(create: (_) => CartProvider()),
+        ChangeNotifierProvider(create: (_) => OrderProvider()),
       ],
       child: const MyApp(),
     ),
@@ -49,6 +58,10 @@ final _router = GoRouter(
     GoRoute(
       path: '/home',
       builder: (context, state) => const HomeScreen(),
+    ),
+    GoRoute(
+      path: '/menu',
+      builder: (context, state) => const MenuScreen(),
     ),
   ],
 );
