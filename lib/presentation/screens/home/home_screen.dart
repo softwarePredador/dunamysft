@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import '../../../core/constants/strings.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../data/services/auth_service.dart';
-import '../../widgets/custom_button.dart';
 
 /// Home screen demonstrating Clean Architecture
 class HomeScreen extends StatelessWidget {

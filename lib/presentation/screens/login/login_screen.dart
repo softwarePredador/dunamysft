@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/assets.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../data/services/auth_service.dart';
@@ -68,7 +67,8 @@ class LoginScreen extends StatelessWidget {
                         child: Text(
                           'Olá, seja bem-vindo',
                           textAlign: TextAlign.center,
-                          style: GoogleFonts.poppins(
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
                             fontSize: 30.0,
                             fontWeight: FontWeight.w500,
                             color: AppTheme.primaryText.withOpacity(0.8),
@@ -78,7 +78,8 @@ class LoginScreen extends StatelessWidget {
                       Text(
                         'Por favor, selecione uma das opções',
                         textAlign: TextAlign.center,
-                        style: GoogleFonts.poppins(
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
                           fontSize: 16.0,
                           fontWeight: FontWeight.normal,
                           color: AppTheme.primaryText,
@@ -113,7 +114,8 @@ class LoginScreen extends StatelessWidget {
                           ),
                           label: Text(
                             'Entrar com Google',
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
                               fontSize: 16.0,
                               fontWeight: FontWeight.w500,
                             ),
@@ -149,7 +151,8 @@ class LoginScreen extends StatelessWidget {
                             ),
                             label: Text(
                               'Entrar com Apple',
-                              style: GoogleFonts.inter(
+                              style: TextStyle(
+                                fontFamily: 'Poppins',
                                 fontSize: 16.0,
                                 fontWeight: FontWeight.w500,
                               ),

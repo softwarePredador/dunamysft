@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/app_theme.dart';
 
 /// Custom text field widget
@@ -39,7 +38,8 @@ class CustomTextField extends StatelessWidget {
         if (label != null) ...[
           Text(
             label!,
-            style: GoogleFonts.poppins(
+            style: const TextStyle(
+              fontFamily: 'Poppins',
               fontSize: 14,
               fontWeight: FontWeight.w500,
               color: AppTheme.primaryText,
@@ -55,13 +55,15 @@ class CustomTextField extends StatelessWidget {
           maxLines: obscureText ? 1 : maxLines,
           enabled: enabled,
           onChanged: onChanged,
-          style: GoogleFonts.poppins(
+          style: const TextStyle(
+            fontFamily: 'Poppins',
             fontSize: 14,
             color: AppTheme.primaryText,
           ),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: GoogleFonts.poppins(
+            hintStyle: TextStyle(
+              fontFamily: 'Poppins',
               fontSize: 14,
               color: AppTheme.secondaryText.withOpacity(0.6),
             ),

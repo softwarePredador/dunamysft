@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
   static const Color primaryText = Color(0xFF4B3E3C);
@@ -18,7 +17,8 @@ class AppTheme {
         onSurface: primaryText,
         onBackground: primaryText,
       ),
-      textTheme: GoogleFonts.poppinsTextTheme().apply(
+      textTheme: ThemeData.light().textTheme.apply(
+        fontFamily: 'Poppins',
         bodyColor: primaryText,
         displayColor: primaryText,
       ),
@@ -26,7 +26,8 @@ class AppTheme {
         style: ElevatedButton.styleFrom(
           backgroundColor: primaryText,
           foregroundColor: Colors.white,
-          textStyle: GoogleFonts.inter(
+          textStyle: const TextStyle(
+            fontFamily: 'Poppins',
             fontWeight: FontWeight.w500,
             fontSize: 16,
           ),

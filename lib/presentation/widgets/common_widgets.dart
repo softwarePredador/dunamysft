@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/strings.dart';
 import '../../core/theme/app_theme.dart';
 
@@ -70,7 +69,8 @@ class LoadingIndicator extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               message!,
-              style: GoogleFonts.poppins(
+              style: const TextStyle(
+                fontFamily: 'Poppins',
                 fontSize: 14,
                 color: AppTheme.secondaryText,
               ),
@@ -112,7 +112,8 @@ class EmptyState extends StatelessWidget {
           Text(
             message,
             textAlign: TextAlign.center,
-            style: GoogleFonts.poppins(
+            style: const TextStyle(
+              fontFamily: 'Poppins',
               fontSize: 16,
               color: AppTheme.secondaryText,
             ),
@@ -156,7 +157,8 @@ class ErrorState extends StatelessWidget {
           Text(
             message,
             textAlign: TextAlign.center,
-            style: GoogleFonts.poppins(
+            style: const TextStyle(
+              fontFamily: 'Poppins',
               fontSize: 16,
               color: AppTheme.secondaryText,
             ),
