@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'core/theme/app_theme.dart';
 import 'data/services/auth_service.dart';
+import 'data/models/menu_item_model.dart';
 import 'presentation/screens/splash/splash_screen.dart';
 import 'presentation/screens/login/login_screen.dart';
 import 'presentation/screens/home/home_screen.dart';
@@ -13,12 +14,29 @@ import 'presentation/screens/cart/cart_screen.dart';
 import 'presentation/screens/orders/my_orders_screen.dart';
 import 'presentation/screens/faq/faq_screen.dart';
 import 'presentation/screens/profile/profile_screen.dart';
+import 'presentation/screens/item_details/item_details_screen.dart';
+import 'presentation/screens/item_category/item_category_screen.dart';
+import 'presentation/screens/payment/payment_screen.dart';
+import 'presentation/screens/pix_payment/pix_payment_screen.dart';
+import 'presentation/screens/order_done/order_done_screen.dart';
+import 'presentation/screens/feedback/feedback_screen.dart';
+// Admin screens
+import 'presentation/screens/admin/admin_dashboard_screen.dart';
+import 'presentation/screens/admin/admin_orders_screen.dart';
+import 'presentation/screens/admin/admin_order_detail_screen.dart';
+import 'presentation/screens/admin/admin_products_screen.dart';
+import 'presentation/screens/admin/admin_product_form_screen.dart';
+import 'presentation/screens/admin/admin_categories_screen.dart';
+import 'presentation/screens/admin/admin_stock_screen.dart';
+import 'presentation/screens/admin/admin_feedback_screen.dart';
+import 'presentation/screens/admin/admin_faq_screen.dart';
 import 'presentation/providers/menu_provider.dart';
 import 'presentation/providers/category_provider.dart';
 import 'presentation/providers/cart_provider.dart';
 import 'presentation/providers/order_provider.dart';
 import 'presentation/providers/faq_provider.dart';
 import 'presentation/providers/home_provider.dart';
+import 'presentation/providers/app_state_provider.dart';
 import 'data/repositories/home_repository_impl.dart';
 
 void main() async {
@@ -37,9 +55,14 @@ void main() async {
     await Firebase.initializeApp();
   }
 
+  // Inicializa o AppStateProvider
+  final appState = AppStateProvider();
+  await appState.initialize();
+
   runApp(
     MultiProvider(
       providers: [
+        ChangeNotifierProvider.value(value: appState),
         Provider<AuthService>(create: (_) => FirebaseAuthService()),
         ChangeNotifierProvider(create: (_) => MenuProvider()),
         ChangeNotifierProvider(create: (_) => CategoryProvider()),
@@ -55,6 +78,7 @@ void main() async {
 
 final _router = GoRouter(
   initialLocation: '/',
+  debugLogDiagnostics: true, // Debug para ver as rotas
   routes: [
     GoRoute(
       path: '/',
@@ -73,6 +97,13 @@ final _router = GoRouter(
       builder: (context, state) => const MenuScreen(),
     ),
     GoRoute(
+      path: '/category/:categoryId',
+      builder: (context, state) {
+        final categoryId = state.pathParameters['categoryId']!;
+        return ItemCategoryScreen(categoryId: categoryId);
+      },
+    ),
+    GoRoute(
       path: '/cart',
       builder: (context, state) => const CartScreen(),
     ),
@@ -87,6 +118,97 @@ final _router = GoRouter(
     GoRoute(
       path: '/profile',
       builder: (context, state) => const ProfileScreen(),
+    ),
+    GoRoute(
+      path: '/item-details',
+      builder: (context, state) {
+        final item = state.extra as MenuItemModel;
+        return ItemDetailsScreen(item: item);
+      },
+    ),
+    GoRoute(
+      path: '/payment',
+      builder: (context, state) => const PaymentScreen(),
+    ),
+    GoRoute(
+      path: '/pix-payment',
+      builder: (context, state) {
+        final orderId = state.extra as String;
+        return PIXPaymentScreen(orderId: orderId);
+      },
+    ),
+    GoRoute(
+      path: '/order-done',
+      builder: (context, state) {
+        final orderId = state.extra as String;
+        return OrderDoneScreen(orderId: orderId);
+      },
+    ),
+    GoRoute(
+      path: '/feedback',
+      builder: (context, state) => const FeedbackScreen(),
+    ),
+    // Admin routes
+    GoRoute(
+      path: '/admin',
+      builder: (context, state) => const AdminDashboardScreen(),
+    ),
+    GoRoute(
+      path: '/admin/orders',
+      builder: (context, state) => const AdminOrdersScreen(),
+    ),
+    GoRoute(
+      path: '/admin/orders/:orderId',
+      builder: (context, state) {
+        final orderId = state.pathParameters['orderId']!;
+        return AdminOrderDetailScreen(orderId: orderId);
+      },
+    ),
+    GoRoute(
+      path: '/admin/products',
+      builder: (context, state) => const AdminProductsScreen(),
+    ),
+    GoRoute(
+      path: '/admin/products/new',
+      builder: (context, state) {
+        final categoryId = state.uri.queryParameters['category'];
+        return AdminProductFormScreen(categoryId: categoryId);
+      },
+    ),
+    GoRoute(
+      path: '/admin/products/:productId',
+      builder: (context, state) {
+        final productId = state.pathParameters['productId']!;
+        return AdminProductFormScreen(productId: productId);
+      },
+    ),
+    GoRoute(
+      path: '/admin/categories',
+      builder: (context, state) => const AdminCategoriesScreen(),
+    ),
+    GoRoute(
+      path: '/admin/stock',
+      builder: (context, state) => const AdminStockScreen(),
+    ),
+    GoRoute(
+      path: '/admin/feedback',
+      builder: (context, state) => const AdminFeedbackScreen(),
+    ),
+    GoRoute(
+      path: '/admin/faq',
+      builder: (context, state) => const AdminFAQScreen(),
+    ),
+    GoRoute(
+      path: '/admin/media',
+      builder: (context, state) => const Scaffold(
+        body: Center(child: Text('Gestão de Mídia - Em breve')),
+      ),
+    ),
+    GoRoute(
+      path: '/admin/reports',
+      builder: (context, state) => const Scaffold(
+        body: Center(child: Text('Relatórios - Em breve')),
+      ),
     ),
   ],
 );

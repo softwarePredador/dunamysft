@@ -29,21 +29,16 @@ class AppTheme {
   static const Color error = Color(0xFFFF5963);
   static const Color info = Color(0xFFFFFFFF);
 
-  // Custom Colors
-  static const Color amarelo = Color(0xFFD0AA5E);
-  static const Color disabled = Color(0xFFD9D9D9);
-  static const Color secondaryColor1 = Color(0xFFFF3B30);
-  static const Color primaryColors = Color(0xFFFF9431);
-  
   // Custom colors from FlutterFlow
   static const Color amarelo = Color(0xFFD0AA5E);
   static const Color disabled = Color(0xFFD9D9D9);
-  static const Color grayPaletteGray20 = Color(0xFFF5F5F5);
   static const Color secondaryColor1 = Color(0xFFFF3B30);
-  static const Color grayPaletteGray100 = Color(0xFF0A0A0A);
-  static const Color grayPaletteGray60 = Color(0xFF9E9E9E);
-  static const Color grayPaletteGray30 = Color(0xFFEDEDED);
   static const Color primaryColors = Color(0xFFFF9431);
+  static const Color grayPaletteGray10 = Color(0xFFFAFAFA);
+  static const Color grayPaletteGray20 = Color(0xFFF5F5F5);
+  static const Color grayPaletteGray30 = Color(0xFFEDEDED);
+  static const Color grayPaletteGray60 = Color(0xFF9E9E9E);
+  static const Color grayPaletteGray100 = Color(0xFF0A0A0A);
   static const Color bordaCinza = Color(0xFFCCCCCC);
   
   static ThemeData get lightTheme {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../data/models/order_model.dart';
+import '../../data/models/product_cart_model.dart';
 import '../../data/services/order_service.dart';
 
 class OrderProvider with ChangeNotifier {
@@ -53,8 +54,41 @@ class OrderProvider with ChangeNotifier {
     );
   }
 
-  // Create order
-  Future<String?> createOrder(OrderModel order) async {
+  // Create order with detailed parameters
+  Future<String?> createOrder({
+    required String userId,
+    required List<ProductCartModel> items,
+    required double total,
+    required String paymentMethod,
+    required String deliveryType,
+    String room = '',
+    String customerName = '',
+    String customerCpf = '',
+  }) async {
+    final codigo = await _orderService.generateOrderCode();
+    
+    final order = OrderModel(
+      id: '',
+      userId: userId,
+      date: DateTime.now(),
+      createdAt: DateTime.now(),
+      status: 'pending',
+      room: room,
+      retirar: deliveryType == 'pickup',
+      total: total,
+      paymentMethod: paymentMethod,
+      deliveryType: deliveryType,
+      codigo: codigo,
+      finished: false,
+      customerName: customerName,
+      customerCpf: customerCpf,
+    );
+    
+    return await _orderService.createOrder(order);
+  }
+
+  // Create order with model
+  Future<String?> createOrderModel(OrderModel order) async {
     return await _orderService.createOrder(order);
   }
 
@@ -75,6 +109,11 @@ class OrderProvider with ChangeNotifier {
 
   // Get order by id
   Future<OrderModel?> getOrder(String id) async {
+    return await _orderService.getOrder(id);
+  }
+
+  // Get order by id (alias for compatibility)
+  Future<OrderModel?> getOrderById(String id) async {
     return await _orderService.getOrder(id);
   }
 }

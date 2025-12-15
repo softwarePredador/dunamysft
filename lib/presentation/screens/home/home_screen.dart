@@ -1,3 +1,4 @@
+import 'package:badges/badges.dart' as badges;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -6,10 +7,12 @@ import 'package:provider/provider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../data/models/menu_item_model.dart';
 import '../../../data/services/auth_service.dart';
 import '../../../domain/entities/category.dart';
 import '../../../domain/entities/gallery_item.dart';
 import '../../../domain/entities/menu_item.dart';
+import '../../providers/app_state_provider.dart';
 import '../../providers/home_provider.dart';
 
 import '../../widgets/navbar_widget.dart';
@@ -27,6 +30,15 @@ class _HomeScreenState extends State<HomeScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
+  void initState() {
+    super.initState();
+    // Reset pedidoEmAndamento ao entrar na Home (igual FlutterFlow)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<AppStateProvider>().pedidoEmAndamento = false;
+    });
+  }
+
+  @override
   void dispose() {
     _pageController.dispose();
     super.dispose();
@@ -42,25 +54,26 @@ class _HomeScreenState extends State<HomeScreen> {
       key: _scaffoldKey,
       backgroundColor: Colors.white,
       endDrawer: const EndDrawerWidget(),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 0.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    InkWell(
-                      onTap: () => _scaffoldKey.currentState?.openEndDrawer(),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Olá!',
-                            style: GoogleFonts.poppins(
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 0.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  InkWell(
+                    onTap: () => _scaffoldKey.currentState?.openEndDrawer(),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Olá!',
+                          style: GoogleFonts.poppins(
                               fontWeight: FontWeight.w500,
                               fontSize: 18.0,
                               color: AppTheme.primaryText,
@@ -91,20 +104,53 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ),
                         ),
-                        // Notification Bell (Placeholder logic)
-                        InkWell(
-                          onTap: () {
-                            // Navigate to orders or cart
-                            context.push('/orders');
+                        // Notification Bell com Badge
+                        Consumer<AppStateProvider>(
+                          builder: (context, appState, child) {
+                            final hasPedido = appState.pedidoEmAndamento;
+                            
+                            return InkWell(
+                              onTap: () {
+                                if (hasPedido && appState.confirmRoom) {
+                                  // Navegar para Room com orderId
+                                  context.push('/room?orderId=${appState.orderId}');
+                                } else {
+                                  context.push('/orders');
+                                }
+                              },
+                              child: hasPedido
+                                  ? badges.Badge(
+                                      badgeContent: const Text(
+                                        ' ',
+                                        style: TextStyle(color: Colors.white, fontSize: 6),
+                                      ),
+                                      showBadge: true,
+                                      badgeStyle: const badges.BadgeStyle(
+                                        badgeColor: AppTheme.secondary,
+                                        elevation: 4,
+                                        padding: EdgeInsets.all(4),
+                                      ),
+                                      position: badges.BadgePosition.topStart(),
+                                      badgeAnimation: const badges.BadgeAnimation.scale(),
+                                      child: Image.asset(
+                                        'assets/images/campainha.png',
+                                        width: 23.0,
+                                        height: 23.0,
+                                        fit: BoxFit.contain,
+                                        errorBuilder: (context, error, stackTrace) =>
+                                            const Icon(Icons.notifications_none, size: 24),
+                                      ),
+                                    )
+                                  : Image.asset(
+                                      'assets/images/campainha.png',
+                                      width: 23.0,
+                                      height: 23.0,
+                                      fit: BoxFit.contain,
+                                      errorBuilder: (context, error, stackTrace) =>
+                                          const Icon(Icons.notifications_none, size: 24),
+                                    ),
+                            );
                           },
-                          child: Image.asset(
-                            'assets/images/campainha.png',
-                            width: 23.0,
-                            height: 23.0,
-                            fit: BoxFit.contain,
-                            errorBuilder: (context, error, stackTrace) =>
-                                const Icon(Icons.notifications_none, size: 24),
-                          ),
                         ),
                       ],
                     ),
@@ -198,25 +244,33 @@ class _HomeScreenState extends State<HomeScreen> {
                   final categories = snapshot.data!;
 
                   return ListView.builder(
-                    padding: EdgeInsets.zero,
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: categories.length,
-                    itemBuilder: (context, index) {
-                      final category = categories[index];
-                      return _CategorySection(category: category);
-                    },
-                  );
-                },
-              ),
-              
-              // Bottom padding for navbar
-              const SizedBox(height: 80),
-            ],
-          ),
+                  padding: EdgeInsets.zero,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: categories.length,
+                  itemBuilder: (context, index) {
+                    final category = categories[index];
+                    return _CategorySection(category: category);
+                  },
+                );
+              },
+            ),
+            
+            // Bottom padding for navbar
+            const SizedBox(height: 80),
+          ],
         ),
       ),
-      bottomNavigationBar: const NavbarWidget(pageIndex: 1),
+      // Navbar na parte inferior (igual FlutterFlow)
+      Align(
+        alignment: Alignment.bottomCenter,
+        child: NavbarWidget(
+          pageIndex: 1,
+          onMenuTap: () => _scaffoldKey.currentState?.openEndDrawer(),
+        ),
+      ),
+        ],
+      ),
     );
   }
 }
@@ -251,8 +305,8 @@ class _CategorySection extends StatelessWidget {
                 ),
                 InkWell(
                   onTap: () {
-                    // Navigate to category details
-                    context.push('/menu?category=${category.id}');
+                    // Navigate to category details (igual FlutterFlow - ItemCategory)
+                    context.push('/category/${category.id}');
                   },
                   child: Row(
                     children: [
@@ -321,54 +375,77 @@ class _MenuItemCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        // Navigate to item details
-        // context.push('/item_details/${item.id}');
-        // For now just print
-        print('Tapped on ${item.name}');
+        // Convert entity to model for navigation
+        final itemModel = MenuItemModel.fromEntity(item);
+        context.push('/item-details', extra: itemModel);
       },
       child: SizedBox(
         width: 130.0,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Stack(
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(20.0),
-              child: CachedNetworkImage(
-                imageUrl: item.photo,
-                width: 126.0,
-                height: 128.0,
-                fit: BoxFit.cover,
-                errorWidget: (context, url, error) => Image.asset(
-                  'assets/images/error_image.png',
-                  width: 126.0,
-                  height: 128.0,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) => Container(
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(20.0),
+                  child: CachedNetworkImage(
+                    imageUrl: item.photo,
                     width: 126.0,
                     height: 128.0,
-                    color: Colors.grey[300],
-                    child: const Icon(Icons.image_not_supported),
+                    fit: BoxFit.cover,
+                    errorWidget: (context, url, error) => Image.asset(
+                      'assets/images/error_image.png',
+                      width: 126.0,
+                      height: 128.0,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        width: 126.0,
+                        height: 128.0,
+                        color: Colors.grey[300],
+                        child: const Icon(Icons.image_not_supported),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  item.name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTheme.lightTheme.textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 14.0,
+                  ),
+                ),
+                Text(
+                  'R\$ ${item.price.toStringAsFixed(2).replaceAll('.', ',')}',
+                  style: AppTheme.lightTheme.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w500,
+                    color: AppTheme.amarelo,
+                    fontSize: 18.0,
+                  ),
+                ),
+              ],
+            ),
+            // Overlay if not available
+            if (!item.isAvailable)
+              Positioned.fill(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.5),
+                    borderRadius: BorderRadius.circular(20.0),
+                  ),
+                  child: const Center(
+                    child: Text(
+                      'Indisponível',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ),
               ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              item.name,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: AppTheme.lightTheme.textTheme.bodyLarge?.copyWith(
-                fontWeight: FontWeight.w500,
-                fontSize: 14.0,
-              ),
-            ),
-            Text(
-              'R\$ ${item.price.toStringAsFixed(2).replaceAll('.', ',')}',
-              style: AppTheme.lightTheme.textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w500,
-                color: AppTheme.amarelo,
-              ),
-            ),
           ],
         ),
       ),

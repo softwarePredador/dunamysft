@@ -14,22 +14,6 @@
       },
       "oauth_client": [
         {
-          "client_id": "1005245374810-6sfn2ntj6grg6fnoc3knjl33867lgpbe.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.mycompany.hoteldunamys",
-            "certificate_hash": "e1ef95e858adb32705119c075ffebc580b6d569c"
-          }
-        },
-        {
-          "client_id": "1005245374810-9f6b60orstg96vhhqdckd7449jciv8hc.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.mycompany.hoteldunamys",
-            "certificate_hash": "be5a78a40780920bc4635866e4144cb54bbf7d34"
-          }
-        },
-        {
           "client_id": "1005245374810-l0hm4vnefh0cd9ldadj79tjqcektre1t.apps.googleusercontent.com",
           "client_type": 3
         }

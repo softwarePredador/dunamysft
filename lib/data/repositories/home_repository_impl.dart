@@ -57,8 +57,12 @@ class HomeRepositoryImpl implements HomeRepository {
           price: model.price,
           photo: model.photo,
           categoryId: model.categoryId,
+          quantity: model.quantity,
+          excluded: model.excluded,
+          onSale: model.onSale,
+          salePrice: model.salePrice,
         );
-      }).toList();
+      }).where((item) => !item.excluded).toList(); // Filtrar excluídos no cliente
     });
   }
 }

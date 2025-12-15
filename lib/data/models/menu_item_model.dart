@@ -33,20 +33,39 @@ class MenuItemModel {
 
   factory MenuItemModel.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
+    
+    // Helper para converter para double (igual castToType do FlutterFlow)
+    double toDouble(dynamic value) {
+      if (value == null) return 0.0;
+      if (value is double) return value;
+      if (value is int) return value.toDouble();
+      if (value is String) return double.tryParse(value) ?? 0.0;
+      return 0.0;
+    }
+    
+    // Helper para converter para int
+    int toInt(dynamic value) {
+      if (value == null) return 0;
+      if (value is int) return value;
+      if (value is double) return value.toInt();
+      if (value is String) return int.tryParse(value) ?? 0;
+      return 0;
+    }
+    
     return MenuItemModel(
       id: doc.id,
-      name: data['name'] ?? '',
-      description: data['description'] ?? '',
-      specifications: data['specifications'] ?? '',
-      price: (data['price'] ?? 0.0).toDouble(),
+      name: data['name']?.toString() ?? '',
+      description: data['description']?.toString() ?? '',
+      specifications: data['specifications']?.toString() ?? '',
+      price: toDouble(data['price']),
       createdAt: (data['created_at'] as Timestamp?)?.toDate(),
       modifiedAt: (data['modified_at'] as Timestamp?)?.toDate(),
-      onSale: data['on_sale'] ?? false,
-      salePrice: (data['sale_price'] ?? 0.0).toDouble(),
-      quantity: data['quantity'] ?? 0,
+      onSale: data['on_sale'] == true,
+      salePrice: toDouble(data['sale_price']),
+      quantity: toInt(data['quantity']),
       categoryId: (data['categoryRefID'] as DocumentReference?)?.id ?? '',
-      photo: data['photo'] ?? '',
-      excluded: data['excluded'] ?? false,
+      photo: data['photo']?.toString() ?? '',
+      excluded: data['excluded'] == true,
     );
   }
 
@@ -70,6 +89,23 @@ class MenuItemModel {
   double get effectivePrice => onSale ? salePrice : price;
 
   bool get isAvailable => !excluded && quantity > 0;
+
+  /// Create from domain entity
+  factory MenuItemModel.fromEntity(dynamic entity) {
+    return MenuItemModel(
+      id: entity.id,
+      name: entity.name,
+      description: entity.description ?? '',
+      specifications: '',
+      price: entity.price,
+      categoryId: entity.categoryId,
+      photo: entity.photo,
+      quantity: entity.quantity ?? 100,
+      excluded: entity.excluded ?? false,
+      onSale: entity.onSale ?? false,
+      salePrice: entity.salePrice ?? 0.0,
+    );
+  }
 
   MenuItemModel copyWith({
     String? id,

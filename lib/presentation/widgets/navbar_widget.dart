@@ -1,19 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'redirect_page_widget.dart';
 
 class NavbarWidget extends StatelessWidget {
   final int pageIndex;
+  final VoidCallback? onMenuTap;
 
   const NavbarWidget({
     super.key,
     this.pageIndex = 1,
+    this.onMenuTap,
   });
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    
+    // Tamanhos proporcionais
+    final navbarHeight = screenHeight * 0.14; // ~115 em tela 820
+    final iconWidth = screenWidth * 0.2; // ~80 em tela 400
+    final iconHeight = screenHeight * 0.073; // ~60 em tela 820
+    final centerButtonSize = screenWidth * 0.16; // ~64 em tela 400
+    final bgHeight = screenHeight * 0.091; // ~75 em tela 820
+    
     return SizedBox(
-      height: 115.0,
+      height: navbarHeight,
       child: Stack(
         children: [
           // Background SVG
@@ -27,7 +40,7 @@ class NavbarWidget extends StatelessWidget {
               child: SvgPicture.asset(
                 'assets/images/navbar_4_bg_white.svg',
                 width: double.infinity,
-                height: 75.0,
+                height: bgHeight,
                 fit: BoxFit.cover,
               ),
             ),
@@ -48,12 +61,26 @@ class NavbarWidget extends StatelessWidget {
                 children: [
                   const SizedBox(width: 14.0),
                   
-                  // Menu Item
+                  // Menu Item - Abre o EndDrawer (igual FlutterFlow)
                   Expanded(
                     flex: 2,
                     child: _NavbarItem(
                       imagePath: 'assets/images/login1_(2).png',
-                      onTap: () => context.push('/menu'),
+                      onTap: () {
+                        // Tenta abrir o EndDrawer se disponível
+                        if (onMenuTap != null) {
+                          onMenuTap!();
+                        } else {
+                          // Fallback: tenta abrir via Scaffold
+                          final scaffold = Scaffold.maybeOf(context);
+                          if (scaffold?.hasEndDrawer ?? false) {
+                            scaffold!.openEndDrawer();
+                          } else {
+                            // Se não tiver drawer, navega para home e abre
+                            context.go('/home');
+                          }
+                        }
+                      },
                     ),
                   ),
                   
@@ -89,9 +116,22 @@ class NavbarWidget extends StatelessWidget {
                     child: _NavbarItem(
                       imagePath: 'assets/images/Group_134.png',
                       onTap: () {
-                        // Show redirect dialog or navigate
-                        // For now, just print
-                        print('More tapped');
+                        showDialog(
+                          context: context,
+                          builder: (dialogContext) {
+                            return Dialog(
+                              elevation: 0,
+                              insetPadding: EdgeInsets.zero,
+                              backgroundColor: Colors.transparent,
+                              alignment: Alignment.center,
+                              child: const SizedBox(
+                                height: double.infinity,
+                                width: double.infinity,
+                                child: RedirectPageWidget(),
+                              ),
+                            );
+                          },
+                        );
                       },
                     ),
                   ),
@@ -108,8 +148,8 @@ class NavbarWidget extends StatelessWidget {
             child: InkWell(
               onTap: () => context.go('/home'),
               child: Container(
-                width: 64.0,
-                height: 64.0,
+                width: centerButtonSize,
+                height: centerButtonSize,
                 decoration: const BoxDecoration(
                   gradient: LinearGradient(
                     colors: [Color(0xFFD0AA5E), Color(0xFFCD9A32)],
@@ -122,8 +162,8 @@ class NavbarWidget extends StatelessWidget {
                 child: Center(
                   child: Image.asset(
                     'assets/images/95z4v_s.png',
-                    width: 80.0,
-                    height: 60.0,
+                    width: iconWidth,
+                    height: iconHeight,
                     fit: BoxFit.none,
                   ),
                 ),
@@ -147,6 +187,13 @@ class _NavbarItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    
+    // Tamanhos proporcionais
+    final iconWidth = screenWidth * 0.2; // ~80 em tela 400
+    final iconHeight = screenHeight * 0.073; // ~60 em tela 820
+    
     return InkWell(
       onTap: onTap,
       splashColor: Colors.transparent,
@@ -158,8 +205,8 @@ class _NavbarItem extends StatelessWidget {
             borderRadius: BorderRadius.circular(8.0),
             child: Image.asset(
               imagePath,
-              width: 80.0,
-              height: 60.0,
+              width: iconWidth,
+              height: iconHeight,
               fit: BoxFit.cover,
             ),
           ),

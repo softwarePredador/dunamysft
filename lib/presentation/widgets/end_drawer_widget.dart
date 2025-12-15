@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+
+import '../../core/theme/app_theme.dart';
+import '../../data/services/auth_service.dart';
 
 class EndDrawerWidget extends StatelessWidget {
   const EndDrawerWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // Mock user email for now - replace with actual Auth Provider later
-    final String currentUserEmail = 'hoteldunamys25@gmail.com'; 
-    // Mock app state - replace with actual Provider later
-    final bool pedidoEmAndamento = false;
+    final authService = Provider.of<AuthService>(context, listen: false);
+    final user = authService.currentUser;
+    final String currentUserEmail = user?.email ?? '';
 
     return Drawer(
-      backgroundColor: Colors.white, // Assuming white background based on reference context
+      backgroundColor: AppTheme.primaryBackground,
       child: SafeArea(
         child: Padding(
           padding: const EdgeInsetsDirectional.fromSTEB(20.0, 20.0, 20.0, 0.0),
@@ -25,11 +28,11 @@ class EndDrawerWidget extends StatelessWidget {
               IconButton(
                 icon: const Icon(
                   Icons.arrow_back,
-                  color: Colors.black, // Primary text color
+                  color: AppTheme.primaryText,
                   size: 24.0,
                 ),
                 onPressed: () {
-                  Navigator.of(context).pop(); // Close drawer
+                  Navigator.of(context).pop();
                 },
               ),
               
@@ -39,8 +42,8 @@ class EndDrawerWidget extends StatelessWidget {
                 child: Text(
                   'Menu',
                   style: GoogleFonts.poppins(
-                    color: Colors.black,
-                    fontSize: 14.0, // bodyMedium default usually 14
+                    color: AppTheme.primaryText,
+                    fontSize: 14.0,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -53,15 +56,18 @@ class EndDrawerWidget extends StatelessWidget {
                 context,
                 iconPath: 'assets/images/vnimc_1.png',
                 label: 'Home / cardápio',
-                onTap: () => context.go('/'), // Navigate to Home
+                onTap: () {
+                  Navigator.of(context).pop();
+                  context.go('/home');
+                },
               ),
               _buildMenuItem(
                 context,
                 iconPath: 'assets/images/3a9k2_3.png',
                 label: 'Perfil',
                 onTap: () {
-                  // context.push('/profile'); 
                   Navigator.of(context).pop();
+                  context.push('/profile');
                 },
               ),
               _buildMenuItem(
@@ -69,12 +75,9 @@ class EndDrawerWidget extends StatelessWidget {
                 iconPath: 'assets/images/49svh_2.png',
                 label: 'Pedidos',
                 onTap: () {
-                  if (pedidoEmAndamento) {
-                    // context.push('/my-orders');
-                  } else {
-                    // context.push('/cart');
-                  }
                   Navigator.of(context).pop();
+                  // Navigate to orders (shows both cart and order history)
+                  context.push('/orders');
                 },
               ),
               _buildMenuItem(
@@ -82,8 +85,8 @@ class EndDrawerWidget extends StatelessWidget {
                 iconPath: 'assets/images/fijek_4.png',
                 label: 'Feedback',
                 onTap: () {
-                  // context.push('/feedback');
                   Navigator.of(context).pop();
+                  context.push('/feedback');
                 },
               ),
               _buildMenuItem(
@@ -91,8 +94,8 @@ class EndDrawerWidget extends StatelessWidget {
                 iconPath: 'assets/images/2emqy_5.png',
                 label: 'Perguntas frequentes',
                 onTap: () {
-                  // context.push('/faq');
                   Navigator.of(context).pop();
+                  context.push('/faq');
                 },
               ),
               _buildMenuItem(
@@ -100,8 +103,11 @@ class EndDrawerWidget extends StatelessWidget {
                 iconPath: 'assets/images/dfjsb_6.png',
                 label: 'SAC',
                 onTap: () {
-                  // context.push('/sac');
+                  // TODO: Implement SAC screen
                   Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Em breve!')),
+                  );
                 },
               ),
               _buildMenuItem(
@@ -109,8 +115,11 @@ class EndDrawerWidget extends StatelessWidget {
                 iconPath: 'assets/images/x7hc1_7.png',
                 label: 'Mapas e Direções',
                 onTap: () {
-                  // context.push('/maps');
+                  // TODO: Implement Maps screen
                   Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Em breve!')),
+                  );
                 },
               ),
               _buildMenuItem(
@@ -118,8 +127,11 @@ class EndDrawerWidget extends StatelessWidget {
                 iconPath: 'assets/images/k7eg7_8.png',
                 label: 'Galeria de imagens',
                 onTap: () {
-                  // context.push('/gallery');
+                  // TODO: Implement Gallery screen
                   Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Em breve!')),
+                  );
                 },
               ),
               _buildMenuItem(
@@ -127,50 +139,82 @@ class EndDrawerWidget extends StatelessWidget {
                 iconPath: 'assets/images/nswz3_9.png',
                 label: 'Reservas pelo site',
                 onTap: () {
-                  // Show Dialog
-                  showDialog(
-                    context: context,
-                    builder: (dialogContext) {
-                      return const Dialog(
-                        child: SizedBox(
-                          height: 200,
-                          child: Center(child: Text("Redirect Page Placeholder")),
-                        ),
-                      );
-                    },
+                  Navigator.of(context).pop();
+                  // TODO: Implement redirect to reservation site
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Em breve!')),
                   );
                 },
               ),
 
               const Divider(thickness: 2.0),
 
-              // Admin Button
+              // Admin Button - only for admin users
               if (currentUserEmail == 'hoteldunamys25@gmail.com' || currentUserEmail == 'rafaelhalder@gmail.com')
                 Padding(
                   padding: const EdgeInsetsDirectional.fromSTEB(0.0, 20.0, 0.0, 0.0),
                   child: InkWell(
                     onTap: () {
-                      // context.push('/admin');
                       Navigator.of(context).pop();
+                      context.push('/admin');
                     },
                     child: Container(
                       width: 130.0,
                       height: 40.0,
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: AppTheme.primaryBackground,
                         borderRadius: BorderRadius.circular(65.0),
                         border: Border.all(
-                          color: Colors.black,
+                          color: AppTheme.primaryText,
                         ),
                       ),
                       child: Center(
                         child: Text(
                           'Administrador',
                           style: GoogleFonts.inter(
-                            color: Colors.black,
+                            color: AppTheme.primaryText,
                             fontWeight: FontWeight.w400,
                           ),
                         ),
+                      ),
+                    ),
+                  ),
+                ),
+                
+              const Spacer(),
+              
+              // Logout Button
+              if (user != null)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 20.0),
+                  child: InkWell(
+                    onTap: () async {
+                      await authService.signOut();
+                      if (context.mounted) {
+                        Navigator.of(context).pop();
+                        context.go('/login');
+                      }
+                    },
+                    child: Container(
+                      width: double.infinity,
+                      height: 40.0,
+                      decoration: BoxDecoration(
+                        color: AppTheme.error.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12.0),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.logout, color: AppTheme.error),
+                          const SizedBox(width: 8.0),
+                          Text(
+                            'Sair',
+                            style: GoogleFonts.poppins(
+                              color: AppTheme.error,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -191,7 +235,7 @@ class EndDrawerWidget extends StatelessWidget {
           width: double.infinity,
           height: 40.0,
           decoration: const BoxDecoration(
-            color: Colors.transparent, // primaryBackground
+            color: Colors.transparent,
           ),
           child: Row(
             mainAxisSize: MainAxisSize.max,
@@ -200,13 +244,14 @@ class EndDrawerWidget extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8.0),
                 child: Image.asset(
                   iconPath,
-                  fit: BoxFit.cover,
-                  width: 40, // Assuming square or similar aspect ratio from reference usage
-                  // Reference didn't specify width/height for image, just fit cover inside ClipRRect. 
-                  // But usually icons need size. Let's check reference again.
-                  // Reference: ClipRRect -> Image.asset. No size on Image. 
-                  // But it's inside a Row with height 40 container. 
-                  // So the image will likely be constrained by height 40 if it's square.
+                  fit: BoxFit.contain,
+                  width: 28.0,
+                  height: 28.0,
+                  errorBuilder: (context, error, stackTrace) => const Icon(
+                    Icons.menu,
+                    size: 24,
+                    color: AppTheme.primaryText,
+                  ),
                 ),
               ),
               Padding(
@@ -214,7 +259,7 @@ class EndDrawerWidget extends StatelessWidget {
                 child: Text(
                   label,
                   style: GoogleFonts.poppins(
-                    color: Colors.black, // primaryText
+                    color: AppTheme.primaryText,
                     fontSize: 18.0,
                     fontWeight: FontWeight.w500,
                   ),

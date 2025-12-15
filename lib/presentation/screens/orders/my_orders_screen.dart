@@ -187,14 +187,14 @@ class _OrderCard extends StatelessWidget {
                 value: order.date != null ? dateFormat.format(order.date!) : 'N/A',
               ),
               const SizedBox(height: 8),
-              if (order.room > 0)
+              if (order.room.isNotEmpty)
                 _buildInfoRow(
                   context,
                   icon: Icons.hotel,
                   label: 'Quarto',
-                  value: order.room.toString(),
+                  value: order.room,
                 ),
-              if (order.room > 0) const SizedBox(height: 8),
+              if (order.room.isNotEmpty) const SizedBox(height: 8),
               _buildInfoRow(
                 context,
                 icon: order.retirar ? Icons.store : Icons.delivery_dining,

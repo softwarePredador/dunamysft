@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../data/models/menu_item_model.dart';
-import '../../../data/models/category_model.dart';
 import '../../providers/menu_provider.dart';
 import '../../providers/category_provider.dart';
 
@@ -227,7 +227,7 @@ class _MenuItemCard extends StatelessWidget {
       child: InkWell(
         onTap: () {
           // Navigate to item details
-          // context.push('/menu/item/${item.id}');
+          context.push('/item-details', extra: item);
         },
         borderRadius: BorderRadius.circular(12),
         child: Column(
