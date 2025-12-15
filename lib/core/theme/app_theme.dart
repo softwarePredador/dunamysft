@@ -28,6 +28,12 @@ class AppTheme {
   static const Color warning = Color(0xFFF9CF58);
   static const Color error = Color(0xFFFF5963);
   static const Color info = Color(0xFFFFFFFF);
+
+  // Custom Colors
+  static const Color amarelo = Color(0xFFD0AA5E);
+  static const Color disabled = Color(0xFFD9D9D9);
+  static const Color secondaryColor1 = Color(0xFFFF3B30);
+  static const Color primaryColors = Color(0xFFFF9431);
   
   // Custom colors from FlutterFlow
   static const Color amarelo = Color(0xFFD0AA5E);

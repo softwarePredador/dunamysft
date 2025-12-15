@@ -13,6 +13,7 @@ import '../../../domain/entities/menu_item.dart';
 import '../../providers/home_provider.dart';
 
 import '../../widgets/navbar_widget.dart';
+import '../../widgets/end_drawer_widget.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -23,6 +24,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final PageController _pageController = PageController();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void dispose() {
@@ -37,7 +39,9 @@ class _HomeScreenState extends State<HomeScreen> {
     final user = authService.currentUser;
 
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: Colors.white,
+      endDrawer: const EndDrawerWidget(),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
@@ -49,27 +53,30 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Olá!',
-                          style: GoogleFonts.poppins(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 18.0,
-                            color: AppTheme.primaryText,
+                    InkWell(
+                      onTap: () => _scaffoldKey.currentState?.openEndDrawer(),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Olá!',
+                            style: GoogleFonts.poppins(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 18.0,
+                              color: AppTheme.primaryText,
+                            ),
                           ),
-                        ),
-                        Text(
-                          user?.displayName ?? 'Visitante',
-                          style: GoogleFonts.poppins(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 18.0,
-                            decoration: TextDecoration.underline,
-                            color: AppTheme.primaryText,
+                          Text(
+                            user?.displayName ?? 'Visitante',
+                            style: GoogleFonts.poppins(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 18.0,
+                              decoration: TextDecoration.underline,
+                              color: AppTheme.primaryText,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                     Row(
                       children: [

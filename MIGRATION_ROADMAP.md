@@ -9,8 +9,8 @@ Este documento serve como guia para transformar o projeto atual (`dunamys`) em u
 
 ## 2. 🧩 Componentes Globais (Prioridade Alta)
 Estes componentes aparecem em múltiplas telas e são essenciais para a navegação e identidade visual.
-- [ ] **Navbar (Barra Inferior):** Portar o `NavbarWidget` customizado do FlutterFlow (design flutuante/arredondado).
-- [ ] **EndDrawer (Menu Lateral):** Portar o `EndrawerCompWidget` (Perfil, Configurações, Logout).
+- [x] **Navbar (Barra Inferior):** Portar o `NavbarWidget` customizado do FlutterFlow (design flutuante/arredondado).
+- [x] **EndDrawer (Menu Lateral):** Portar o `EndrawerCompWidget` (Perfil, Configurações, Logout).
 - [ ] **Componentes de Carrinho:** Portar `Cartmenucomponent` e `ComponentCartUser`.
 
 ## 3. 📱 Telas do Usuário (Fluxo Principal)
@@ -18,8 +18,8 @@ Estes componentes aparecem em múltiplas telas e são essenciais para a navegaç
 ### A. Navegação e Home
 - [ ] **Home:**
     - [ ] Ajustar Padding/Espaçamento do Header.
-    - [ ] Implementar `EndDrawer`.
-    - [ ] Implementar `Navbar` flutuante.
+    - [x] Implementar `EndDrawer`.
+    - [x] Implementar `Navbar` flutuante.
     - [ ] Verificar suporte a vídeo no Carrossel (se necessário).
 
 ### B. Cardápio e Pedidos
