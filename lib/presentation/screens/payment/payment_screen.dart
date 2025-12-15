@@ -195,217 +195,182 @@ class _PaymentScreenState extends State<PaymentScreen> {
         ),
         body: Stack(
           children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: Container(
-                width: double.infinity,
-                height: double.infinity,
-                decoration: const BoxDecoration(
-                  color: AppTheme.primaryBackground,
-                ),
-                child: Column(
-                  children: [
-                    // Título "Pagamento"
-                    Container(
-                      decoration: const BoxDecoration(
-                        color: AppTheme.primaryBackground,
-                      ),
-                      child: Row(
-                        children: [
-                          Text(
-                            'Pagamento',
-                            style: GoogleFonts.inter(
-                              fontWeight: FontWeight.w500,
-                              fontSize: 16.0,
-                              height: 2.0,
-                            ),
-                          ),
-                        ],
+            // Conteúdo com scroll
+            SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 200.0), // Bottom para navbar + botão
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Título "Pagamento"
+                  Text(
+                    'Pagamento',
+                    style: GoogleFonts.inter(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 16.0,
+                      height: 2.0,
+                    ),
+                  ),
+                  
+                  // "Pagamento Total"
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
+                    child: Text(
+                      'Pagamento Total',
+                      style: GoogleFonts.inter(
+                        fontSize: 14.0,
                       ),
                     ),
-                    
-                    // "Pagamento Total"
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
-                        child: Text(
-                          'Pagamento Total',
-                          style: GoogleFonts.inter(
-                            fontSize: 14.0,
-                          ),
-                        ),
-                      ),
+                  ),
+                  
+                  // Choice Chips: Débito | Crédito | Pix
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 30.0),
+                    child: Wrap(
+                      spacing: 8.0,
+                      runSpacing: 8.0,
+                      children: [
+                        _buildPaymentChip('Débito', Icons.circle),
+                        _buildPaymentChip('Crédito', Icons.circle),
+                        _buildPaymentChip('Pix', Icons.circle),
+                      ],
                     ),
-                    
-                    // Choice Chips: Débito | Crédito | Pix
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 30.0),
-                        child: Wrap(
-                          spacing: 8.0,
-                          runSpacing: 8.0,
-                          children: [
-                            _buildPaymentChip('Débito', Icons.circle),
-                            _buildPaymentChip('Crédito', Icons.circle),
-                            _buildPaymentChip('Pix', Icons.circle),
-                          ],
-                        ),
-                      ),
+                  ),
+                  
+                  // Campos para PIX
+                  if (_selectedPaymentType == 'Pix') ...[
+                    _buildTextField(
+                      controller: _nomeController,
+                      label: 'Nome Completo',
                     ),
-                    
-                    // Formulário condicional baseado no tipo de pagamento
-                    Expanded(
-                      child: SingleChildScrollView(
-                        child: Column(
-                          children: [
-                            // Campos para PIX
-                            if (_selectedPaymentType == 'Pix') ...[
-                              _buildTextField(
-                                controller: _nomeController,
-                                label: 'Nome Completo',
-                              ),
-                              const SizedBox(height: 20.0),
-                              _buildTextField(
-                                controller: _cpfController,
-                                label: 'CPF',
-                                keyboardType: TextInputType.number,
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.digitsOnly,
-                                  _CpfInputFormatter(),
-                                ],
-                              ),
-                            ],
-                            
-                            // Campos para Débito/Crédito
-                            if (_selectedPaymentType == 'Débito' || 
-                                _selectedPaymentType == 'Crédito') ...[
-                              _buildTextField(
-                                controller: _cardNumberController,
-                                label: 'Número do cartão',
-                                keyboardType: TextInputType.number,
-                                maxLength: 16,
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.digitsOnly,
-                                ],
-                              ),
-                              const SizedBox(height: 20.0),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(right: 10.0),
-                                      child: _buildTextField(
-                                        controller: _cardExpiryController,
-                                        label: 'Data de validade',
-                                        hint: 'MM/YYYY',
-                                        keyboardType: TextInputType.datetime,
-                                        maxLength: 7,
-                                        inputFormatters: [
-                                          FilteringTextInputFormatter.digitsOnly,
-                                          _ExpiryDateInputFormatter(),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(left: 10.0),
-                                      child: _buildTextField(
-                                        controller: _cardCvvController,
-                                        label: 'CVV',
-                                        keyboardType: TextInputType.number,
-                                        maxLength: 3,
-                                        inputFormatters: [
-                                          FilteringTextInputFormatter.digitsOnly,
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 20.0),
-                              _buildTextField(
-                                controller: _cardHolderController,
-                                label: 'Nome do titular',
-                              ),
-                              const SizedBox(height: 20.0),
-                              _buildTextField(
-                                controller: _cardCpfController,
-                                label: 'CPF / CNPJ do titular',
-                                keyboardType: TextInputType.number,
-                                maxLength: 14,
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.digitsOnly,
-                                  _CpfInputFormatter(),
-                                ],
-                              ),
-                            ],
-                            
-                            const SizedBox(height: 20.0),
-                          ],
-                        ),
-                      ),
-                    ),
-                    
-                    // Bottom: Total + Botão Continuar
-                    Container(
-                      width: double.infinity,
-                      height: 100.0,
-                      decoration: const BoxDecoration(),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          // Total
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Total',
-                                style: GoogleFonts.inter(
-                                  fontSize: 14.0,
-                                ),
-                              ),
-                              Text(
-                                'R\$ ${cartProvider.totalPrice.toStringAsFixed(2).replaceAll('.', ',')}',
-                                style: GoogleFonts.inter(
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 18.0,
-                                  color: AppTheme.amarelo,
-                                ),
-                              ),
-                            ],
-                          ),
-                          
-                          // Botão Continuar
-                          GestureDetector(
-                            onTap: _isLoading ? null : _processPayment,
-                            child: Container(
-                              width: 200.0,
-                              height: 80.0,
-                              decoration: BoxDecoration(
-                                color: AppTheme.amarelo,
-                                borderRadius: BorderRadius.circular(15.0),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  'Continuar',
-                                  style: GoogleFonts.inter(
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 16.0,
-                                    color: AppTheme.secondaryBackground,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                    const SizedBox(height: 20.0),
+                    _buildTextField(
+                      controller: _cpfController,
+                      label: 'CPF',
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                        _CpfInputFormatter(),
+                      ],
                     ),
                   ],
-                ),
+                  
+                  // Campos para Débito/Crédito
+                  if (_selectedPaymentType == 'Débito' || 
+                      _selectedPaymentType == 'Crédito') ...[
+                    _buildTextField(
+                      controller: _cardNumberController,
+                      label: 'Número do cartão',
+                      keyboardType: TextInputType.number,
+                      maxLength: 16,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                      ],
+                    ),
+                    const SizedBox(height: 20.0),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 10.0),
+                            child: _buildTextField(
+                              controller: _cardExpiryController,
+                              label: 'Data de validade',
+                              hint: 'MM/YYYY',
+                              keyboardType: TextInputType.datetime,
+                              maxLength: 7,
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly,
+                                _ExpiryDateInputFormatter(),
+                              ],
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 10.0),
+                            child: _buildTextField(
+                              controller: _cardCvvController,
+                              label: 'CVV',
+                              keyboardType: TextInputType.number,
+                              maxLength: 3,
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly,
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20.0),
+                    _buildTextField(
+                      controller: _cardHolderController,
+                      label: 'Nome do titular',
+                    ),
+                    const SizedBox(height: 20.0),
+                    _buildTextField(
+                      controller: _cardCpfController,
+                      label: 'CPF / CNPJ do titular',
+                      keyboardType: TextInputType.number,
+                      maxLength: 14,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                        _CpfInputFormatter(),
+                      ],
+                    ),
+                  ],
+                  
+                  const SizedBox(height: 30.0),
+                  
+                  // Total + Botão Continuar
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      // Total
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Total',
+                            style: GoogleFonts.inter(
+                              fontSize: 14.0,
+                            ),
+                          ),
+                          Text(
+                            'R\$ ${cartProvider.totalPrice.toStringAsFixed(2).replaceAll('.', ',')}',
+                            style: GoogleFonts.inter(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 18.0,
+                              color: AppTheme.amarelo,
+                            ),
+                          ),
+                        ],
+                      ),
+                      
+                      // Botão Continuar
+                      GestureDetector(
+                        onTap: _isLoading ? null : _processPayment,
+                        child: Container(
+                          width: 200.0,
+                          height: 60.0,
+                          decoration: BoxDecoration(
+                            color: AppTheme.amarelo,
+                            borderRadius: BorderRadius.circular(15.0),
+                          ),
+                          child: Center(
+                            child: Text(
+                              'Continuar',
+                              style: GoogleFonts.inter(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 16.0,
+                                color: AppTheme.secondaryBackground,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
             
