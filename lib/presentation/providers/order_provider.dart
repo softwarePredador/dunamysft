@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import '../../data/models/order_model.dart';
 import '../../data/models/product_cart_model.dart';
 import '../../data/services/order_service.dart';
+import '../../data/services/order_product_service.dart';
 
 class OrderProvider with ChangeNotifier {
   final OrderService _orderService = OrderService();
+  final OrderProductService _orderProductService = OrderProductService();
   
   List<OrderModel> _orders = [];
   bool _isLoading = false;
@@ -84,7 +86,17 @@ class OrderProvider with ChangeNotifier {
       customerCpf: customerCpf,
     );
     
-    return await _orderService.createOrder(order);
+    final orderId = await _orderService.createOrder(order);
+    
+    // Salvar itens do pedido na collection order_products
+    if (orderId != null && items.isNotEmpty) {
+      await _orderProductService.saveOrderProducts(
+        orderId: orderId,
+        cartItems: items,
+      );
+    }
+    
+    return orderId;
   }
 
   // Create order with model

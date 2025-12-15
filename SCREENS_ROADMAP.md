@@ -68,7 +68,33 @@
 
 ---
 
-## 🔄 FLUXO PRINCIPAL VALIDADO
+## � INTEGRAÇÃO CIELO (PAGAMENTOS)
+
+| Funcionalidade | Status | Arquivo |
+|----------------|--------|---------|
+| PIX - Gerar QR Code | ✅ OK | `payment_service.dart` |
+| PIX - Polling Status | ✅ OK | `pix_payment_screen.dart` |
+| Cartão Débito | ✅ OK | `payment_service.dart` |
+| Cartão Crédito | ✅ OK | `payment_service.dart` |
+| Detecção Bandeira | ✅ OK | `payment_service.dart` |
+
+**Credenciais Sandbox:**
+- MerchantId: `8937bd5b-9796-494d-9fe5-f76b3e4da633`
+- URL: `apisandbox.cieloecommerce.cielo.com.br`
+
+---
+
+## 📦 ORDER_PRODUCTS (ITENS DO PEDIDO)
+
+| Funcionalidade | Status | Arquivo |
+|----------------|--------|---------|
+| Model | ✅ OK | `order_product_model.dart` |
+| Service | ✅ OK | `order_product_service.dart` |
+| Salvar ao criar pedido | ✅ OK | `order_provider.dart` |
+
+---
+
+## �🔄 FLUXO PRINCIPAL VALIDADO
 
 ```
 Login → Splash → Home

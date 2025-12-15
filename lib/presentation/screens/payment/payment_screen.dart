@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../data/services/auth_service.dart';
+import '../../../data/services/payment_service.dart';
 import '../../providers/app_state_provider.dart';
 import '../../providers/cart_provider.dart';
 import '../../providers/order_provider.dart';
@@ -28,6 +29,7 @@ class PaymentScreen extends StatefulWidget {
 
 class _PaymentScreenState extends State<PaymentScreen> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
+  final PaymentService _paymentService = PaymentService();
   
   // Etapa atual: 1 = Entrega, 2 = Pagamento
   int _currentStep = 1;
@@ -39,6 +41,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
   // Tipo de pagamento: 'Débito', 'Crédito', 'Pix'
   String _selectedPaymentType = 'Débito';
   bool _isLoading = false;
+  String? _detectedBrand;
 
   // Controllers para PIX
   final TextEditingController _nomeController = TextEditingController();
@@ -52,7 +55,14 @@ class _PaymentScreenState extends State<PaymentScreen> {
   final TextEditingController _cardCpfController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    _cardNumberController.addListener(_onCardNumberChanged);
+  }
+
+  @override
   void dispose() {
+    _cardNumberController.removeListener(_onCardNumberChanged);
     _roomController.dispose();
     _nomeController.dispose();
     _cpfController.dispose();
@@ -62,6 +72,18 @@ class _PaymentScreenState extends State<PaymentScreen> {
     _cardHolderController.dispose();
     _cardCpfController.dispose();
     super.dispose();
+  }
+
+  void _onCardNumberChanged() async {
+    final number = _cardNumberController.text.replaceAll(RegExp(r'[^\d]'), '');
+    if (number.length >= 6) {
+      final brand = await _paymentService.detectCardBrand(number);
+      if (brand != _detectedBrand && mounted) {
+        setState(() => _detectedBrand = brand);
+      }
+    } else if (_detectedBrand != null) {
+      setState(() => _detectedBrand = null);
+    }
   }
 
   void _goToPaymentStep() {
@@ -134,6 +156,37 @@ class _PaymentScreenState extends State<PaymentScreen> {
         paymentMethod = 'Pix';
       }
 
+      // Para cartão, processa pagamento ANTES de criar pedido
+      if (_selectedPaymentType != 'Pix') {
+        // Detecta bandeira se não detectada ainda
+        String brand = _detectedBrand ?? 
+            await _paymentService.detectCardBrand(_cardNumberController.text) ?? 
+            'Visa';
+        
+        // Tipo Cielo: DebitCard ou CreditCard
+        String tipo = _selectedPaymentType == 'Débito' ? 'DebitCard' : 'CreditCard';
+        
+        // Processa pagamento com Cielo
+        final cardResult = await _paymentService.processCardPayment(
+          nomeCompleto: _cardHolderController.text,
+          valor: cartProvider.totalPrice,
+          cardNumber: _cardNumberController.text,
+          expiration: _cardExpiryController.text,
+          securityCode: _cardCvvController.text,
+          brand: brand,
+          tipo: tipo,
+        );
+        
+        if (!cardResult.success || !cardResult.isApproved) {
+          setState(() => _isLoading = false);
+          _showSnackBar(cardResult.errorMessage ?? cardResult.returnMessage ?? 'Pagamento não aprovado');
+          return;
+        }
+        
+        // Pagamento aprovado, salva paymentId
+        debugPrint('Cartão aprovado! PaymentId: ${cardResult.paymentId}');
+      }
+
       // Cria ordem com todos os dados
       final orderId = await orderProvider.createOrder(
         userId: user.uid,
@@ -166,7 +219,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
         setState(() => _isLoading = false);
         
         if (_selectedPaymentType == 'Pix') {
-          // PIX → vai para tela de pagamento PIX
+          // Para PIX, gera QR code na tela de PIX (passando dados)
           context.push('/pix-payment', extra: {
             'orderId': orderId,
             'total': cartProvider.totalPrice,

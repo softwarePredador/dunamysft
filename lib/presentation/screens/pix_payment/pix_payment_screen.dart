@@ -1,10 +1,14 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../data/services/payment_service.dart';
 
-class PIXPaymentScreen extends StatelessWidget {
+class PIXPaymentScreen extends StatefulWidget {
   final String orderId;
   final double total;
   final String nome;
@@ -19,10 +23,101 @@ class PIXPaymentScreen extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    // Mock PIX code - in production, this would come from payment gateway
-    const String pixCode = '00020126580014BR.GOV.BCB.PIX0136123e4567-e89b-12d3-a456-426614174000';
+  State<PIXPaymentScreen> createState() => _PIXPaymentScreenState();
+}
 
+class _PIXPaymentScreenState extends State<PIXPaymentScreen> {
+  final PaymentService _paymentService = PaymentService();
+  
+  bool _isLoading = true;
+  String? _pixCode;
+  String? _paymentId;
+  String? _errorMessage;
+  Timer? _statusTimer;
+  int _expirationMinutes = 30;
+
+  @override
+  void initState() {
+    super.initState();
+    _generatePixPayment();
+  }
+
+  @override
+  void dispose() {
+    _statusTimer?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _generatePixPayment() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    final result = await _paymentService.generatePixPayment(
+      nomeCompleto: widget.nome,
+      cpfCnpj: widget.cpf,
+      valor: widget.total,
+    );
+
+    if (mounted) {
+      if (result.success && result.qrCodeString != null) {
+        setState(() {
+          _pixCode = result.qrCodeString;
+          _paymentId = result.paymentId;
+          _isLoading = false;
+        });
+        
+        // Inicia polling do status a cada 5 segundos
+        _startStatusPolling();
+      } else {
+        setState(() {
+          _errorMessage = result.errorMessage ?? 'Erro ao gerar PIX';
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  void _startStatusPolling() {
+    _statusTimer?.cancel();
+    _statusTimer = Timer.periodic(const Duration(seconds: 5), (timer) async {
+      if (_paymentId != null) {
+        final status = await _paymentService.checkPaymentStatus(_paymentId!);
+        
+        if (status.isPaid && mounted) {
+          timer.cancel();
+          // Pagamento confirmado! Vai para tela de sucesso
+          _showSnackBar('Pagamento confirmado!', isSuccess: true);
+          context.push('/order-done/${widget.orderId}');
+        } else if (status.isCancelled && mounted) {
+          timer.cancel();
+          setState(() {
+            _errorMessage = 'Pagamento cancelado ou expirado';
+          });
+        }
+      }
+    });
+  }
+
+  void _copyPixCode() {
+    if (_pixCode != null) {
+      Clipboard.setData(ClipboardData(text: _pixCode!));
+      _showSnackBar('Código PIX copiado!', isSuccess: true);
+    }
+  }
+
+  void _showSnackBar(String message, {bool isSuccess = false}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: isSuccess ? AppTheme.success : AppTheme.error,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppTheme.primaryBackground,
       appBar: AppBar(
@@ -49,175 +144,11 @@ class PIXPaymentScreen extends StatelessWidget {
         children: [
           SingleChildScrollView(
             padding: const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 140.0),
-            child: Column(
-              children: [
-                // PIX QR Code Container
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(24.0),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16.0),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 10.0,
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    children: [
-                      Text(
-                        'Escaneie o QR Code',
-                        style: GoogleFonts.poppins(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 18.0,
-                          color: AppTheme.primaryText,
-                        ),
-                      ),
-                      const SizedBox(height: 20.0),
-                      
-                      // QR Code placeholder
-                      Container(
-                        width: 200.0,
-                        height: 200.0,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: AppTheme.grayPaletteGray20),
-                          borderRadius: BorderRadius.circular(12.0),
-                        ),
-                        child: const Center(
-                          child: Icon(
-                            Icons.qr_code_2,
-                            size: 150.0,
-                            color: AppTheme.primaryText,
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(height: 20.0),
-
-                      Text(
-                        'ou copie o código PIX',
-                        style: GoogleFonts.inter(
-                          fontSize: 14.0,
-                          color: AppTheme.secondaryText,
-                        ),
-                      ),
-
-                      const SizedBox(height: 12.0),
-
-                      // PIX Code
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(12.0),
-                        decoration: BoxDecoration(
-                          color: AppTheme.grayPaletteGray10,
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                pixCode,
-                                style: GoogleFonts.inter(
-                                  fontSize: 12.0,
-                                  color: AppTheme.primaryText,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.copy, size: 20.0),
-                              onPressed: () {
-                                // Copy to clipboard
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Código PIX copiado!'),
-                                    backgroundColor: AppTheme.success,
-                                  ),
-                                );
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 24.0),
-
-                // Instructions
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(16.0),
-                  decoration: BoxDecoration(
-                    color: AppTheme.info.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12.0),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          const Icon(
-                            Icons.info_outline,
-                            color: AppTheme.info,
-                            size: 20.0,
-                          ),
-                          const SizedBox(width: 8.0),
-                          Text(
-                            'Como pagar com PIX',
-                            style: GoogleFonts.poppins(
-                              fontWeight: FontWeight.w500,
-                              fontSize: 14.0,
-                              color: AppTheme.info,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12.0),
-                      _buildInstruction('1', 'Abra o app do seu banco'),
-                      _buildInstruction('2', 'Escolha pagar com PIX'),
-                      _buildInstruction('3', 'Escaneie o QR Code ou cole o código'),
-                      _buildInstruction('4', 'Confirme o pagamento'),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 24.0),
-
-                // Timer Info
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(16.0),
-                  decoration: BoxDecoration(
-                    color: AppTheme.warning.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12.0),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(
-                        Icons.timer_outlined,
-                        color: AppTheme.warning,
-                        size: 24.0,
-                      ),
-                      const SizedBox(width: 12.0),
-                      Expanded(
-                        child: Text(
-                          'Este código expira em 30 minutos',
-                          style: GoogleFonts.inter(
-                            fontSize: 14.0,
-                            color: AppTheme.warning,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+            child: _isLoading
+                ? _buildLoading()
+                : _errorMessage != null
+                    ? _buildError()
+                    : _buildPixContent(),
           ),
 
           // Bottom Button
@@ -239,7 +170,11 @@ class PIXPaymentScreen extends StatelessWidget {
                 child: SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: () => context.push('/order-done/$orderId'),
+                    onPressed: _pixCode != null 
+                        ? () => context.push('/order-done/${widget.orderId}')
+                        : _errorMessage != null 
+                            ? _generatePixPayment 
+                            : null,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppTheme.amarelo,
                       foregroundColor: Colors.white,
@@ -249,7 +184,7 @@ class PIXPaymentScreen extends StatelessWidget {
                       ),
                     ),
                     child: Text(
-                      'Já Paguei',
+                      _pixCode != null ? 'Já Paguei' : 'Tentar Novamente',
                       style: GoogleFonts.poppins(
                         fontWeight: FontWeight.w500,
                         fontSize: 16.0,
@@ -262,6 +197,289 @@ class PIXPaymentScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildLoading() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const SizedBox(height: 100),
+          const CircularProgressIndicator(color: AppTheme.amarelo),
+          const SizedBox(height: 24),
+          Text(
+            'Gerando QR Code PIX...',
+            style: GoogleFonts.inter(
+              fontSize: 16.0,
+              color: AppTheme.secondaryText,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildError() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const SizedBox(height: 100),
+          const Icon(
+            Icons.error_outline,
+            color: AppTheme.error,
+            size: 64,
+          ),
+          const SizedBox(height: 24),
+          Text(
+            'Erro ao gerar PIX',
+            style: GoogleFonts.poppins(
+              fontSize: 18.0,
+              fontWeight: FontWeight.w500,
+              color: AppTheme.error,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 40),
+            child: Text(
+              _errorMessage ?? 'Erro desconhecido',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.inter(
+                fontSize: 14.0,
+                color: AppTheme.secondaryText,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPixContent() {
+    return Column(
+      children: [
+        // PIX QR Code Container
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(24.0),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16.0),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 10.0,
+              ),
+            ],
+          ),
+          child: Column(
+            children: [
+              Text(
+                'Escaneie o QR Code',
+                style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.w500,
+                  fontSize: 18.0,
+                  color: AppTheme.primaryText,
+                ),
+              ),
+              const SizedBox(height: 20.0),
+              
+              // QR Code real
+              if (_pixCode != null)
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12.0),
+                  ),
+                  child: QrImageView(
+                    data: _pixCode!,
+                    version: QrVersions.auto,
+                    size: 200.0,
+                    backgroundColor: Colors.white,
+                    errorCorrectionLevel: QrErrorCorrectLevel.M,
+                  ),
+                ),
+
+              const SizedBox(height: 20.0),
+
+              // Valor
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                decoration: BoxDecoration(
+                  color: AppTheme.amarelo.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  'R\$ ${widget.total.toStringAsFixed(2).replaceAll('.', ',')}',
+                  style: GoogleFonts.poppins(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.amarelo,
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 20.0),
+
+              Text(
+                'ou copie o código PIX',
+                style: GoogleFonts.inter(
+                  fontSize: 14.0,
+                  color: AppTheme.secondaryText,
+                ),
+              ),
+
+              const SizedBox(height: 12.0),
+
+              // PIX Code
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12.0),
+                decoration: BoxDecoration(
+                  color: AppTheme.grayPaletteGray10,
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        _pixCode ?? '',
+                        style: GoogleFonts.inter(
+                          fontSize: 10.0,
+                          color: AppTheme.primaryText,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.copy, size: 20.0),
+                      onPressed: _copyPixCode,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 24.0),
+
+        // Status do pagamento
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16.0),
+          decoration: BoxDecoration(
+            color: AppTheme.success.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(12.0),
+            border: Border.all(color: AppTheme.success.withOpacity(0.3)),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 12,
+                height: 12,
+                decoration: BoxDecoration(
+                  color: AppTheme.success,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppTheme.success.withOpacity(0.5),
+                      blurRadius: 8,
+                      spreadRadius: 2,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 12.0),
+              Expanded(
+                child: Text(
+                  'Aguardando confirmação do pagamento...',
+                  style: GoogleFonts.inter(
+                    fontSize: 14.0,
+                    color: AppTheme.success,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 24.0),
+
+        // Instructions
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16.0),
+          decoration: BoxDecoration(
+            color: AppTheme.info.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(12.0),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const Icon(
+                    Icons.info_outline,
+                    color: AppTheme.info,
+                    size: 20.0,
+                  ),
+                  const SizedBox(width: 8.0),
+                  Text(
+                    'Como pagar com PIX',
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 14.0,
+                      color: AppTheme.info,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12.0),
+              _buildInstruction('1', 'Abra o app do seu banco'),
+              _buildInstruction('2', 'Escolha pagar com PIX'),
+              _buildInstruction('3', 'Escaneie o QR Code ou cole o código'),
+              _buildInstruction('4', 'Confirme o pagamento'),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 24.0),
+
+        // Timer Info
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16.0),
+          decoration: BoxDecoration(
+            color: AppTheme.warning.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(12.0),
+          ),
+          child: Row(
+            children: [
+              const Icon(
+                Icons.timer_outlined,
+                color: AppTheme.warning,
+                size: 24.0,
+              ),
+              const SizedBox(width: 12.0),
+              Expanded(
+                child: Text(
+                  'Este código expira em $_expirationMinutes minutos',
+                  style: GoogleFonts.inter(
+                    fontSize: 14.0,
+                    color: AppTheme.warning,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
