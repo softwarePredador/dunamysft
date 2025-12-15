@@ -103,11 +103,8 @@ class EndDrawerWidget extends StatelessWidget {
                 iconPath: 'assets/images/dfjsb_6.png',
                 label: 'SAC',
                 onTap: () {
-                  // TODO: Implement SAC screen
                   Navigator.of(context).pop();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Em breve!')),
-                  );
+                  context.push('/sac');
                 },
               ),
               _buildMenuItem(
@@ -115,11 +112,8 @@ class EndDrawerWidget extends StatelessWidget {
                 iconPath: 'assets/images/x7hc1_7.png',
                 label: 'Mapas e Direções',
                 onTap: () {
-                  // TODO: Implement Maps screen
                   Navigator.of(context).pop();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Em breve!')),
-                  );
+                  context.push('/maps');
                 },
               ),
               _buildMenuItem(

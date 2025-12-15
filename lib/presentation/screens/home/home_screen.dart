@@ -111,12 +111,9 @@ class _HomeScreenState extends State<HomeScreen> {
                             
                             return InkWell(
                               onTap: () {
-                                if (hasPedido && appState.confirmRoom) {
-                                  // Navegar para Room com orderId
-                                  context.push('/room?orderId=${appState.orderId}');
-                                } else {
-                                  context.push('/orders');
-                                }
+                                // Navegar para tela de pedidos
+                                // Na nossa lógica, o quarto já foi informado antes do pagamento
+                                context.push('/orders');
                               },
                               child: hasPedido
                                   ? badges.Badge(

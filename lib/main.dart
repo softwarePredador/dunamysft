@@ -20,6 +20,8 @@ import 'presentation/screens/payment/payment_screen.dart';
 import 'presentation/screens/pix_payment/pix_payment_screen.dart';
 import 'presentation/screens/order_done/order_done_screen.dart';
 import 'presentation/screens/feedback/feedback_screen.dart';
+import 'presentation/screens/sac/sac_screen.dart';
+import 'presentation/screens/maps/maps_screen.dart';
 // Admin screens
 import 'presentation/screens/admin/admin_dashboard_screen.dart';
 import 'presentation/screens/admin/admin_orders_screen.dart';
@@ -152,6 +154,14 @@ final _router = GoRouter(
     GoRoute(
       path: '/feedback',
       builder: (context, state) => const FeedbackScreen(),
+    ),
+    GoRoute(
+      path: '/sac',
+      builder: (context, state) => const SACScreen(),
+    ),
+    GoRoute(
+      path: '/maps',
+      builder: (context, state) => const MapsScreen(),
     ),
     // Admin routes
     GoRoute(
