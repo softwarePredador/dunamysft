@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
@@ -10,6 +11,8 @@ import '../../../domain/entities/category.dart';
 import '../../../domain/entities/gallery_item.dart';
 import '../../../domain/entities/menu_item.dart';
 import '../../providers/home_provider.dart';
+
+import '../../widgets/navbar_widget.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -51,17 +54,19 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: [
                         Text(
                           'Olá!',
-                          style: AppTheme.lightTheme.textTheme.titleLarge?.copyWith(
+                          style: GoogleFonts.poppins(
                             fontWeight: FontWeight.w500,
                             fontSize: 18.0,
+                            color: AppTheme.primaryText,
                           ),
                         ),
                         Text(
                           user?.displayName ?? 'Visitante',
-                          style: AppTheme.lightTheme.textTheme.bodyMedium?.copyWith(
+                          style: GoogleFonts.poppins(
                             fontWeight: FontWeight.w500,
                             fontSize: 18.0,
                             decoration: TextDecoration.underline,
+                            color: AppTheme.primaryText,
                           ),
                         ),
                       ],
@@ -72,8 +77,10 @@ class _HomeScreenState extends State<HomeScreen> {
                           padding: const EdgeInsets.only(right: 15.0),
                           child: Text(
                             'Seu pedido',
-                            style: AppTheme.lightTheme.textTheme.titleMedium?.copyWith(
+                            style: GoogleFonts.inter(
+                              fontWeight: FontWeight.normal,
                               fontSize: 12.0,
+                              color: AppTheme.primaryText,
                             ),
                           ),
                         ),
@@ -202,6 +209,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
+      bottomNavigationBar: const NavbarWidget(pageIndex: 1),
     );
   }
 }
