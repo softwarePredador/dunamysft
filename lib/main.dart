@@ -133,14 +133,19 @@ final _router = GoRouter(
     GoRoute(
       path: '/pix-payment',
       builder: (context, state) {
-        final orderId = state.extra as String;
-        return PIXPaymentScreen(orderId: orderId);
+        final data = state.extra as Map<String, dynamic>;
+        return PIXPaymentScreen(
+          orderId: data['orderId'] as String,
+          total: data['total'] as double,
+          nome: data['nome'] as String,
+          cpf: data['cpf'] as String,
+        );
       },
     ),
     GoRoute(
-      path: '/order-done',
+      path: '/order-done/:orderId',
       builder: (context, state) {
-        final orderId = state.extra as String;
+        final orderId = state.pathParameters['orderId']!;
         return OrderDoneScreen(orderId: orderId);
       },
     ),

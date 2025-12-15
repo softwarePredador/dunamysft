@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:go_router/go_router.dart';
@@ -6,19 +5,23 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../data/services/feedback_service.dart';
+import '../../../data/models/feedback_model.dart';
 
 class AdminFeedbackScreen extends StatelessWidget {
   const AdminFeedbackScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final feedbackService = FeedbackService();
+    
     return Scaffold(
       backgroundColor: AppTheme.primaryBackground,
       appBar: AppBar(
         backgroundColor: AppTheme.primaryBackground,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(
+          icon: const Icon(
             Icons.arrow_circle_left_sharp,
             color: AppTheme.primaryText,
             size: 35,
@@ -35,11 +38,8 @@ class AdminFeedbackScreen extends StatelessWidget {
         centerTitle: true,
       ),
       body: SafeArea(
-        child: StreamBuilder<QuerySnapshot>(
-          stream: FirebaseFirestore.instance
-              .collection('feedback')
-              .orderBy('created_at', descending: true)
-              .snapshots(),
+        child: StreamBuilder<List<FeedbackModel>>(
+          stream: feedbackService.getAllFeedbacks(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
@@ -51,14 +51,14 @@ class AdminFeedbackScreen extends StatelessWidget {
               );
             }
 
-            final feedbacks = snapshot.data?.docs ?? [];
+            final feedbacks = snapshot.data ?? [];
 
             if (feedbacks.isEmpty) {
               return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.feedback_outlined,
                       size: 64,
                       color: AppTheme.secondaryText,
@@ -79,11 +79,9 @@ class AdminFeedbackScreen extends StatelessWidget {
             // Calculate average rating
             double totalRating = 0;
             int ratingCount = 0;
-            for (var doc in feedbacks) {
-              final data = doc.data() as Map<String, dynamic>;
-              final rating = (data['rating'] as num?)?.toDouble() ?? 0;
-              if (rating > 0) {
-                totalRating += rating;
+            for (var feedback in feedbacks) {
+              if (feedback.ranking > 0) {
+                totalRating += feedback.ranking;
                 ratingCount++;
               }
             }
@@ -165,14 +163,36 @@ class AdminFeedbackScreen extends StatelessWidget {
                     itemCount: feedbacks.length,
                     itemBuilder: (context, index) {
                       final feedback = feedbacks[index];
-                      final data = feedback.data() as Map<String, dynamic>;
 
                       return _FeedbackCard(
-                        userName: data['user_name'] ?? 'Cliente',
-                        rating: (data['rating'] as num?)?.toDouble() ?? 0,
-                        comment: data['comment'] ?? '',
-                        category: data['category'] ?? '',
-                        createdAt: data['created_at'] as Timestamp?,
+                        feedbackId: feedback.id,
+                        userId: feedback.userId,
+                        ranking: feedback.ranking.toDouble(),
+                        obs: feedback.obs,
+                        emotion: feedback.emotion,
+                        date: feedback.date,
+                        onDelete: () async {
+                          final confirmed = await showDialog<bool>(
+                            context: context,
+                            builder: (ctx) => AlertDialog(
+                              title: const Text('Confirmar'),
+                              content: const Text('Deseja deletar este feedback?'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(ctx, false),
+                                  child: const Text('Cancelar'),
+                                ),
+                                TextButton(
+                                  onPressed: () => Navigator.pop(ctx, true),
+                                  child: const Text('Deletar'),
+                                ),
+                              ],
+                            ),
+                          );
+                          if (confirmed == true) {
+                            await feedbackService.deleteFeedback(feedback.id);
+                          }
+                        },
                       );
                     },
                   ),
@@ -187,25 +207,29 @@ class AdminFeedbackScreen extends StatelessWidget {
 }
 
 class _FeedbackCard extends StatelessWidget {
-  final String userName;
-  final double rating;
-  final String comment;
-  final String category;
-  final Timestamp? createdAt;
+  final String feedbackId;
+  final String userId;
+  final double ranking;
+  final String obs;
+  final String emotion;
+  final DateTime? date;
+  final VoidCallback onDelete;
 
   const _FeedbackCard({
-    required this.userName,
-    required this.rating,
-    required this.comment,
-    required this.category,
-    required this.createdAt,
+    required this.feedbackId,
+    required this.userId,
+    required this.ranking,
+    required this.obs,
+    required this.emotion,
+    required this.date,
+    required this.onDelete,
   });
 
   @override
   Widget build(BuildContext context) {
     final dateFormat = DateFormat('dd/MM/yyyy HH:mm');
-    final dateStr = createdAt != null
-        ? dateFormat.format(createdAt!.toDate())
+    final dateStr = date != null
+        ? dateFormat.format(date!)
         : 'Data não disponível';
 
     return Card(
@@ -222,25 +246,37 @@ class _FeedbackCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  userName,
+                  'Cliente',
                   style: GoogleFonts.poppins(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                     color: AppTheme.primaryText,
                   ),
                 ),
-                Text(
-                  dateStr,
-                  style: GoogleFonts.inter(
-                    fontSize: 12,
-                    color: AppTheme.secondaryText,
-                  ),
+                Row(
+                  children: [
+                    Text(
+                      dateStr,
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        color: AppTheme.secondaryText,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    IconButton(
+                      icon: const Icon(Icons.delete_outline, size: 20),
+                      color: AppTheme.error,
+                      onPressed: onDelete,
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                    ),
+                  ],
                 ),
               ],
             ),
             const SizedBox(height: 8),
             RatingBarIndicator(
-              rating: rating,
+              rating: ranking,
               itemBuilder: (context, _) => const Icon(
                 Icons.star,
                 color: Colors.amber,
@@ -248,16 +284,16 @@ class _FeedbackCard extends StatelessWidget {
               itemCount: 5,
               itemSize: 20,
             ),
-            if (category.isNotEmpty) ...[
+            if (emotion.isNotEmpty) ...[
               const SizedBox(height: 8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: AppTheme.amarelo.withOpacity(0.2),
+                  color: AppTheme.amarelo.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
-                  category,
+                  emotion,
                   style: GoogleFonts.inter(
                     fontSize: 12,
                     color: AppTheme.amarelo,
@@ -266,10 +302,10 @@ class _FeedbackCard extends StatelessWidget {
                 ),
               ),
             ],
-            if (comment.isNotEmpty) ...[
+            if (obs.isNotEmpty) ...[
               const SizedBox(height: 12),
               Text(
-                comment,
+                obs,
                 style: GoogleFonts.inter(
                   fontSize: 14,
                   color: AppTheme.primaryText,

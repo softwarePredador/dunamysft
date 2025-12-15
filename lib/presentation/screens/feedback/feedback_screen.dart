@@ -5,7 +5,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../data/models/feedback_model.dart';
 import '../../../data/services/auth_service.dart';
+import '../../../data/services/feedback_service.dart';
 import '../../widgets/navbar_widget.dart';
 
 class FeedbackScreen extends StatefulWidget {
@@ -61,19 +63,33 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
     setState(() => _isLoading = true);
 
     try {
-      // TODO: Implement feedback submission to Firebase
-      await Future.delayed(const Duration(seconds: 1)); // Simulating API call
+      final feedbackService = FeedbackService();
+      final feedback = FeedbackModel(
+        id: '',
+        userId: user.uid,
+        emotion: _selectedChip ?? '',
+        ranking: _rating.round(),
+        obs: _commentController.text,
+      );
+      
+      final success = await feedbackService.submitFeedback(feedback);
 
       setState(() => _isLoading = false);
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Obrigado pelo seu feedback!'),
-            backgroundColor: AppTheme.success,
-          ),
-        );
-        context.pop();
+        if (success) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Obrigado pelo seu feedback!'),
+              backgroundColor: AppTheme.success,
+            ),
+          );
+          context.go('/home');
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Erro ao enviar feedback. Tente novamente.')),
+          );
+        }
       }
     } catch (e) {
       setState(() => _isLoading = false);

@@ -6,10 +6,16 @@ import '../../../core/theme/app_theme.dart';
 
 class PIXPaymentScreen extends StatelessWidget {
   final String orderId;
+  final double total;
+  final String nome;
+  final String cpf;
 
   const PIXPaymentScreen({
     super.key,
     required this.orderId,
+    required this.total,
+    required this.nome,
+    required this.cpf,
   });
 
   @override
@@ -233,7 +239,7 @@ class PIXPaymentScreen extends StatelessWidget {
                 child: SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: () => context.push('/order-done', extra: orderId),
+                    onPressed: () => context.push('/order-done/$orderId'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppTheme.amarelo,
                       foregroundColor: Colors.white,
