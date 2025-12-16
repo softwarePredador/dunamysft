@@ -14,7 +14,7 @@ class AdminFeedbackScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final feedbackService = FeedbackService();
-    
+
     return Scaffold(
       backgroundColor: AppTheme.primaryBackground,
       appBar: AppBar(
@@ -23,7 +23,7 @@ class AdminFeedbackScreen extends StatelessWidget {
         leading: IconButton(
           icon: const Icon(
             Icons.arrow_circle_left_sharp,
-            color: AppTheme.amarelo,
+            color: AppTheme.adminAccent,
             size: 35,
           ),
           onPressed: () {
@@ -100,7 +100,7 @@ class AdminFeedbackScreen extends StatelessWidget {
                   margin: const EdgeInsets.all(16),
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: AppTheme.amarelo,
+                    color: AppTheme.adminAccent,
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Row(
@@ -182,7 +182,9 @@ class AdminFeedbackScreen extends StatelessWidget {
                             context: context,
                             builder: (ctx) => AlertDialog(
                               title: const Text('Confirmar'),
-                              content: const Text('Deseja deletar este feedback?'),
+                              content: const Text(
+                                'Deseja deletar este feedback?',
+                              ),
                               actions: [
                                 TextButton(
                                   onPressed: () => Navigator.pop(ctx, false),
@@ -240,9 +242,7 @@ class _FeedbackCard extends StatelessWidget {
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -283,26 +283,27 @@ class _FeedbackCard extends StatelessWidget {
             const SizedBox(height: 8),
             RatingBarIndicator(
               rating: ranking,
-              itemBuilder: (context, _) => const Icon(
-                Icons.star,
-                color: Colors.amber,
-              ),
+              itemBuilder: (context, _) =>
+                  const Icon(Icons.star, color: Colors.amber),
               itemCount: 5,
               itemSize: 20,
             ),
             if (emotion.isNotEmpty) ...[
               const SizedBox(height: 8),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
-                  color: AppTheme.amarelo.withValues(alpha: 0.2),
+                  color: AppTheme.adminAccent.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
                   emotion,
                   style: GoogleFonts.inter(
                     fontSize: 12,
-                    color: AppTheme.amarelo,
+                    color: AppTheme.adminAccent,
                     fontWeight: FontWeight.w500,
                   ),
                 ),

@@ -18,7 +18,7 @@ class AdminCategoriesScreen extends StatelessWidget {
         leading: IconButton(
           icon: const Icon(
             Icons.arrow_circle_left_sharp,
-            color: AppTheme.amarelo,
+            color: AppTheme.adminAccent,
             size: 35,
           ),
           onPressed: () {
@@ -40,7 +40,7 @@ class AdminCategoriesScreen extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showCategoryDialog(context),
-        backgroundColor: AppTheme.amarelo,
+        backgroundColor: AppTheme.adminAccent,
         child: const Icon(Icons.add, color: Colors.white),
       ),
       body: SafeArea(
@@ -86,7 +86,7 @@ class AdminCategoriesScreen extends StatelessWidget {
                       icon: const Icon(Icons.add),
                       label: const Text('Criar Categoria'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTheme.amarelo,
+                        backgroundColor: AppTheme.adminAccent,
                       ),
                     ),
                   ],
@@ -190,7 +190,9 @@ class AdminCategoriesScreen extends StatelessWidget {
                       .update(data);
                 } else {
                   data['created_at'] = FieldValue.serverTimestamp();
-                  await FirebaseFirestore.instance.collection('category').add(data);
+                  await FirebaseFirestore.instance
+                      .collection('category')
+                      .add(data);
                 }
 
                 if (context.mounted) {
@@ -198,21 +200,23 @@ class AdminCategoriesScreen extends StatelessWidget {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(
-                        isEditing ? 'Categoria atualizada!' : 'Categoria criada!',
+                        isEditing
+                            ? 'Categoria atualizada!'
+                            : 'Categoria criada!',
                       ),
                     ),
                   );
                 }
               } catch (e) {
                 if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Erro: $e')),
-                  );
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(SnackBar(content: Text('Erro: $e')));
                 }
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.amarelo,
+              backgroundColor: AppTheme.adminAccent,
             ),
             child: Text(isEditing ? 'Salvar' : 'Criar'),
           ),
@@ -254,15 +258,15 @@ class AdminCategoriesScreen extends StatelessWidget {
           .delete();
 
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Categoria excluída!')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Categoria excluída!')));
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro ao excluir: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Erro ao excluir: $e')));
       }
     }
   }
@@ -287,16 +291,14 @@ class _CategoryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: ListTile(
         contentPadding: const EdgeInsets.all(12),
         leading: Container(
           width: 60,
           height: 60,
           decoration: BoxDecoration(
-            color: AppTheme.amarelo.withOpacity(0.2),
+            color: AppTheme.adminAccent.withOpacity(0.2),
             borderRadius: BorderRadius.circular(8),
           ),
           child: photoUrl.isNotEmpty
@@ -305,17 +307,11 @@ class _CategoryCard extends StatelessWidget {
                   child: Image.network(
                     photoUrl,
                     fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => Icon(
-                      Icons.category,
-                      color: AppTheme.amarelo,
-                    ),
+                    errorBuilder: (context, error, stackTrace) =>
+                        Icon(Icons.category, color: AppTheme.adminAccent),
                   ),
                 )
-              : Icon(
-                  Icons.category,
-                  color: AppTheme.amarelo,
-                  size: 30,
-                ),
+              : Icon(Icons.category, color: AppTheme.adminAccent, size: 30),
         ),
         title: Text(
           name,

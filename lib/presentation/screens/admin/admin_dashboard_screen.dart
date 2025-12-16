@@ -22,7 +22,7 @@ class AdminDashboardScreen extends StatelessWidget {
         leading: IconButton(
           icon: const Icon(
             Icons.arrow_circle_left_sharp,
-            color: AppTheme.amarelo,
+            color: AppTheme.adminAccent,
             size: 35,
           ),
           onPressed: () {
@@ -128,7 +128,7 @@ class AdminDashboardScreen extends StatelessWidget {
                     errorBuilder: (context, error, stackTrace) {
                       return Container(
                         decoration: BoxDecoration(
-                          color: AppTheme.amarelo,
+                          color: AppTheme.adminAccent,
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: const Icon(
@@ -179,11 +179,7 @@ class _AdminMenuItem extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              Icon(
-                icon,
-                size: 32,
-                color: AppTheme.secondaryBackground,
-              ),
+              Icon(icon, size: 32, color: AppTheme.secondaryBackground),
               Text(
                 title,
                 style: GoogleFonts.inter(

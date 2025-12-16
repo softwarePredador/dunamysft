@@ -18,7 +18,7 @@ class AdminStockScreen extends StatelessWidget {
         leading: IconButton(
           icon: const Icon(
             Icons.arrow_circle_left_sharp,
-            color: AppTheme.amarelo,
+            color: AppTheme.adminAccent,
             size: 35,
           ),
           onPressed: () {
@@ -197,14 +197,12 @@ class _StockCardState extends State<_StockCard> {
     final stockColor = _currentStock == 0
         ? Colors.red
         : _currentStock < 5
-            ? Colors.orange
-            : Colors.green;
+        ? Colors.orange
+        : Colors.green;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -225,8 +223,10 @@ class _StockCardState extends State<_StockCard> {
                 ),
                 Switch(
                   value: _isAvailable,
-                  activeColor: AppTheme.amarelo,
-                  onChanged: _isUpdating ? null : (value) => _toggleAvailability(),
+                  activeColor: AppTheme.adminAccent,
+                  onChanged: _isUpdating
+                      ? null
+                      : (value) => _toggleAvailability(),
                 ),
               ],
             ),
@@ -291,7 +291,7 @@ class _StockCardState extends State<_StockCard> {
                         width: 32,
                         height: 32,
                         decoration: BoxDecoration(
-                          color: AppTheme.amarelo,
+                          color: AppTheme.adminAccent,
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: const Icon(

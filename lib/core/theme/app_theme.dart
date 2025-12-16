@@ -32,6 +32,10 @@ class AppTheme {
   // Custom colors from FlutterFlow
   static const Color amarelo = Color(0xFFD0AA5E);
   static const Color disabled = Color(0xFFD9D9D9);
+  
+  // Admin specific colors - usar primaryText como cor de destaque
+  static const Color adminAccent = Color(0xFF4B3E3C); // Mesmo que primaryText
+  static const Color adminAccentLight = Color(0xFF6B5E5C); // Versão mais clara para hover
   static const Color secondaryColor1 = Color(0xFFFF3B30);
   static const Color primaryColors = Color(0xFFFF9431);
   static const Color grayPaletteGray10 = Color(0xFFFAFAFA);

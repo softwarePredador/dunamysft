@@ -19,7 +19,7 @@ class AdminOrdersScreen extends StatelessWidget {
         leading: IconButton(
           icon: const Icon(
             Icons.arrow_circle_left_sharp,
-            color: AppTheme.amarelo,
+            color: AppTheme.adminAccent,
             size: 35,
           ),
           onPressed: () {
@@ -63,14 +63,14 @@ class AdminOrdersScreen extends StatelessWidget {
                       .snapshots(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(
-                        child: CircularProgressIndicator(),
-                      );
+                      return const Center(child: CircularProgressIndicator());
                     }
 
                     if (snapshot.hasError) {
                       return Center(
-                        child: Text('Erro ao carregar pedidos: ${snapshot.error}'),
+                        child: Text(
+                          'Erro ao carregar pedidos: ${snapshot.error}',
+                        ),
                       );
                     }
 
@@ -108,7 +108,8 @@ class AdminOrdersScreen extends StatelessWidget {
                         return _OrderCard(
                           orderId: order.id,
                           room: orderData['room']?.toString() ?? 'N/A',
-                          total: (orderData['total'] as num?)?.toDouble() ?? 0.0,
+                          total:
+                              (orderData['total'] as num?)?.toDouble() ?? 0.0,
                           status: orderData['status'] ?? 'pendente',
                           createdAt: orderData['created_at'] as Timestamp?,
                           onTap: () {
@@ -154,7 +155,7 @@ class _OrderCard extends StatelessWidget {
       case 'pronto':
         return Colors.green;
       case 'entregue':
-        return AppTheme.amarelo;
+        return AppTheme.adminAccent;
       case 'cancelado':
         return Colors.red;
       default:
@@ -178,9 +179,7 @@ class _OrderCard extends StatelessWidget {
           width: double.infinity,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(15),
-            border: Border.all(
-              color: AppTheme.primaryText,
-            ),
+            border: Border.all(color: AppTheme.primaryText),
           ),
           child: Padding(
             padding: const EdgeInsets.all(16.0),

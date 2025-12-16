@@ -19,7 +19,7 @@ class AdminProductsScreen extends StatelessWidget {
         leading: IconButton(
           icon: const Icon(
             Icons.arrow_circle_left_sharp,
-            color: AppTheme.amarelo,
+            color: AppTheme.adminAccent,
             size: 35,
           ),
           onPressed: () {
@@ -41,7 +41,7 @@ class AdminProductsScreen extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => context.push('/admin/products/new'),
-        backgroundColor: AppTheme.amarelo,
+        backgroundColor: AppTheme.adminAccent,
         child: const Icon(Icons.add, color: Colors.white),
       ),
       body: SafeArea(
@@ -54,7 +54,9 @@ class AdminProductsScreen extends StatelessWidget {
 
             if (categorySnapshot.hasError) {
               return Center(
-                child: Text('Erro ao carregar categorias: ${categorySnapshot.error}'),
+                child: Text(
+                  'Erro ao carregar categorias: ${categorySnapshot.error}',
+                ),
               );
             }
 
@@ -82,7 +84,7 @@ class AdminProductsScreen extends StatelessWidget {
                     ElevatedButton(
                       onPressed: () => context.push('/admin/categories'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTheme.amarelo,
+                        backgroundColor: AppTheme.adminAccent,
                       ),
                       child: const Text('Criar Categoria'),
                     ),
@@ -142,9 +144,12 @@ class _CategorySection extends StatelessWidget {
           child: StreamBuilder<QuerySnapshot>(
             stream: FirebaseFirestore.instance
                 .collection('menu')
-                .where('categoryRefID',
-                    isEqualTo:
-                        FirebaseFirestore.instance.collection('category').doc(categoryId))
+                .where(
+                  'categoryRefID',
+                  isEqualTo: FirebaseFirestore.instance
+                      .collection('category')
+                      .doc(categoryId),
+                )
                 .snapshots(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
@@ -177,8 +182,9 @@ class _CategorySection extends StatelessWidget {
                                 productId: product.id,
                                 name: productData['name'] ?? 'Produto',
                                 price:
-                                    (productData['price'] as num?)?.toDouble() ??
-                                        0.0,
+                                    (productData['price'] as num?)
+                                        ?.toDouble() ??
+                                    0.0,
                                 imageUrl: productData['photo'] ?? '',
                                 isAvailable: productData['available'] ?? true,
                               );
@@ -187,7 +193,9 @@ class _CategorySection extends StatelessWidget {
                   ),
                   // Add Product Button
                   InkWell(
-                    onTap: () => context.push('/admin/products/new?category=$categoryId'),
+                    onTap: () => context.push(
+                      '/admin/products/new?category=$categoryId',
+                    ),
                     child: Container(
                       width: 100,
                       height: 180,
@@ -262,7 +270,9 @@ class _ProductCard extends StatelessWidget {
           children: [
             // Image
             ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(12),
+              ),
               child: Stack(
                 children: [
                   imageUrl.isNotEmpty
@@ -331,7 +341,7 @@ class _ProductCard extends StatelessWidget {
                     style: GoogleFonts.inter(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
-                      color: AppTheme.amarelo,
+                      color: AppTheme.adminAccent,
                     ),
                   ),
                 ],

@@ -9,10 +9,7 @@ import '../../../core/theme/app_theme.dart';
 class AdminOrderDetailScreen extends StatefulWidget {
   final String orderId;
 
-  const AdminOrderDetailScreen({
-    super.key,
-    required this.orderId,
-  });
+  const AdminOrderDetailScreen({super.key, required this.orderId});
 
   @override
   State<AdminOrderDetailScreen> createState() => _AdminOrderDetailScreenState();
@@ -59,9 +56,9 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
           .collection('order')
           .doc(widget.orderId)
           .update({
-        'status': newStatus,
-        'finished': newStatus == 'entregue' || newStatus == 'cancelado',
-      });
+            'status': newStatus,
+            'finished': newStatus == 'entregue' || newStatus == 'cancelado',
+          });
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -70,9 +67,9 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro ao atualizar status: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Erro ao atualizar status: $e')));
       }
     } finally {
       if (mounted) {
@@ -93,7 +90,7 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
         leading: IconButton(
           icon: const Icon(
             Icons.arrow_circle_left_sharp,
-            color: AppTheme.amarelo,
+            color: AppTheme.adminAccent,
             size: 35,
           ),
           onPressed: () {
@@ -116,10 +113,10 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
               return const Center(child: CircularProgressIndicator());
             }
 
-            if (snapshot.hasError || !snapshot.hasData || !snapshot.data!.exists) {
-              return Center(
-                child: Text('Erro ao carregar pedido'),
-              );
+            if (snapshot.hasError ||
+                !snapshot.hasData ||
+                !snapshot.data!.exists) {
+              return Center(child: Text('Erro ao carregar pedido'));
             }
 
             final orderData = snapshot.data!.data() as Map<String, dynamic>;
@@ -225,8 +222,10 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
                             final itemMap = item as Map<String, dynamic>;
                             final quantity = itemMap['quantity'] ?? 1;
                             final name = itemMap['name'] ?? 'Item';
-                            final price = (itemMap['price'] as num?)?.toDouble() ?? 0.0;
-                            final additionals = itemMap['additionals'] as List<dynamic>? ?? [];
+                            final price =
+                                (itemMap['price'] as num?)?.toDouble() ?? 0.0;
+                            final additionals =
+                                itemMap['additionals'] as List<dynamic>? ?? [];
                             final observation = itemMap['observation'] ?? '';
 
                             return Padding(
@@ -235,7 +234,8 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
                                         '$quantity x $name',
@@ -341,7 +341,7 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
                                 style: GoogleFonts.poppins(
                                   fontSize: 18,
                                   fontWeight: FontWeight.w600,
-                                  color: AppTheme.amarelo,
+                                  color: AppTheme.adminAccent,
                                 ),
                               ),
                             ],
@@ -411,13 +411,15 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
                                 }
                               },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppTheme.amarelo,
+                          backgroundColor: AppTheme.adminAccent,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
                         child: _isUpdating
-                            ? const CircularProgressIndicator(color: Colors.white)
+                            ? const CircularProgressIndicator(
+                                color: Colors.white,
+                              )
                             : Text(
                                 'Atualizar Status',
                                 style: GoogleFonts.poppins(

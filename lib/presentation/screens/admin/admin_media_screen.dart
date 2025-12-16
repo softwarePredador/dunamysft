@@ -19,7 +19,7 @@ class AdminMediaScreen extends StatelessWidget {
         leading: IconButton(
           icon: const Icon(
             Icons.arrow_circle_left_sharp,
-            color: AppTheme.amarelo,
+            color: AppTheme.adminAccent,
             size: 35,
           ),
           onPressed: () {
@@ -41,12 +41,14 @@ class AdminMediaScreen extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showAddLocalDialog(context),
-        backgroundColor: AppTheme.amarelo,
+        backgroundColor: AppTheme.adminAccent,
         child: const Icon(Icons.add_location_alt, color: Colors.white),
       ),
       body: SafeArea(
         child: StreamBuilder<QuerySnapshot>(
-          stream: FirebaseFirestore.instance.collection('localDunamys').snapshots(),
+          stream: FirebaseFirestore.instance
+              .collection('localDunamys')
+              .snapshots(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
@@ -84,7 +86,7 @@ class AdminMediaScreen extends StatelessWidget {
                       icon: const Icon(Icons.add),
                       label: const Text('Adicionar Local'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTheme.amarelo,
+                        backgroundColor: AppTheme.adminAccent,
                       ),
                     ),
                   ],
@@ -124,9 +126,7 @@ class AdminMediaScreen extends StatelessWidget {
           decoration: InputDecoration(
             labelText: 'Nome do Local',
             hintText: 'Ex: Piscina, Restaurante...',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
           ),
         ),
         actions: [
@@ -151,12 +151,14 @@ class AdminMediaScreen extends StatelessWidget {
 
               if (context.mounted) {
                 Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Local criado!')),
-                );
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(const SnackBar(content: Text('Local criado!')));
               }
             },
-            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.amarelo),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.adminAccent,
+            ),
             child: const Text('Criar'),
           ),
         ],
@@ -169,10 +171,7 @@ class _LocalMediaSection extends StatelessWidget {
   final String localId;
   final String localName;
 
-  const _LocalMediaSection({
-    required this.localId,
-    required this.localName,
-  });
+  const _LocalMediaSection({required this.localId, required this.localName});
 
   @override
   Widget build(BuildContext context) {
@@ -212,7 +211,12 @@ class _LocalMediaSection extends StatelessWidget {
           child: StreamBuilder<QuerySnapshot>(
             stream: FirebaseFirestore.instance
                 .collection('gallerylocal')
-                .where('local', isEqualTo: FirebaseFirestore.instance.collection('localDunamys').doc(localId))
+                .where(
+                  'local',
+                  isEqualTo: FirebaseFirestore.instance
+                      .collection('localDunamys')
+                      .doc(localId),
+                )
                 .snapshots(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
@@ -228,16 +232,20 @@ class _LocalMediaSection extends StatelessWidget {
                         ? Center(
                             child: Text(
                               'Nenhuma mídia',
-                              style: GoogleFonts.inter(color: AppTheme.secondaryText),
+                              style: GoogleFonts.inter(
+                                color: AppTheme.secondaryText,
+                              ),
                             ),
                           )
                         : ListView.separated(
                             scrollDirection: Axis.horizontal,
                             itemCount: items.length,
-                            separatorBuilder: (_, __) => const SizedBox(width: 10),
+                            separatorBuilder: (_, __) =>
+                                const SizedBox(width: 10),
                             itemBuilder: (context, index) {
                               final item = items[index];
-                              final itemData = item.data() as Map<String, dynamic>;
+                              final itemData =
+                                  item.data() as Map<String, dynamic>;
                               final imageUrl = itemData['image'] ?? '';
                               final videoUrl = itemData['video'] ?? '';
 
@@ -264,7 +272,11 @@ class _LocalMediaSection extends StatelessWidget {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(Icons.add_photo_alternate, size: 32, color: AppTheme.secondaryText),
+                          const Icon(
+                            Icons.add_photo_alternate,
+                            size: 32,
+                            color: AppTheme.secondaryText,
+                          ),
                           const SizedBox(height: 8),
                           Text(
                             'Adicionar',
@@ -300,9 +312,7 @@ class _LocalMediaSection extends StatelessWidget {
           controller: controller,
           decoration: InputDecoration(
             labelText: 'Nome do Local',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
           ),
         ),
         actions: [
@@ -324,7 +334,9 @@ class _LocalMediaSection extends StatelessWidget {
                 Navigator.pop(context);
               }
             },
-            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.amarelo),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.adminAccent,
+            ),
             child: const Text('Salvar'),
           ),
         ],
@@ -358,7 +370,12 @@ class _LocalMediaSection extends StatelessWidget {
       // Deletar todas as mídias do local
       final mediaSnapshot = await FirebaseFirestore.instance
           .collection('gallerylocal')
-          .where('local', isEqualTo: FirebaseFirestore.instance.collection('localDunamys').doc(localId))
+          .where(
+            'local',
+            isEqualTo: FirebaseFirestore.instance
+                .collection('localDunamys')
+                .doc(localId),
+          )
           .get();
 
       for (final doc in mediaSnapshot.docs) {
@@ -366,18 +383,21 @@ class _LocalMediaSection extends StatelessWidget {
       }
 
       // Deletar o local
-      await FirebaseFirestore.instance.collection('localDunamys').doc(localId).delete();
+      await FirebaseFirestore.instance
+          .collection('localDunamys')
+          .doc(localId)
+          .delete();
 
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Local excluído!')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Local excluído!')));
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro ao excluir: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Erro ao excluir: $e')));
       }
     }
   }
@@ -445,7 +465,9 @@ class _LocalMediaSection extends StatelessWidget {
               await FirebaseFirestore.instance.collection('gallerylocal').add({
                 'image': imageUrl,
                 'video': videoController.text.trim(),
-                'local': FirebaseFirestore.instance.collection('localDunamys').doc(localId),
+                'local': FirebaseFirestore.instance
+                    .collection('localDunamys')
+                    .doc(localId),
                 'created_at': FieldValue.serverTimestamp(),
               });
 
@@ -456,7 +478,9 @@ class _LocalMediaSection extends StatelessWidget {
                 );
               }
             },
-            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.amarelo),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.adminAccent,
+            ),
             child: const Text('Adicionar'),
           ),
         ],
@@ -554,11 +578,14 @@ class _MediaItem extends StatelessWidget {
     );
 
     if (confirm == true) {
-      await FirebaseFirestore.instance.collection('gallerylocal').doc(itemId).delete();
+      await FirebaseFirestore.instance
+          .collection('gallerylocal')
+          .doc(itemId)
+          .delete();
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Mídia excluída!')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Mídia excluída!')));
       }
     }
   }

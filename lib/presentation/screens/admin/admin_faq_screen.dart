@@ -18,7 +18,7 @@ class AdminFAQScreen extends StatelessWidget {
         leading: IconButton(
           icon: const Icon(
             Icons.arrow_circle_left_sharp,
-            color: AppTheme.amarelo,
+            color: AppTheme.adminAccent,
             size: 35,
           ),
           onPressed: () {
@@ -40,7 +40,7 @@ class AdminFAQScreen extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showFAQDialog(context),
-        backgroundColor: AppTheme.amarelo,
+        backgroundColor: AppTheme.adminAccent,
         child: const Icon(Icons.add, color: Colors.white),
       ),
       body: SafeArea(
@@ -86,7 +86,7 @@ class AdminFAQScreen extends StatelessWidget {
                       icon: const Icon(Icons.add),
                       label: const Text('Criar FAQ'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTheme.amarelo,
+                        backgroundColor: AppTheme.adminAccent,
                       ),
                     ),
                   ],
@@ -166,8 +166,9 @@ class AdminFAQScreen extends StatelessWidget {
     String? currentQuestion,
     String? currentAnswer,
   }) {
-    final questionController =
-        TextEditingController(text: currentQuestion ?? '');
+    final questionController = TextEditingController(
+      text: currentQuestion ?? '',
+    );
     final answerController = TextEditingController(text: currentAnswer ?? '');
     final isEditing = faqId != null;
 
@@ -216,7 +217,8 @@ class AdminFAQScreen extends StatelessWidget {
               if (question.isEmpty || answer.isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                      content: Text('Pergunta e resposta são obrigatórios')),
+                    content: Text('Pergunta e resposta são obrigatórios'),
+                  ),
                 );
                 return;
               }
@@ -227,10 +229,10 @@ class AdminFAQScreen extends StatelessWidget {
                       .collection('faq')
                       .doc(faqId)
                       .update({
-                    'question': question,
-                    'answer': answer,
-                    'updated_at': FieldValue.serverTimestamp(),
-                  });
+                        'question': question,
+                        'answer': answer,
+                        'updated_at': FieldValue.serverTimestamp(),
+                      });
                 } else {
                   // Get max order
                   final snapshot = await FirebaseFirestore.instance
@@ -243,8 +245,8 @@ class AdminFAQScreen extends StatelessWidget {
                   if (snapshot.docs.isNotEmpty) {
                     newOrder =
                         ((snapshot.docs.first.data()['order'] as num?) ?? 0)
-                                .toInt() +
-                            1;
+                            .toInt() +
+                        1;
                   }
 
                   await FirebaseFirestore.instance.collection('faq').add({
@@ -259,21 +261,22 @@ class AdminFAQScreen extends StatelessWidget {
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content:
-                          Text(isEditing ? 'FAQ atualizada!' : 'FAQ criada!'),
+                      content: Text(
+                        isEditing ? 'FAQ atualizada!' : 'FAQ criada!',
+                      ),
                     ),
                   );
                 }
               } catch (e) {
                 if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Erro: $e')),
-                  );
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(SnackBar(content: Text('Erro: $e')));
                 }
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.amarelo,
+              backgroundColor: AppTheme.adminAccent,
             ),
             child: Text(isEditing ? 'Salvar' : 'Criar'),
           ),
@@ -308,15 +311,15 @@ class AdminFAQScreen extends StatelessWidget {
       await FirebaseFirestore.instance.collection('faq').doc(faqId).delete();
 
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('FAQ excluída!')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('FAQ excluída!')));
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro ao excluir: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Erro ao excluir: $e')));
       }
     }
   }
@@ -342,9 +345,7 @@ class _FAQCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: ExpansionTile(
         leading: const Icon(Icons.drag_handle),
         title: Text(

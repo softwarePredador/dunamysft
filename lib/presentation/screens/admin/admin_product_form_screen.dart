@@ -13,11 +13,7 @@ class AdminProductFormScreen extends StatefulWidget {
   final String? productId;
   final String? categoryId;
 
-  const AdminProductFormScreen({
-    super.key,
-    this.productId,
-    this.categoryId,
-  });
+  const AdminProductFormScreen({super.key, this.productId, this.categoryId});
 
   @override
   State<AdminProductFormScreen> createState() => _AdminProductFormScreenState();
@@ -39,7 +35,7 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
   File? _selectedImage;
 
   List<Map<String, dynamic>> _categories = [];
-  
+
   // Lista dinâmica de adicionais
   final List<Map<String, dynamic>> _additionals = [];
   bool _loadingAdditionals = false;
@@ -89,11 +85,13 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
 
   Future<void> _loadAdditionals() async {
     if (widget.productId == null) return;
-    
+
     setState(() => _loadingAdditionals = true);
-    
+
     try {
-      final menuRef = FirebaseFirestore.instance.collection('menu').doc(widget.productId);
+      final menuRef = FirebaseFirestore.instance
+          .collection('menu')
+          .doc(widget.productId);
       final snapshot = await FirebaseFirestore.instance
           .collection('item_additional')
           .where('item', isEqualTo: menuRef)
@@ -103,7 +101,7 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
         final data = doc.data();
         final price = data['price'];
         // Ignorar adicionais vazios (sem nome e preço)
-        if ((data['name'] == null || data['name'].toString().isEmpty) && 
+        if ((data['name'] == null || data['name'].toString().isEmpty) &&
             (price == null || price == 0)) {
           continue;
         }
@@ -117,7 +115,7 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
           'toDelete': false,
         });
       }
-      
+
       // Se não tem nenhum adicional, adicionar um campo vazio
       if (_additionals.isEmpty) {
         _addAdditionalField();
@@ -132,8 +130,9 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
   }
 
   Future<void> _loadCategories() async {
-    final snapshot =
-        await FirebaseFirestore.instance.collection('category').get();
+    final snapshot = await FirebaseFirestore.instance
+        .collection('category')
+        .get();
     setState(() {
       _categories = snapshot.docs
           .map((doc) => {'id': doc.id, 'name': doc['name'] ?? 'Categoria'})
@@ -171,7 +170,8 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
     setState(() => _isUploadingImage = true);
 
     try {
-      final fileName = 'products/${DateTime.now().millisecondsSinceEpoch}_${_nameController.text.isNotEmpty ? _nameController.text.replaceAll(' ', '_') : 'produto'}.jpg';
+      final fileName =
+          'products/${DateTime.now().millisecondsSinceEpoch}_${_nameController.text.isNotEmpty ? _nameController.text.replaceAll(' ', '_') : 'produto'}.jpg';
       final ref = FirebaseStorage.instance.ref().child(fileName);
 
       final uploadTask = await ref.putFile(
@@ -193,9 +193,9 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro ao fazer upload: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Erro ao fazer upload: $e')));
       }
     } finally {
       if (mounted) {
@@ -265,13 +265,13 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
         width: 100,
         padding: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
-          color: AppTheme.amarelo.withOpacity(0.1),
+          color: AppTheme.adminAccent.withOpacity(0.1),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppTheme.amarelo),
+          border: Border.all(color: AppTheme.adminAccent),
         ),
         child: Column(
           children: [
-            Icon(icon, size: 40, color: AppTheme.amarelo),
+            Icon(icon, size: 40, color: AppTheme.adminAccent),
             const SizedBox(height: 8),
             Text(
               label,
@@ -311,9 +311,9 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro ao carregar produto: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Erro ao carregar produto: $e')));
       }
     } finally {
       if (mounted) {
@@ -326,9 +326,9 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     if (_selectedCategoryId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Selecione uma categoria')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Selecione uma categoria')));
       return;
     }
 
@@ -349,15 +349,19 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
       };
 
       DocumentReference productRef;
-      
+
       if (widget.productId != null) {
         // Update
-        productRef = FirebaseFirestore.instance.collection('menu').doc(widget.productId);
+        productRef = FirebaseFirestore.instance
+            .collection('menu')
+            .doc(widget.productId);
         await productRef.update(data);
       } else {
         // Create
         data['created_at'] = FieldValue.serverTimestamp();
-        final docRef = await FirebaseFirestore.instance.collection('menu').add(data);
+        final docRef = await FirebaseFirestore.instance
+            .collection('menu')
+            .add(data);
         productRef = docRef;
       }
 
@@ -367,18 +371,20 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(widget.productId != null
-                ? 'Produto atualizado!'
-                : 'Produto criado!'),
+            content: Text(
+              widget.productId != null
+                  ? 'Produto atualizado!'
+                  : 'Produto criado!',
+            ),
           ),
         );
         context.pop();
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro ao salvar: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Erro ao salvar: $e')));
       }
     } finally {
       if (mounted) {
@@ -389,11 +395,16 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
 
   Future<void> _saveAdditionals(DocumentReference productRef) async {
     final batch = FirebaseFirestore.instance.batch();
-    final itemAdditionalCollection = FirebaseFirestore.instance.collection('item_additional');
+    final itemAdditionalCollection = FirebaseFirestore.instance.collection(
+      'item_additional',
+    );
 
     for (var additional in _additionals) {
-      final name = (additional['nameController'] as TextEditingController).text.trim();
-      final priceText = (additional['priceController'] as TextEditingController).text.trim();
+      final name = (additional['nameController'] as TextEditingController).text
+          .trim();
+      final priceText = (additional['priceController'] as TextEditingController)
+          .text
+          .trim();
       final price = double.tryParse(priceText) ?? 0.0;
       final existingId = additional['id'] as String?;
       final toDelete = additional['toDelete'] as bool;
@@ -414,7 +425,9 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
         'name': name,
         'price': price,
         'item': productRef,
-        'name_price': name.isNotEmpty ? '$name R\$ ${price.toStringAsFixed(2)}' : '',
+        'name_price': name.isNotEmpty
+            ? '$name R\$ ${price.toStringAsFixed(2)}'
+            : '',
       };
 
       if (existingId != null) {
@@ -460,16 +473,16 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
           .delete();
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Produto excluído!')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Produto excluído!')));
         context.pop();
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro ao excluir: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Erro ao excluir: $e')));
       }
     }
   }
@@ -500,7 +513,7 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
         leading: IconButton(
           icon: const Icon(
             Icons.arrow_circle_left_sharp,
-            color: AppTheme.amarelo,
+            color: AppTheme.adminAccent,
             size: 35,
           ),
           onPressed: () {
@@ -543,7 +556,9 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
                         child: Stack(
                           children: [
                             GestureDetector(
-                              onTap: _isUploadingImage ? null : _showImageSourceDialog,
+                              onTap: _isUploadingImage
+                                  ? null
+                                  : _showImageSourceDialog,
                               child: Container(
                                 width: 150,
                                 height: 150,
@@ -551,7 +566,9 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
                                   color: AppTheme.secondaryBackground,
                                   borderRadius: BorderRadius.circular(16),
                                   border: Border.all(
-                                    color: AppTheme.amarelo.withOpacity(0.5),
+                                    color: AppTheme.adminAccent.withOpacity(
+                                      0.5,
+                                    ),
                                     width: 2,
                                   ),
                                 ),
@@ -559,10 +576,11 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
                                   borderRadius: BorderRadius.circular(14),
                                   child: _isUploadingImage
                                       ? Column(
-                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
                                           children: [
                                             const CircularProgressIndicator(
-                                              color: AppTheme.amarelo,
+                                              color: AppTheme.adminAccent,
                                             ),
                                             const SizedBox(height: 8),
                                             Text(
@@ -575,58 +593,72 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
                                           ],
                                         )
                                       : _selectedImage != null
-                                          ? Image.file(
-                                              _selectedImage!,
-                                              fit: BoxFit.cover,
-                                              width: 150,
-                                              height: 150,
-                                            )
-                                          : _photoUrlController.text.isNotEmpty
-                                              ? CachedNetworkImage(
-                                                  imageUrl: _photoUrlController.text,
-                                                  fit: BoxFit.cover,
-                                                  width: 150,
-                                                  height: 150,
-                                                  placeholder: (context, url) => const Center(
-                                                    child: CircularProgressIndicator(),
+                                      ? Image.file(
+                                          _selectedImage!,
+                                          fit: BoxFit.cover,
+                                          width: 150,
+                                          height: 150,
+                                        )
+                                      : _photoUrlController.text.isNotEmpty
+                                      ? CachedNetworkImage(
+                                          imageUrl: _photoUrlController.text,
+                                          fit: BoxFit.cover,
+                                          width: 150,
+                                          height: 150,
+                                          placeholder: (context, url) =>
+                                              const Center(
+                                                child:
+                                                    CircularProgressIndicator(),
+                                              ),
+                                          errorWidget: (context, url, error) =>
+                                              Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  Icon(
+                                                    Icons.broken_image,
+                                                    size: 40,
+                                                    color:
+                                                        AppTheme.secondaryText,
                                                   ),
-                                                  errorWidget: (context, url, error) => Column(
-                                                    mainAxisAlignment: MainAxisAlignment.center,
-                                                    children: [
-                                                      Icon(Icons.broken_image, 
-                                                        size: 40, 
-                                                        color: AppTheme.secondaryText),
-                                                      const SizedBox(height: 8),
-                                                      Text('URL inválida',
-                                                        style: GoogleFonts.inter(
-                                                          fontSize: 12,
-                                                          color: AppTheme.secondaryText,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                )
-                                              : Column(
-                                                  mainAxisAlignment: MainAxisAlignment.center,
-                                                  children: [
-                                                    Icon(Icons.add_a_photo,
-                                                      size: 40,
-                                                      color: AppTheme.amarelo),
-                                                    const SizedBox(height: 8),
-                                                    Text('Toque para\nadicionar',
-                                                      textAlign: TextAlign.center,
-                                                      style: GoogleFonts.inter(
-                                                        fontSize: 12,
-                                                        color: AppTheme.secondaryText,
-                                                      ),
+                                                  const SizedBox(height: 8),
+                                                  Text(
+                                                    'URL inválida',
+                                                    style: GoogleFonts.inter(
+                                                      fontSize: 12,
+                                                      color: AppTheme
+                                                          .secondaryText,
                                                     ),
-                                                  ],
-                                                ),
+                                                  ),
+                                                ],
+                                              ),
+                                        )
+                                      : Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Icon(
+                                              Icons.add_a_photo,
+                                              size: 40,
+                                              color: AppTheme.adminAccent,
+                                            ),
+                                            const SizedBox(height: 8),
+                                            Text(
+                                              'Toque para\nadicionar',
+                                              textAlign: TextAlign.center,
+                                              style: GoogleFonts.inter(
+                                                fontSize: 12,
+                                                color: AppTheme.secondaryText,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                 ),
                               ),
                             ),
                             // Botão de editar imagem (quando já tem imagem)
-                            if (_photoUrlController.text.isNotEmpty && !_isUploadingImage)
+                            if (_photoUrlController.text.isNotEmpty &&
+                                !_isUploadingImage)
                               Positioned(
                                 right: 0,
                                 bottom: 0,
@@ -635,7 +667,7 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
                                   child: Container(
                                     padding: const EdgeInsets.all(8),
                                     decoration: BoxDecoration(
-                                      color: AppTheme.amarelo,
+                                      color: AppTheme.adminAccent,
                                       shape: BoxShape.circle,
                                       boxShadow: [
                                         BoxShadow(
@@ -675,7 +707,11 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
                         tilePadding: EdgeInsets.zero,
                         title: Row(
                           children: [
-                            Icon(Icons.link, size: 18, color: AppTheme.secondaryText),
+                            Icon(
+                              Icons.link,
+                              size: 18,
+                              color: AppTheme.secondaryText,
+                            ),
                             const SizedBox(width: 8),
                             Text(
                               'Ou cole uma URL de imagem',
@@ -689,7 +725,9 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
                         children: [
                           TextFormField(
                             controller: _photoUrlController,
-                            decoration: _inputDecoration('Cole a URL da imagem'),
+                            decoration: _inputDecoration(
+                              'Cole a URL da imagem',
+                            ),
                             onChanged: (value) => setState(() {}),
                           ),
                           const SizedBox(height: 8),
@@ -725,11 +763,16 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
                             const SizedBox(height: 16),
 
                             // Name
-                            _buildLabel('Nome do Produto *', Icons.restaurant_menu),
+                            _buildLabel(
+                              'Nome do Produto *',
+                              Icons.restaurant_menu,
+                            ),
                             const SizedBox(height: 8),
                             TextFormField(
                               controller: _nameController,
-                              decoration: _inputDecoration('Ex: Hambúrguer Artesanal'),
+                              decoration: _inputDecoration(
+                                'Ex: Hambúrguer Artesanal',
+                              ),
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
                                   return 'Nome é obrigatório';
@@ -744,7 +787,9 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
                             const SizedBox(height: 8),
                             TextFormField(
                               controller: _descriptionController,
-                              decoration: _inputDecoration('Descrição do produto'),
+                              decoration: _inputDecoration(
+                                'Descrição do produto',
+                              ),
                               maxLines: 3,
                             ),
                             const SizedBox(height: 16),
@@ -753,16 +798,23 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
                             _buildLabel('Categoria *', Icons.category),
                             const SizedBox(height: 8),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                              ),
                               decoration: BoxDecoration(
-                                border: Border.all(color: AppTheme.primaryText.withOpacity(0.3)),
+                                border: Border.all(
+                                  color: AppTheme.primaryText.withOpacity(0.3),
+                                ),
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: DropdownButtonHideUnderline(
                                 child: DropdownButton<String>(
                                   value: _selectedCategoryId,
-                                  hint: Text('Selecione uma categoria',
-                                    style: GoogleFonts.inter(color: AppTheme.secondaryText),
+                                  hint: Text(
+                                    'Selecione uma categoria',
+                                    style: GoogleFonts.inter(
+                                      color: AppTheme.secondaryText,
+                                    ),
                                   ),
                                   isExpanded: true,
                                   items: _categories.map((cat) {
@@ -816,19 +868,24 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
                               children: [
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      _buildLabel('Preço *', Icons.attach_money),
+                                      _buildLabel(
+                                        'Preço *',
+                                        Icons.attach_money,
+                                      ),
                                       const SizedBox(height: 8),
                                       TextFormField(
                                         controller: _priceController,
-                                        decoration: _inputDecoration('0.00').copyWith(
-                                          prefixText: 'R\$ ',
-                                          prefixStyle: GoogleFonts.inter(
-                                            color: AppTheme.primaryText,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
+                                        decoration: _inputDecoration('0.00')
+                                            .copyWith(
+                                              prefixText: 'R\$ ',
+                                              prefixStyle: GoogleFonts.inter(
+                                                color: AppTheme.primaryText,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
                                         keyboardType: TextInputType.number,
                                         validator: (value) {
                                           if (value == null || value.isEmpty) {
@@ -846,7 +903,8 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
                                 const SizedBox(width: 16),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       _buildLabel('Estoque', Icons.inventory),
                                       const SizedBox(height: 8),
@@ -864,41 +922,55 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
 
                             // Available Switch
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 8,
+                              ),
                               decoration: BoxDecoration(
-                                color: _isAvailable 
-                                    ? AppTheme.amarelo.withOpacity(0.1)
+                                color: _isAvailable
+                                    ? AppTheme.adminAccent.withOpacity(0.1)
                                     : Colors.red.withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
-                                  color: _isAvailable ? AppTheme.amarelo : Colors.red,
+                                  color: _isAvailable
+                                      ? AppTheme.adminAccent
+                                      : Colors.red,
                                   width: 1,
                                 ),
                               ),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Row(
                                     children: [
                                       Icon(
-                                        _isAvailable ? Icons.check_circle : Icons.cancel,
-                                        color: _isAvailable ? AppTheme.amarelo : Colors.red,
+                                        _isAvailable
+                                            ? Icons.check_circle
+                                            : Icons.cancel,
+                                        color: _isAvailable
+                                            ? AppTheme.adminAccent
+                                            : Colors.red,
                                         size: 20,
                                       ),
                                       const SizedBox(width: 8),
                                       Text(
-                                        _isAvailable ? 'Produto Disponível' : 'Produto Indisponível',
+                                        _isAvailable
+                                            ? 'Produto Disponível'
+                                            : 'Produto Indisponível',
                                         style: GoogleFonts.inter(
                                           fontSize: 14,
                                           fontWeight: FontWeight.w500,
-                                          color: _isAvailable ? AppTheme.amarelo : Colors.red,
+                                          color: _isAvailable
+                                              ? AppTheme.adminAccent
+                                              : Colors.red,
                                         ),
                                       ),
                                     ],
                                   ),
                                   Switch(
                                     value: _isAvailable,
-                                    activeColor: AppTheme.amarelo,
+                                    activeColor: AppTheme.adminAccent,
                                     onChanged: (value) {
                                       setState(() {
                                         _isAvailable = value;
@@ -935,7 +1007,11 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
                               children: [
                                 Row(
                                   children: [
-                                    Icon(Icons.add_box, size: 20, color: AppTheme.amarelo),
+                                    Icon(
+                                      Icons.add_box,
+                                      size: 20,
+                                      color: AppTheme.adminAccent,
+                                    ),
                                     const SizedBox(width: 8),
                                     Text(
                                       'Adicionais do Produto',
@@ -952,7 +1028,7 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
                                   icon: Container(
                                     padding: const EdgeInsets.all(4),
                                     decoration: BoxDecoration(
-                                      color: AppTheme.amarelo,
+                                      color: AppTheme.adminAccent,
                                       shape: BoxShape.circle,
                                     ),
                                     child: const Icon(
@@ -974,7 +1050,7 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
                               ),
                             ),
                             const SizedBox(height: 16),
-                            
+
                             if (_loadingAdditionals)
                               const Center(
                                 child: Padding(
@@ -995,13 +1071,20 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
                         height: 56,
                         child: ElevatedButton.icon(
                           onPressed: _isSaving ? null : _saveProduct,
-                          icon: _isSaving 
+                          icon: _isSaving
                               ? const SizedBox.shrink()
-                              : Icon(isEditing ? Icons.save : Icons.add_circle, color: Colors.white),
+                              : Icon(
+                                  isEditing ? Icons.save : Icons.add_circle,
+                                  color: Colors.white,
+                                ),
                           label: _isSaving
-                              ? const CircularProgressIndicator(color: Colors.white)
+                              ? const CircularProgressIndicator(
+                                  color: Colors.white,
+                                )
                               : Text(
-                                  isEditing ? 'Salvar Alterações' : 'Cadastrar Produto',
+                                  isEditing
+                                      ? 'Salvar Alterações'
+                                      : 'Cadastrar Produto',
                                   style: GoogleFonts.poppins(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
@@ -1009,7 +1092,7 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
                                   ),
                                 ),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: AppTheme.amarelo,
+                            backgroundColor: AppTheme.adminAccent,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
                             ),
@@ -1029,7 +1112,7 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
   Widget _buildLabel(String text, IconData icon) {
     return Row(
       children: [
-        Icon(icon, size: 18, color: AppTheme.amarelo),
+        Icon(icon, size: 18, color: AppTheme.adminAccent),
         const SizedBox(width: 8),
         Text(
           text,
@@ -1045,13 +1128,13 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
 
   List<Widget> _buildAdditionalFields() {
     final List<Widget> fields = [];
-    
+
     for (int i = 0; i < _additionals.length; i++) {
       final additional = _additionals[i];
-      
+
       // Não mostrar os marcados para deletar
       if (additional['toDelete'] == true) continue;
-      
+
       fields.add(
         Padding(
           padding: const EdgeInsets.only(bottom: 12),
@@ -1060,9 +1143,7 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
             decoration: BoxDecoration(
               color: AppTheme.primaryBackground,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: AppTheme.primaryText.withOpacity(0.1),
-              ),
+              border: Border.all(color: AppTheme.primaryText.withOpacity(0.1)),
             ),
             child: Row(
               children: [
@@ -1070,7 +1151,8 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
                 Expanded(
                   flex: 3,
                   child: TextFormField(
-                    controller: additional['nameController'] as TextEditingController,
+                    controller:
+                        additional['nameController'] as TextEditingController,
                     decoration: InputDecoration(
                       hintText: 'Nome do adicional',
                       hintStyle: GoogleFonts.inter(
@@ -1079,17 +1161,27 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
                       ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: AppTheme.primaryText.withOpacity(0.3)),
+                        borderSide: BorderSide(
+                          color: AppTheme.primaryText.withOpacity(0.3),
+                        ),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: AppTheme.primaryText.withOpacity(0.3)),
+                        borderSide: BorderSide(
+                          color: AppTheme.primaryText.withOpacity(0.3),
+                        ),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
-                        borderSide: const BorderSide(color: AppTheme.amarelo, width: 2),
+                        borderSide: const BorderSide(
+                          color: AppTheme.adminAccent,
+                          width: 2,
+                        ),
                       ),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 10,
+                      ),
                       isDense: true,
                     ),
                     style: GoogleFonts.inter(fontSize: 14),
@@ -1100,7 +1192,8 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
                 Expanded(
                   flex: 2,
                   child: TextFormField(
-                    controller: additional['priceController'] as TextEditingController,
+                    controller:
+                        additional['priceController'] as TextEditingController,
                     keyboardType: TextInputType.number,
                     decoration: InputDecoration(
                       hintText: '0.00',
@@ -1116,17 +1209,27 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
                       ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: AppTheme.primaryText.withOpacity(0.3)),
+                        borderSide: BorderSide(
+                          color: AppTheme.primaryText.withOpacity(0.3),
+                        ),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: AppTheme.primaryText.withOpacity(0.3)),
+                        borderSide: BorderSide(
+                          color: AppTheme.primaryText.withOpacity(0.3),
+                        ),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
-                        borderSide: const BorderSide(color: AppTheme.amarelo, width: 2),
+                        borderSide: const BorderSide(
+                          color: AppTheme.adminAccent,
+                          width: 2,
+                        ),
                       ),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 10,
+                      ),
                       isDense: true,
                     ),
                     style: GoogleFonts.inter(fontSize: 14),
@@ -1156,7 +1259,7 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
         ),
       );
     }
-    
+
     // Mensagem se não tem adicionais
     if (fields.isEmpty) {
       fields.add(
@@ -1200,7 +1303,7 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
         ),
       );
     }
-    
+
     return fields;
   }
 
@@ -1218,7 +1321,7 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: AppTheme.amarelo, width: 2),
+        borderSide: BorderSide(color: AppTheme.adminAccent, width: 2),
       ),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
     );
