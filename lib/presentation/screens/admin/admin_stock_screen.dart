@@ -223,7 +223,8 @@ class _StockCardState extends State<_StockCard> {
                 ),
                 Switch(
                   value: _isAvailable,
-                  activeColor: AppTheme.adminAccent,
+                  activeTrackColor: AppTheme.adminAccent.withValues(alpha: 0.5),
+                  activeThumbColor: AppTheme.adminAccent,
                   onChanged: _isUpdating
                       ? null
                       : (value) => _toggleAvailability(),

@@ -970,7 +970,8 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
                                   ),
                                   Switch(
                                     value: _isAvailable,
-                                    activeColor: AppTheme.adminAccent,
+                                    activeTrackColor: AppTheme.adminAccent.withValues(alpha: 0.5),
+                                    activeThumbColor: AppTheme.adminAccent,
                                     onChanged: (value) {
                                       setState(() {
                                         _isAvailable = value;

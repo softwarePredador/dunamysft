@@ -218,8 +218,7 @@ class _AdminReportsScreenState extends State<AdminReportsScreen> {
       await Share.shareXFiles(
         [XFile(file.path)],
         subject: 'Relatório de Pedidos - Hotel Dunamys',
-        text:
-            'Relatório de pedidos de ${DateFormat('dd/MM/yyyy').format(_startDate!)} a ${DateFormat('dd/MM/yyyy').format(_endDate!)}',
+        text: 'Relatório de pedidos de ${DateFormat('dd/MM/yyyy').format(_startDate!)} a ${DateFormat('dd/MM/yyyy').format(_endDate!)}',
       );
     } catch (e) {
       if (mounted) {

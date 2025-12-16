@@ -134,6 +134,10 @@ class AppTheme {
           borderRadius: BorderRadius.all(Radius.circular(12)),
         ),
       ),
+      progressIndicatorTheme: const ProgressIndicatorThemeData(
+        color: primaryText,
+        circularTrackColor: Colors.transparent,
+      ),
     );
   }
 }

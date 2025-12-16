@@ -13,7 +13,6 @@ class EndDrawerWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final authService = Provider.of<AuthService>(context, listen: false);
     final user = authService.currentUser;
-    final String currentUserEmail = user?.email ?? '';
 
     return Drawer(
       backgroundColor: AppTheme.primaryBackground,
