@@ -1,30 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import '../../core/theme/app_theme.dart';
 import 'redirect_page_widget.dart';
 
 class NavbarWidget extends StatelessWidget {
   final int pageIndex;
   final VoidCallback? onMenuTap;
 
-  const NavbarWidget({
-    super.key,
-    this.pageIndex = 1,
-    this.onMenuTap,
-  });
+  const NavbarWidget({super.key, this.pageIndex = 1, this.onMenuTap});
 
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-    
+
     // Tamanhos proporcionais
     final navbarHeight = screenHeight * 0.14; // ~115 em tela 820
     final iconWidth = screenWidth * 0.2; // ~80 em tela 400
     final iconHeight = screenHeight * 0.073; // ~60 em tela 820
     final centerButtonSize = screenWidth * 0.16; // ~64 em tela 400
     final bgHeight = screenHeight * 0.091; // ~75 em tela 820
-    
+
     return SizedBox(
       height: navbarHeight,
       child: Stack(
@@ -45,22 +42,20 @@ class NavbarWidget extends StatelessWidget {
               ),
             ),
           ),
-          
+
           // Navigation Items
           Padding(
             padding: const EdgeInsetsDirectional.fromSTEB(0.0, 40.0, 0.0, 0.0),
             child: Container(
               width: double.infinity,
               height: 72.0,
-              constraints: const BoxConstraints(
-                minHeight: 76.0,
-              ),
+              constraints: const BoxConstraints(minHeight: 76.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(width: 14.0),
-                  
+
                   // Menu Item - Abre o EndDrawer (igual FlutterFlow)
                   Expanded(
                     flex: 2,
@@ -83,7 +78,7 @@ class NavbarWidget extends StatelessWidget {
                       },
                     ),
                   ),
-                  
+
                   const SizedBox(width: 8.0),
 
                   // Cart Item
@@ -94,9 +89,9 @@ class NavbarWidget extends StatelessWidget {
                       onTap: () => context.push('/cart'),
                     ),
                   ),
-                  
+
                   const Spacer(flex: 3), // Space for the center button
-                  
+
                   const SizedBox(width: 8.0),
 
                   // Profile Item
@@ -107,7 +102,7 @@ class NavbarWidget extends StatelessWidget {
                       onTap: () => context.push('/profile'),
                     ),
                   ),
-                  
+
                   const SizedBox(width: 8.0),
 
                   // More/Redirect Item
@@ -135,13 +130,13 @@ class NavbarWidget extends StatelessWidget {
                       },
                     ),
                   ),
-                  
+
                   const SizedBox(width: 14.0),
                 ],
               ),
             ),
           ),
-          
+
           // Center Floating Button (Home)
           Align(
             alignment: const AlignmentDirectional(0.0, -1.0),
@@ -150,12 +145,15 @@ class NavbarWidget extends StatelessWidget {
               child: Container(
                 width: centerButtonSize,
                 height: centerButtonSize,
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [Color(0xFFD0AA5E), Color(0xFFCD9A32)],
-                    stops: [0.5, 1.0],
-                    begin: AlignmentDirectional(0.0, -1.0),
-                    end: AlignmentDirectional(0, 1.0),
+                    colors: [
+                      AppTheme.amareloGradientStart,
+                      AppTheme.amareloGradientEnd,
+                    ],
+                    stops: const [0.5, 1.0],
+                    begin: const AlignmentDirectional(0.0, -1.0),
+                    end: const AlignmentDirectional(0, 1.0),
                   ),
                   shape: BoxShape.circle,
                 ),
@@ -180,20 +178,17 @@ class _NavbarItem extends StatelessWidget {
   final String imagePath;
   final VoidCallback onTap;
 
-  const _NavbarItem({
-    required this.imagePath,
-    required this.onTap,
-  });
+  const _NavbarItem({required this.imagePath, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-    
+
     // Tamanhos proporcionais
     final iconWidth = screenWidth * 0.2; // ~80 em tela 400
     final iconHeight = screenHeight * 0.073; // ~60 em tela 820
-    
+
     return InkWell(
       onTap: onTap,
       splashColor: Colors.transparent,

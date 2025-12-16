@@ -73,7 +73,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
         ranking: _rating.round(),
         obs: _commentController.text,
       );
-      
+
       final success = await feedbackService.submitFeedback(feedback);
 
       setState(() => _isLoading = false);
@@ -89,16 +89,18 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
           context.go('/home');
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Erro ao enviar feedback. Tente novamente.')),
+            const SnackBar(
+              content: Text('Erro ao enviar feedback. Tente novamente.'),
+            ),
           );
         }
       }
     } catch (e) {
       setState(() => _isLoading = false);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro ao enviar feedback: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Erro ao enviar feedback: $e')));
       }
     }
   }
@@ -177,12 +179,16 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                         },
                         selectedColor: AppTheme.amarelo,
                         labelStyle: TextStyle(
-                          color: isSelected ? Colors.white : AppTheme.primaryText,
+                          color: isSelected
+                              ? Colors.white
+                              : AppTheme.primaryText,
                         ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(100.0),
                           side: BorderSide(
-                            color: isSelected ? AppTheme.amarelo : const Color(0xFFCCCCCC),
+                            color: isSelected
+                                ? AppTheme.amarelo
+                                : AppTheme.bordaCinza,
                           ),
                         ),
                       );
@@ -212,10 +218,8 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                       itemCount: 5,
                       itemSize: 50.0,
                       itemPadding: const EdgeInsets.symmetric(horizontal: 4.0),
-                      itemBuilder: (context, _) => const Icon(
-                        Icons.star,
-                        color: AppTheme.amarelo,
-                      ),
+                      itemBuilder: (context, _) =>
+                          const Icon(Icons.star, color: AppTheme.amarelo),
                       onRatingUpdate: (rating) {
                         setState(() => _rating = rating);
                       },

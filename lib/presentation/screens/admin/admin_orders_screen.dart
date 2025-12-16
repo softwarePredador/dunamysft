@@ -149,15 +149,15 @@ class _OrderCard extends StatelessWidget {
   Color _getStatusColor() {
     switch (status.toLowerCase()) {
       case 'pendente':
-        return Colors.orange;
+        return AppTheme.statusPending;
       case 'em preparo':
-        return Colors.blue;
+        return AppTheme.statusPreparing;
       case 'pronto':
-        return Colors.green;
+        return AppTheme.statusReady;
       case 'entregue':
-        return AppTheme.adminAccent;
+        return AppTheme.statusDelivered;
       case 'cancelado':
-        return Colors.red;
+        return AppTheme.statusCancelled;
       default:
         return AppTheme.secondaryText;
     }

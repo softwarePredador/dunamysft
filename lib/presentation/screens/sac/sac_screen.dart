@@ -32,7 +32,9 @@ class SACScreen extends StatelessWidget {
   }
 
   Future<void> _launchWhatsApp(String phone) async {
-    final uri = Uri.parse('https://wa.me/${phone.replaceAll(RegExp(r'[^\d]'), '')}');
+    final uri = Uri.parse(
+      'https://wa.me/${phone.replaceAll(RegExp(r'[^\d]'), '')}',
+    );
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     }
@@ -124,14 +126,16 @@ class SACScreen extends StatelessWidget {
                 _buildSocialRow(
                   icon: FontAwesomeIcons.instagram,
                   label: 'Instagram',
-                  onTap: () => _launchUrl('https://www.instagram.com/hoteldunamys/'),
+                  onTap: () =>
+                      _launchUrl('https://www.instagram.com/hoteldunamys/'),
                 ),
 
                 // Facebook
                 _buildSocialRow(
                   icon: FontAwesomeIcons.facebook,
                   label: 'Facebook',
-                  onTap: () => _launchUrl('https://www.facebook.com/hoteldunamys'),
+                  onTap: () =>
+                      _launchUrl('https://www.facebook.com/hoteldunamys'),
                 ),
 
                 const SizedBox(height: 30.0),
@@ -185,9 +189,7 @@ class SACScreen extends StatelessWidget {
           // Navbar
           Align(
             alignment: Alignment.bottomCenter,
-            child: NavbarWidget(
-              onMenuTap: () {},
-            ),
+            child: NavbarWidget(onMenuTap: () {}),
           ),
         ],
       ),
@@ -238,11 +240,7 @@ class SACScreen extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 8.0),
         child: Row(
           children: [
-            FaIcon(
-              icon,
-              color: AppTheme.amarelo,
-              size: 24.0,
-            ),
+            FaIcon(icon, color: AppTheme.amarelo, size: 24.0),
             const SizedBox(width: 10.0),
             Text(
               label,
@@ -258,10 +256,7 @@ class SACScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildEmailRow({
-    required String email,
-    required VoidCallback onTap,
-  }) {
+  Widget _buildEmailRow({required String email, required VoidCallback onTap}) {
     return InkWell(
       onTap: onTap,
       child: Padding(
@@ -301,7 +296,7 @@ class SACScreen extends StatelessWidget {
           children: [
             const FaIcon(
               FontAwesomeIcons.whatsapp,
-              color: Color(0xFF25D366),
+              color: AppTheme.whatsappGreen,
               size: 24.0,
             ),
             const SizedBox(width: 10.0),

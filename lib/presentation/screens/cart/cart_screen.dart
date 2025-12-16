@@ -39,9 +39,7 @@ class _CartScreenState extends State<CartScreen> {
 
     if (user == null) {
       return Scaffold(
-        appBar: AppBar(
-          title: const Text('Carrinho'),
-        ),
+        appBar: AppBar(title: const Text('Carrinho')),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -50,10 +48,7 @@ class _CartScreenState extends State<CartScreen> {
               const SizedBox(height: 16),
               const Text('Faça login para ver seu carrinho'),
               const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () => context.go('/login'),
-                child: const Text('Fazer Login'),
-              ),
+              ElevatedButton(onPressed: () => context.go('/login'), child: const Text('Fazer Login')),
             ],
           ),
         ),
@@ -70,11 +65,7 @@ class _CartScreenState extends State<CartScreen> {
           backgroundColor: AppTheme.primaryBackground,
           elevation: 0,
           leading: IconButton(
-            icon: const Icon(
-              Icons.arrow_circle_left_sharp,
-              color: AppTheme.amarelo,
-              size: 35.0,
-            ),
+            icon: const Icon(Icons.arrow_circle_left_sharp, color: AppTheme.amarelo, size: 35.0),
             onPressed: () {
               if (context.canPop()) {
                 context.pop();
@@ -101,16 +92,9 @@ class _CartScreenState extends State<CartScreen> {
                     children: [
                       const Icon(Icons.error_outline, size: 64, color: AppTheme.error),
                       const SizedBox(height: 16),
-                      Text(
-                        'Erro ao carregar carrinho',
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
+                      Text('Erro ao carregar carrinho', style: Theme.of(context).textTheme.titleMedium),
                       const SizedBox(height: 8),
-                      Text(
-                        cartProvider.error,
-                        style: Theme.of(context).textTheme.bodySmall,
-                        textAlign: TextAlign.center,
-                      ),
+                      Text(cartProvider.error, style: Theme.of(context).textTheme.bodySmall, textAlign: TextAlign.center),
                     ],
                   ),
                 );
@@ -122,11 +106,7 @@ class _CartScreenState extends State<CartScreen> {
                 return Center(
                   child: Text(
                     'Carrinho Vazio',
-                    style: GoogleFonts.inter(
-                      fontWeight: FontWeight.w500,
-                      fontSize: 16.0,
-                      color: AppTheme.primaryText,
-                    ),
+                    style: GoogleFonts.inter(fontWeight: FontWeight.w500, fontSize: 16.0, color: AppTheme.primaryText),
                   ),
                 );
               }
@@ -146,11 +126,7 @@ class _CartScreenState extends State<CartScreen> {
                             children: [
                               Text(
                                 'Itens adicionados',
-                                style: GoogleFonts.inter(
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 16.0,
-                                  color: AppTheme.primaryText,
-                                ),
+                                style: GoogleFonts.inter(fontWeight: FontWeight.w500, fontSize: 16.0, color: AppTheme.primaryText),
                               ),
                             ],
                           ),
@@ -200,10 +176,7 @@ class _CartScreenState extends State<CartScreen> {
   Widget _buildBottomBar(BuildContext context, CartProvider cartProvider) {
     return Container(
       width: double.infinity,
-      decoration: BoxDecoration(
-        color: AppTheme.primaryBackground,
-        borderRadius: BorderRadius.circular(20.0),
-      ),
+      decoration: BoxDecoration(color: AppTheme.primaryBackground, borderRadius: BorderRadius.circular(20.0)),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -215,19 +188,11 @@ class _CartScreenState extends State<CartScreen> {
               children: [
                 Text(
                   'Total',
-                  style: GoogleFonts.inter(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 16.0,
-                    color: AppTheme.primaryText,
-                  ),
+                  style: GoogleFonts.inter(fontWeight: FontWeight.w500, fontSize: 16.0, color: AppTheme.primaryText),
                 ),
                 Text(
                   'R\$ ${cartProvider.total.toStringAsFixed(2).replaceAll('.', ',')}',
-                  style: GoogleFonts.inter(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 18.0,
-                    color: AppTheme.amarelo,
-                  ),
+                  style: GoogleFonts.inter(fontWeight: FontWeight.w500, fontSize: 18.0, color: AppTheme.amarelo),
                 ),
               ],
             ),
@@ -238,18 +203,11 @@ class _CartScreenState extends State<CartScreen> {
             child: Container(
               width: 220.0,
               height: 80.0,
-              decoration: BoxDecoration(
-                color: AppTheme.amarelo,
-                borderRadius: BorderRadius.circular(15.0),
-              ),
+              decoration: BoxDecoration(color: AppTheme.amarelo, borderRadius: BorderRadius.circular(15.0)),
               child: Center(
                 child: Text(
                   'Continuar',
-                  style: GoogleFonts.inter(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 16.0,
-                    color: AppTheme.secondaryBackground,
-                  ),
+                  style: GoogleFonts.inter(fontWeight: FontWeight.w500, fontSize: 16.0, color: AppTheme.secondaryBackground),
                 ),
               ),
             ),
@@ -266,10 +224,7 @@ class _CartScreenState extends State<CartScreen> {
         title: const Text('Limpar Carrinho'),
         content: const Text('Tem certeza que deseja remover todos os itens?'),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar'),
-          ),
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
           TextButton(
             onPressed: () async {
               await context.read<CartProvider>().clearCart(userId);
@@ -290,20 +245,15 @@ class _CartItemCard extends StatelessWidget {
   final Function(int) onQuantityChanged;
   final VoidCallback onRemove;
 
-  const _CartItemCard({
-    required this.cartItem,
-    required this.onQuantityChanged,
-    required this.onRemove,
-  });
+  const _CartItemCard({required this.cartItem, required this.onQuantityChanged, required this.onRemove});
 
   @override
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 1,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      color: AppTheme.secondaryBackground,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Row(
@@ -329,10 +279,7 @@ class _CartItemCard extends StatelessWidget {
               Container(
                 width: 60,
                 height: 60,
-                decoration: BoxDecoration(
-                  color: AppTheme.grayPaletteGray20,
-                  borderRadius: BorderRadius.circular(8),
-                ),
+                decoration: BoxDecoration(color: AppTheme.grayPaletteGray20, borderRadius: BorderRadius.circular(8)),
                 child: const Icon(Icons.fastfood, color: AppTheme.grayPaletteGray60),
               ),
             const SizedBox(width: 12),
@@ -342,38 +289,24 @@ class _CartItemCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    cartItem.menuItemName.isNotEmpty 
-                        ? cartItem.menuItemName 
-                        : 'Item #${cartItem.menuItemId.substring(0, 8)}',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
+                    cartItem.menuItemName.isNotEmpty ? cartItem.menuItemName : 'Item #${cartItem.menuItemId.substring(0, 8)}',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
                   ),
                   const SizedBox(height: 4),
                   // Preço base
-                  Text(
-                    'R\$ ${cartItem.price.toStringAsFixed(2)}',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: AppTheme.primaryColors,
-                        ),
-                  ),
+                  Text('R\$ ${cartItem.price.toStringAsFixed(2)}', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppTheme.amarelo)),
                   // Preço dos adicionais (se houver)
                   if (cartItem.additionalPrice > 0) ...[
                     Text(
                       '+ Adicionais: R\$ ${cartItem.additionalPrice.toStringAsFixed(2)}',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppTheme.amarelo,
-                            fontWeight: FontWeight.w500,
-                          ),
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppTheme.amarelo, fontWeight: FontWeight.w500),
                     ),
                   ],
                   if (cartItem.additionals.isNotEmpty) ...[
                     const SizedBox(height: 4),
                     Text(
                       cartItem.additionals.join(", "),
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppTheme.secondaryText,
-                          ),
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppTheme.secondaryText),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -382,9 +315,7 @@ class _CartItemCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       'Obs: ${cartItem.observation}',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppTheme.secondaryText,
-                          ),
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppTheme.secondaryText),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -414,10 +345,7 @@ class _CartItemCard extends StatelessWidget {
                         border: Border.all(color: AppTheme.bordaCinza),
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: Text(
-                        '${cartItem.quantity}',
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
+                      child: Text('${cartItem.quantity}', style: Theme.of(context).textTheme.titleMedium),
                     ),
                     IconButton(
                       icon: const Icon(Icons.add_circle_outline),
@@ -431,10 +359,7 @@ class _CartItemCard extends StatelessWidget {
                   onPressed: onRemove,
                   icon: const Icon(Icons.delete_outline, size: 16),
                   label: const Text('Remover'),
-                  style: TextButton.styleFrom(
-                    foregroundColor: AppTheme.error,
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                  ),
+                  style: TextButton.styleFrom(foregroundColor: AppTheme.error, padding: const EdgeInsets.symmetric(horizontal: 8)),
                 ),
               ],
             ),

@@ -65,207 +65,225 @@ class _HomeScreenState extends State<HomeScreen> {
                   padding: const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 0.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  InkWell(
-                    onTap: () => _scaffoldKey.currentState?.openEndDrawer(),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Olá!',
-                          style: GoogleFonts.poppins(
-                              fontWeight: FontWeight.w500,
-                              fontSize: 18.0,
-                              color: AppTheme.primaryText,
+                    children: [
+                      InkWell(
+                        onTap: () => _scaffoldKey.currentState?.openEndDrawer(),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Olá!',
+                              style: GoogleFonts.poppins(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 18.0,
+                                color: AppTheme.primaryText,
+                              ),
                             ),
-                          ),
-                          Text(
-                            user?.displayName ?? 'Visitante',
-                            style: GoogleFonts.poppins(
-                              fontWeight: FontWeight.w500,
-                              fontSize: 18.0,
-                              decoration: TextDecoration.underline,
-                              color: AppTheme.primaryText,
+                            Text(
+                              user?.displayName ?? 'Visitante',
+                              style: GoogleFonts.poppins(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 18.0,
+                                decoration: TextDecoration.underline,
+                                color: AppTheme.primaryText,
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Row(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(right: 15.0),
-                          child: Text(
-                            'Seu pedido',
-                            style: GoogleFonts.inter(
-                              fontWeight: FontWeight.normal,
-                              fontSize: 12.0,
-                              color: AppTheme.primaryText,
-                            ),
-                          ),
+                          ],
                         ),
-                        // Notification Bell com Badge
-                        Consumer<AppStateProvider>(
-                          builder: (context, appState, child) {
-                            final hasPedido = appState.pedidoEmAndamento;
-                            
-                            return InkWell(
-                              onTap: () {
-                                // Navegar para tela de pedidos
-                                // Na nossa lógica, o quarto já foi informado antes do pagamento
-                                context.push('/orders');
-                              },
-                              child: hasPedido
-                                  ? badges.Badge(
-                                      badgeContent: const Text(
-                                        ' ',
-                                        style: TextStyle(color: Colors.white, fontSize: 6),
-                                      ),
-                                      showBadge: true,
-                                      badgeStyle: const badges.BadgeStyle(
-                                        badgeColor: AppTheme.secondary,
-                                        elevation: 4,
-                                        padding: EdgeInsets.all(4),
-                                      ),
-                                      position: badges.BadgePosition.topStart(),
-                                      badgeAnimation: const badges.BadgeAnimation.scale(),
-                                      child: Image.asset(
+                      ),
+                      Row(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(right: 15.0),
+                            child: Text(
+                              'Seu pedido',
+                              style: GoogleFonts.inter(
+                                fontWeight: FontWeight.normal,
+                                fontSize: 12.0,
+                                color: AppTheme.primaryText,
+                              ),
+                            ),
+                          ),
+                          // Notification Bell com Badge
+                          Consumer<AppStateProvider>(
+                            builder: (context, appState, child) {
+                              final hasPedido = appState.pedidoEmAndamento;
+
+                              return InkWell(
+                                onTap: () {
+                                  // Navegar para tela de pedidos
+                                  // Na nossa lógica, o quarto já foi informado antes do pagamento
+                                  context.push('/orders');
+                                },
+                                child: hasPedido
+                                    ? badges.Badge(
+                                        badgeContent: const Text(
+                                          ' ',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 6,
+                                          ),
+                                        ),
+                                        showBadge: true,
+                                        badgeStyle: const badges.BadgeStyle(
+                                          badgeColor: AppTheme.secondary,
+                                          elevation: 4,
+                                          padding: EdgeInsets.all(4),
+                                        ),
+                                        position:
+                                            badges.BadgePosition.topStart(),
+                                        badgeAnimation:
+                                            const badges.BadgeAnimation.scale(),
+                                        child: Image.asset(
+                                          'assets/images/campainha.png',
+                                          width: 23.0,
+                                          height: 23.0,
+                                          fit: BoxFit.contain,
+                                          errorBuilder:
+                                              (context, error, stackTrace) =>
+                                                  const Icon(
+                                                    Icons.notifications_none,
+                                                    size: 24,
+                                                  ),
+                                        ),
+                                      )
+                                    : Image.asset(
                                         'assets/images/campainha.png',
                                         width: 23.0,
                                         height: 23.0,
                                         fit: BoxFit.contain,
-                                        errorBuilder: (context, error, stackTrace) =>
-                                            const Icon(Icons.notifications_none, size: 24),
+                                        errorBuilder:
+                                            (context, error, stackTrace) =>
+                                                const Icon(
+                                                  Icons.notifications_none,
+                                                  size: 24,
+                                                ),
                                       ),
-                                    )
-                                  : Image.asset(
-                                      'assets/images/campainha.png',
-                                      width: 23.0,
-                                      height: 23.0,
-                                      fit: BoxFit.contain,
-                                      errorBuilder: (context, error, stackTrace) =>
-                                          const Icon(Icons.notifications_none, size: 24),
-                                    ),
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                  ],
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-              ),
 
-              const SizedBox(height: 20),
+                const SizedBox(height: 20),
 
-              // Gallery Carousel
-              SizedBox(
-                height: 235.0,
-                child: StreamBuilder<List<GalleryItem>>(
-                  stream: homeProvider.galleryItemsStream,
+                // Gallery Carousel
+                SizedBox(
+                  height: 235.0,
+                  child: StreamBuilder<List<GalleryItem>>(
+                    stream: homeProvider.galleryItemsStream,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                      if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                        return const SizedBox.shrink();
+                      }
+
+                      final items = snapshot.data!;
+
+                      return Column(
+                        children: [
+                          Expanded(
+                            child: PageView.builder(
+                              controller: _pageController,
+                              itemCount: items.length,
+                              itemBuilder: (context, index) {
+                                final item = items[index];
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8.0,
+                                  ),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(20.0),
+                                    child: CachedNetworkImage(
+                                      imageUrl: item.image,
+                                      fit: BoxFit.fill,
+                                      placeholder: (context, url) =>
+                                          const Center(
+                                            child: CircularProgressIndicator(),
+                                          ),
+                                      errorWidget: (context, url, error) =>
+                                          const Icon(Icons.error),
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          SmoothPageIndicator(
+                            controller: _pageController,
+                            count: items.length,
+                            effect: const ExpandingDotsEffect(
+                              expansionFactor: 4.0,
+                              spacing: 8.0,
+                              radius: 8.0,
+                              dotWidth: 8.0,
+                              dotHeight: 8.0,
+                              dotColor: AppTheme.disabled,
+                              activeDotColor: AppTheme.amarelo,
+                            ),
+                            onDotClicked: (index) {
+                              _pageController.animateToPage(
+                                index,
+                                duration: const Duration(milliseconds: 500),
+                                curve: Curves.ease,
+                              );
+                            },
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
+                // Categories List
+                StreamBuilder<List<Category>>(
+                  stream: homeProvider.categoriesStream,
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(child: CircularProgressIndicator());
                     }
                     if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                      return const SizedBox.shrink();
+                      return const Center(
+                        child: Text('Nenhuma categoria encontrada.'),
+                      );
                     }
 
-                    final items = snapshot.data!;
+                    final categories = snapshot.data!;
 
-                    return Column(
-                      children: [
-                        Expanded(
-                          child: PageView.builder(
-                            controller: _pageController,
-                            itemCount: items.length,
-                            itemBuilder: (context, index) {
-                              final item = items[index];
-                              return Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(20.0),
-                                  child: CachedNetworkImage(
-                                    imageUrl: item.image,
-                                    fit: BoxFit.fill,
-                                    placeholder: (context, url) => const Center(
-                                      child: CircularProgressIndicator(),
-                                    ),
-                                    errorWidget: (context, url, error) =>
-                                        const Icon(Icons.error),
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        SmoothPageIndicator(
-                          controller: _pageController,
-                          count: items.length,
-                          effect: const ExpandingDotsEffect(
-                            expansionFactor: 4.0,
-                            spacing: 8.0,
-                            radius: 8.0,
-                            dotWidth: 8.0,
-                            dotHeight: 8.0,
-                            dotColor: AppTheme.disabled,
-                            activeDotColor: AppTheme.amarelo,
-                          ),
-                          onDotClicked: (index) {
-                            _pageController.animateToPage(
-                              index,
-                              duration: const Duration(milliseconds: 500),
-                              curve: Curves.ease,
-                            );
-                          },
-                        ),
-                      ],
+                    return ListView.builder(
+                      padding: EdgeInsets.zero,
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: categories.length,
+                      itemBuilder: (context, index) {
+                        final category = categories[index];
+                        return _CategorySection(category: category);
+                      },
                     );
                   },
                 ),
-              ),
 
-              const SizedBox(height: 20),
-
-              // Categories List
-              StreamBuilder<List<Category>>(
-                stream: homeProvider.categoriesStream,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return const Center(child: Text('Nenhuma categoria encontrada.'));
-                  }
-
-                  final categories = snapshot.data!;
-
-                  return ListView.builder(
-                  padding: EdgeInsets.zero,
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: categories.length,
-                  itemBuilder: (context, index) {
-                    final category = categories[index];
-                    return _CategorySection(category: category);
-                  },
-                );
-              },
+                // Bottom padding for navbar
+                const SizedBox(height: 80),
+              ],
             ),
-            
-            // Bottom padding for navbar
-            const SizedBox(height: 80),
-          ],
-        ),
-      ),
-      // Navbar na parte inferior (igual FlutterFlow)
-      Align(
-        alignment: Alignment.bottomCenter,
-        child: NavbarWidget(
-          pageIndex: 1,
-          onMenuTap: () => _scaffoldKey.currentState?.openEndDrawer(),
-        ),
-      ),
+          ),
+          // Navbar na parte inferior (igual FlutterFlow)
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: NavbarWidget(
+              pageIndex: 1,
+              onMenuTap: () => _scaffoldKey.currentState?.openEndDrawer(),
+            ),
+          ),
         ],
       ),
     );
@@ -288,7 +306,10 @@ class _CategorySection extends StatelessWidget {
         children: [
           // Category Header
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 20.0,
+              vertical: 10.0,
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -297,7 +318,7 @@ class _CategorySection extends StatelessWidget {
                   style: AppTheme.lightTheme.textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.w500,
                     fontSize: 16.0,
-                    color: const Color(0xFF543434),
+                    color: AppTheme.primaryText,
                   ),
                 ),
                 InkWell(
@@ -309,16 +330,14 @@ class _CategorySection extends StatelessWidget {
                     children: [
                       Text(
                         'ver todos',
-                        style: AppTheme.lightTheme.textTheme.bodyMedium?.copyWith(
-                          fontSize: 12.0,
-                          decoration: TextDecoration.underline,
-                        ),
+                        style: AppTheme.lightTheme.textTheme.bodyMedium
+                            ?.copyWith(
+                              fontSize: 12.0,
+                              decoration: TextDecoration.underline,
+                            ),
                       ),
                       const SizedBox(width: 2),
-                      const Icon(
-                        Icons.arrow_forward_ios_sharp,
-                        size: 14.0,
-                      ),
+                      const Icon(Icons.arrow_forward_ios_sharp, size: 14.0),
                     ],
                   ),
                 ),
@@ -449,4 +468,3 @@ class _MenuItemCard extends StatelessWidget {
     );
   }
 }
-

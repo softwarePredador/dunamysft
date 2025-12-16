@@ -44,11 +44,7 @@ class _FAQScreenState extends State<FAQScreen> {
                   child: Row(
                     children: [
                       IconButton(
-                        icon: const Icon(
-                          Icons.arrow_circle_left_sharp,
-                          color: AppTheme.amarelo,
-                          size: 35.0,
-                        ),
+                        icon: const Icon(Icons.arrow_circle_left_sharp, color: AppTheme.amarelo, size: 35.0),
                         onPressed: () {
                           if (context.canPop()) {
                             context.pop();
@@ -60,10 +56,7 @@ class _FAQScreenState extends State<FAQScreen> {
                       const Expanded(
                         child: Text(
                           'Perguntas Frequentes',
-                          style: TextStyle(
-                            fontSize: 18.0,
-                            fontWeight: FontWeight.w500,
-                          ),
+                          style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.w500),
                           textAlign: TextAlign.center,
                         ),
                       ),
@@ -86,16 +79,9 @@ class _FAQScreenState extends State<FAQScreen> {
                             children: [
                               const Icon(Icons.error_outline, size: 64, color: AppTheme.error),
                               const SizedBox(height: 16),
-                              Text(
-                                'Erro ao carregar perguntas',
-                                style: Theme.of(context).textTheme.titleMedium,
-                              ),
+                              Text('Erro ao carregar perguntas', style: Theme.of(context).textTheme.titleMedium),
                               const SizedBox(height: 8),
-                              Text(
-                                faqProvider.error,
-                                style: Theme.of(context).textTheme.bodySmall,
-                                textAlign: TextAlign.center,
-                              ),
+                              Text(faqProvider.error, style: Theme.of(context).textTheme.bodySmall, textAlign: TextAlign.center),
                             ],
                           ),
                         );
@@ -103,17 +89,14 @@ class _FAQScreenState extends State<FAQScreen> {
 
                       final faqs = faqProvider.faqs;
 
-          if (faqs.isEmpty) {
+                      if (faqs.isEmpty) {
                         return Center(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               const Icon(Icons.help_outline, size: 64, color: AppTheme.grayPaletteGray60),
                               const SizedBox(height: 16),
-                              Text(
-                                'Nenhuma pergunta disponível',
-                                style: Theme.of(context).textTheme.titleMedium,
-                              ),
+                              Text('Nenhuma pergunta disponível', style: Theme.of(context).textTheme.titleMedium),
                             ],
                           ),
                         );
@@ -136,9 +119,7 @@ class _FAQScreenState extends State<FAQScreen> {
           // Navbar
           Align(
             alignment: Alignment.bottomCenter,
-            child: NavbarWidget(
-              onMenuTap: () => _scaffoldKey.currentState?.openEndDrawer(),
-            ),
+            child: NavbarWidget(onMenuTap: () => _scaffoldKey.currentState?.openEndDrawer()),
           ),
         ],
       ),
@@ -163,22 +144,12 @@ class _FAQItemState extends State<_FAQItem> {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 1,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Theme(
         data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
         child: ExpansionTile(
-          title: Text(
-            widget.faq.question,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
-          ),
-          trailing: Icon(
-            _isExpanded ? Icons.expand_less : Icons.expand_more,
-            color: AppTheme.primaryColors,
-          ),
+          title: Text(widget.faq.question, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
+          trailing: Icon(_isExpanded ? Icons.expand_less : Icons.expand_more, color: AppTheme.amarelo),
           onExpansionChanged: (expanded) {
             setState(() {
               _isExpanded = expanded;
@@ -189,12 +160,7 @@ class _FAQItemState extends State<_FAQItem> {
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
               child: Align(
                 alignment: Alignment.centerLeft,
-                child: Text(
-                  widget.faq.answer,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppTheme.secondaryText,
-                      ),
-                ),
+                child: Text(widget.faq.answer, style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppTheme.secondaryText)),
               ),
             ),
           ],

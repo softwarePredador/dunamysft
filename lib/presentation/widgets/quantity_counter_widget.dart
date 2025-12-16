@@ -26,10 +26,7 @@ class QuantityCounterWidget extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppTheme.secondaryBackground,
         borderRadius: BorderRadius.circular(15),
-        border: Border.all(
-          color: AppTheme.alternate,
-          width: 1,
-        ),
+        border: Border.all(color: AppTheme.alternate, width: 1),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -43,7 +40,7 @@ class QuantityCounterWidget extends StatelessWidget {
               FontAwesomeIcons.minus,
               color: quantity > minValue
                   ? AppTheme.secondaryText
-                  : const Color(0xFFE0E3E7),
+                  : AppTheme.alternate,
               size: 10,
             ),
           ),
@@ -68,7 +65,7 @@ class QuantityCounterWidget extends StatelessWidget {
               FontAwesomeIcons.plus,
               color: quantity < maxValue
                   ? AppTheme.primaryText
-                  : const Color(0xFFE0E3E7),
+                  : AppTheme.alternate,
               size: 10,
             ),
           ),

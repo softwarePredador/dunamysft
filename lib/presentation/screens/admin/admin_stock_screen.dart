@@ -195,10 +195,10 @@ class _StockCardState extends State<_StockCard> {
   @override
   Widget build(BuildContext context) {
     final stockColor = _currentStock == 0
-        ? Colors.red
+        ? AppTheme.stockLow
         : _currentStock < 5
-        ? Colors.orange
-        : Colors.green;
+        ? AppTheme.stockMedium
+        : AppTheme.stockOk;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),

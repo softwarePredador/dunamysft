@@ -15,10 +15,7 @@ import '../../widgets/navbar_widget.dart';
 class ItemDetailsScreen extends StatefulWidget {
   final MenuItemModel item;
 
-  const ItemDetailsScreen({
-    super.key,
-    required this.item,
-  });
+  const ItemDetailsScreen({super.key, required this.item});
 
   @override
   State<ItemDetailsScreen> createState() => _ItemDetailsScreenState();
@@ -45,27 +42,30 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
 
   Future<void> _loadAdditionals() async {
     try {
-      final menuRef = FirebaseFirestore.instance.collection('menu').doc(widget.item.id);
+      final menuRef = FirebaseFirestore.instance
+          .collection('menu')
+          .doc(widget.item.id);
       final snapshot = await FirebaseFirestore.instance
           .collection('item_additional')
           .where('item', isEqualTo: menuRef)
           .get();
 
       final List<Map<String, dynamic>> additionals = [];
-      
+
       for (var doc in snapshot.docs) {
         final data = doc.data();
         final price = _toDouble(data['price']);
         final name = data['name']?.toString() ?? '';
-        
+
         // Ignorar adicionais sem nome ou com preço zero/negativo
         if (name.isEmpty || price <= 0) continue;
-        
+
         additionals.add({
           'id': doc.id,
           'name': name,
           'price': price,
-          'namePrice': data['name_price']?.toString() ?? 
+          'namePrice':
+              data['name_price']?.toString() ??
               '$name - R\$ ${price.toStringAsFixed(2).replaceAll('.', ',')}',
         });
       }
@@ -115,7 +115,7 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
   void _addToCart() {
     final authService = context.read<AuthService>();
     final user = authService.currentUser;
-    
+
     if (user == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Faça login para adicionar ao carrinho')),
@@ -160,7 +160,9 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
       backgroundColor: AppTheme.primaryBackground,
       endDrawer: const EndDrawerWidget(),
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(MediaQuery.of(context).size.height * 0.065),
+        preferredSize: Size.fromHeight(
+          MediaQuery.of(context).size.height * 0.065,
+        ),
         child: AppBar(
           backgroundColor: AppTheme.primaryBackground,
           elevation: 0,
@@ -288,27 +290,30 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
                       runSpacing: 8.0,
                       children: _availableAdditionals.map((additional) {
                         final name = additional['name'] as String? ?? '';
-                        final price = (additional['price'] as num?)?.toDouble() ?? 0.0;
-                        final namePrice = additional['namePrice'] as String? ?? 
+                        final price =
+                            (additional['price'] as num?)?.toDouble() ?? 0.0;
+                        final namePrice =
+                            additional['namePrice'] as String? ??
                             '$name - R\$ ${price.toStringAsFixed(2).replaceAll('.', ',')}';
                         final isSelected = _selectedAdditionals.contains(name);
                         return FilterChip(
                           label: Text(namePrice),
                           selected: isSelected,
-                          onSelected: (selected) => _updateAdditionalSelection(
-                            name,
-                            price,
-                            selected,
-                          ),
+                          onSelected: (selected) =>
+                              _updateAdditionalSelection(name, price, selected),
                           selectedColor: AppTheme.amarelo,
                           checkmarkColor: Colors.white,
                           labelStyle: TextStyle(
-                            color: isSelected ? Colors.white : AppTheme.primaryText,
+                            color: isSelected
+                                ? Colors.white
+                                : AppTheme.primaryText,
                           ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(100.0),
                             side: BorderSide(
-                              color: isSelected ? AppTheme.amarelo : const Color(0xFFCCCCCC),
+                              color: isSelected
+                                  ? AppTheme.amarelo
+                                  : AppTheme.bordaCinza,
                             ),
                           ),
                         );
@@ -425,7 +430,9 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         Text(
-                          widget.item.isAvailable ? 'Adicionar' : 'Indisponível',
+                          widget.item.isAvailable
+                              ? 'Adicionar'
+                              : 'Indisponível',
                           style: GoogleFonts.inter(
                             fontWeight: FontWeight.w500,
                             fontSize: 16.0,
