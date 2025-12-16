@@ -16,41 +16,60 @@ class AdminDashboardScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: AppTheme.primaryBackground,
+      appBar: AppBar(
+        backgroundColor: AppTheme.primaryBackground,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_circle_left_sharp,
+            color: AppTheme.amarelo,
+            size: 35,
+          ),
+          onPressed: () {
+            context.go('/home');
+          },
+        ),
+        title: Text(
+          'Painel Admin',
+          style: GoogleFonts.poppins(
+            color: AppTheme.primaryText,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        centerTitle: true,
+        actions: [
+          TextButton(
+            onPressed: () => context.go('/home'),
+            child: Text(
+              'Sair',
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                color: AppTheme.primaryText,
+                decoration: TextDecoration.underline,
+              ),
+            ),
+          ),
+        ],
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20.0),
           child: SingleChildScrollView(
             child: Column(
               children: [
-                // Header
+                // Header com nome do usuário
                 Padding(
-                  padding: const EdgeInsets.only(top: 30.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Olá $userName',
-                        style: GoogleFonts.poppins(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
-                          color: AppTheme.primaryText,
-                        ),
-                      ),
-                      InkWell(
-                        onTap: () => context.go('/home'),
-                        child: Text(
-                          'Sair',
-                          style: GoogleFonts.inter(
-                            fontSize: 14,
-                            color: AppTheme.primaryText,
-                            decoration: TextDecoration.underline,
-                          ),
-                        ),
-                      ),
-                    ],
+                  padding: const EdgeInsets.only(top: 10.0),
+                  child: Text(
+                    'Olá $userName',
+                    style: GoogleFonts.poppins(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                      color: AppTheme.primaryText,
+                    ),
                   ),
                 ),
-                const SizedBox(height: 30),
+                const SizedBox(height: 20),
 
                 // Menu Items
                 _AdminMenuItem(

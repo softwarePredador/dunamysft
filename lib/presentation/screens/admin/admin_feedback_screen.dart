@@ -23,7 +23,7 @@ class AdminFeedbackScreen extends StatelessWidget {
         leading: IconButton(
           icon: const Icon(
             Icons.arrow_circle_left_sharp,
-            color: AppTheme.primaryText,
+            color: AppTheme.amarelo,
             size: 35,
           ),
           onPressed: () {

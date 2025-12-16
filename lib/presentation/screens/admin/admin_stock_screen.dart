@@ -16,9 +16,9 @@ class AdminStockScreen extends StatelessWidget {
         backgroundColor: AppTheme.primaryBackground,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(
+          icon: const Icon(
             Icons.arrow_circle_left_sharp,
-            color: AppTheme.primaryText,
+            color: AppTheme.amarelo,
             size: 35,
           ),
           onPressed: () {

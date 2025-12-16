@@ -34,6 +34,8 @@ import 'presentation/screens/admin/admin_categories_screen.dart';
 import 'presentation/screens/admin/admin_stock_screen.dart';
 import 'presentation/screens/admin/admin_feedback_screen.dart';
 import 'presentation/screens/admin/admin_faq_screen.dart';
+import 'presentation/screens/admin/admin_reports_screen.dart';
+import 'presentation/screens/admin/admin_media_screen.dart';
 import 'presentation/providers/menu_provider.dart';
 import 'presentation/providers/category_provider.dart';
 import 'presentation/providers/cart_provider.dart';
@@ -224,15 +226,11 @@ final _router = GoRouter(
     ),
     GoRoute(
       path: '/admin/media',
-      builder: (context, state) => const Scaffold(
-        body: Center(child: Text('Gestão de Mídia - Em breve')),
-      ),
+      builder: (context, state) => const AdminMediaScreen(),
     ),
     GoRoute(
       path: '/admin/reports',
-      builder: (context, state) => const Scaffold(
-        body: Center(child: Text('Relatórios - Em breve')),
-      ),
+      builder: (context, state) => const AdminReportsScreen(),
     ),
   ],
 );

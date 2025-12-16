@@ -30,6 +30,25 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
     'cancelado',
   ];
 
+  // Mapeamento de status em inglês para português
+  String _normalizeStatus(String status) {
+    final statusMap = {
+      'pending': 'pendente',
+      'preparing': 'em preparo',
+      'ready': 'pronto',
+      'delivered': 'entregue',
+      'cancelled': 'cancelado',
+      'canceled': 'cancelado',
+    };
+    final normalized = statusMap[status.toLowerCase()] ?? status.toLowerCase();
+    // Verificar se o status normalizado está na lista de opções
+    if (_statusOptions.contains(normalized)) {
+      return normalized;
+    }
+    // Se não encontrar, retorna o primeiro status da lista
+    return _statusOptions.first;
+  }
+
   Future<void> _updateStatus(String newStatus) async {
     setState(() {
       _isUpdating = true;
@@ -72,9 +91,9 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
         backgroundColor: AppTheme.primaryBackground,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(
+          icon: const Icon(
             Icons.arrow_circle_left_sharp,
-            color: AppTheme.primaryText,
+            color: AppTheme.amarelo,
             size: 35,
           ),
           onPressed: () {
@@ -106,7 +125,8 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
             final orderData = snapshot.data!.data() as Map<String, dynamic>;
             final room = orderData['room']?.toString() ?? 'N/A';
             final total = (orderData['total'] as num?)?.toDouble() ?? 0.0;
-            final status = orderData['status'] ?? 'pendente';
+            final rawStatus = orderData['status']?.toString() ?? 'pendente';
+            final status = _normalizeStatus(rawStatus);
             final customerName = orderData['customer_name'] ?? 'Cliente';
             final paymentMethod = orderData['payment_method'] ?? 'N/A';
             final deliveryType = orderData['delivery_type'] ?? 'N/A';
