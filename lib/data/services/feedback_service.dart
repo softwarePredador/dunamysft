@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../../core/utils/app_logger.dart';
 import '../models/feedback_model.dart';
 
 class FeedbackService {
@@ -13,7 +14,7 @@ class FeedbackService {
       await _firestore.collection(_collection).add(feedback.toFirestore());
       return true;
     } catch (e) {
-      print('Erro ao enviar feedback: $e');
+      AppLogger.error('Erro ao enviar feedback', error: e, tag: 'FeedbackService');
       return false;
     }
   }
@@ -43,7 +44,7 @@ class FeedbackService {
           .map((doc) => FeedbackModel.fromFirestore(doc))
           .toList();
     } catch (e) {
-      print('Erro ao buscar feedbacks do usuário: $e');
+      AppLogger.error('Erro ao buscar feedbacks do usuário', error: e, tag: 'FeedbackService');
       return [];
     }
   }
@@ -56,7 +57,7 @@ class FeedbackService {
       });
       return true;
     } catch (e) {
-      print('Erro ao marcar feedback como resolvido: $e');
+      AppLogger.error('Erro ao marcar feedback como resolvido', error: e, tag: 'FeedbackService');
       return false;
     }
   }
@@ -67,7 +68,7 @@ class FeedbackService {
       await _firestore.collection(_collection).doc(feedbackId).delete();
       return true;
     } catch (e) {
-      print('Erro ao deletar feedback: $e');
+      AppLogger.error('Erro ao deletar feedback', error: e, tag: 'FeedbackService');
       return false;
     }
   }

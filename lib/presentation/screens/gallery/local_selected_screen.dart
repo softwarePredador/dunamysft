@@ -205,7 +205,7 @@ class _GalleryItemCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(12.0),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withValues(alpha: 0.1),
               blurRadius: 8.0,
             ),
           ],
@@ -233,7 +233,7 @@ class _GalleryItemCard extends StatelessWidget {
               // Overlay para vídeo
               if (item.hasVideo)
                 Container(
-                  color: Colors.black.withOpacity(0.3),
+                  color: Colors.black.withValues(alpha: 0.3),
                   child: const Center(
                     child: Icon(
                       Icons.play_circle_fill,

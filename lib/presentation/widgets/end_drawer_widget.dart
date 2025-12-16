@@ -190,7 +190,7 @@ class EndDrawerWidget extends StatelessWidget {
                       width: double.infinity,
                       height: 40.0,
                       decoration: BoxDecoration(
-                        color: AppTheme.error.withOpacity(0.1),
+                        color: AppTheme.error.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12.0),
                       ),
                       child: Row(

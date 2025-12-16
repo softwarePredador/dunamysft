@@ -71,7 +71,7 @@ class LoginScreen extends StatelessWidget {
                             fontFamily: 'Poppins',
                             fontSize: 30.0,
                             fontWeight: FontWeight.w500,
-                            color: AppTheme.primaryText.withOpacity(0.8),
+                            color: AppTheme.primaryText.withValues(alpha: 0.8),
                           ),
                         ),
                       ),

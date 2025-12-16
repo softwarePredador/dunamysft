@@ -217,31 +217,31 @@ class _OrderCard extends StatelessWidget {
 
     switch (status.toLowerCase()) {
       case 'pendente':
-        backgroundColor = AppTheme.warning.withOpacity(0.2);
+        backgroundColor = AppTheme.warning.withValues(alpha: 0.2);
         textColor = AppTheme.warning;
         displayText = 'Pendente';
         break;
       case 'em preparo':
       case 'preparing':
-        backgroundColor = AppTheme.primary.withOpacity(0.2);
+        backgroundColor = AppTheme.primary.withValues(alpha: 0.2);
         textColor = AppTheme.primary;
         displayText = 'Em Preparo';
         break;
       case 'pronto':
       case 'ready':
-        backgroundColor = AppTheme.success.withOpacity(0.2);
+        backgroundColor = AppTheme.success.withValues(alpha: 0.2);
         textColor = AppTheme.success;
         displayText = 'Pronto';
         break;
       case 'entregue':
       case 'delivered':
-        backgroundColor = AppTheme.success.withOpacity(0.2);
+        backgroundColor = AppTheme.success.withValues(alpha: 0.2);
         textColor = AppTheme.success;
         displayText = 'Entregue';
         break;
       case 'cancelado':
       case 'cancelled':
-        backgroundColor = AppTheme.error.withOpacity(0.2);
+        backgroundColor = AppTheme.error.withValues(alpha: 0.2);
         textColor = AppTheme.error;
         displayText = 'Cancelado';
         break;

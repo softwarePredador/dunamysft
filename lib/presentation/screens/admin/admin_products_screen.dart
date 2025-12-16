@@ -263,7 +263,7 @@ class _ProductCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppTheme.secondaryBackground,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppTheme.primaryText.withOpacity(0.2)),
+          border: Border.all(color: AppTheme.primaryText.withValues(alpha: 0.2)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -282,7 +282,7 @@ class _ProductCard extends StatelessWidget {
                           height: 100,
                           fit: BoxFit.cover,
                           placeholder: (context, url) => Container(
-                            color: AppTheme.secondaryText.withOpacity(0.2),
+                            color: AppTheme.secondaryText.withValues(alpha: 0.2),
                             child: const Center(
                               child: CircularProgressIndicator(),
                             ),
@@ -290,20 +290,20 @@ class _ProductCard extends StatelessWidget {
                           errorWidget: (context, url, error) => Container(
                             width: 140,
                             height: 100,
-                            color: AppTheme.secondaryText.withOpacity(0.2),
+                            color: AppTheme.secondaryText.withValues(alpha: 0.2),
                             child: const Icon(Icons.image_not_supported),
                           ),
                         )
                       : Container(
                           width: 140,
                           height: 100,
-                          color: AppTheme.secondaryText.withOpacity(0.2),
+                          color: AppTheme.secondaryText.withValues(alpha: 0.2),
                           child: const Icon(Icons.fastfood),
                         ),
                   if (!isAvailable)
                     Positioned.fill(
                       child: Container(
-                        color: Colors.black.withOpacity(0.5),
+                        color: Colors.black.withValues(alpha: 0.5),
                         child: const Center(
                           child: Text(
                             'INDISPONÍVEL',

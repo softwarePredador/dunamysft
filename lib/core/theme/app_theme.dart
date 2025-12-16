@@ -74,13 +74,11 @@ class AppTheme {
         secondary: secondary,
         tertiary: tertiary,
         error: error,
-        background: primaryBackground,
         surface: secondaryBackground,
         onPrimary: Colors.white,
         onSecondary: Colors.white,
         onError: Colors.white,
         onSurface: primaryText,
-        onBackground: primaryText,
       ),
       textTheme: TextTheme(
         displayLarge: GoogleFonts.poppins(color: primaryText, fontWeight: FontWeight.w600, fontSize: 64.0),

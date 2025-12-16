@@ -212,7 +212,7 @@ class _PIXPaymentScreenState extends State<PIXPaymentScreen> {
                 color: Colors.white,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withValues(alpha: 0.1),
                     blurRadius: 10.0,
                     offset: const Offset(0, -5),
                   ),
@@ -328,7 +328,7 @@ class _PIXPaymentScreenState extends State<PIXPaymentScreen> {
             borderRadius: BorderRadius.circular(16.0),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withValues(alpha: 0.05),
                 blurRadius: 10.0,
               ),
             ],
@@ -368,7 +368,7 @@ class _PIXPaymentScreenState extends State<PIXPaymentScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 decoration: BoxDecoration(
-                  color: AppTheme.amarelo.withOpacity(0.1),
+                  color: AppTheme.amarelo.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
@@ -432,9 +432,9 @@ class _PIXPaymentScreenState extends State<PIXPaymentScreen> {
           width: double.infinity,
           padding: const EdgeInsets.all(16.0),
           decoration: BoxDecoration(
-            color: AppTheme.success.withOpacity(0.1),
+            color: AppTheme.success.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12.0),
-            border: Border.all(color: AppTheme.success.withOpacity(0.3)),
+            border: Border.all(color: AppTheme.success.withValues(alpha: 0.3)),
           ),
           child: Row(
             children: [
@@ -446,7 +446,7 @@ class _PIXPaymentScreenState extends State<PIXPaymentScreen> {
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: AppTheme.success.withOpacity(0.5),
+                      color: AppTheme.success.withValues(alpha: 0.5),
                       blurRadius: 8,
                       spreadRadius: 2,
                     ),
@@ -475,7 +475,7 @@ class _PIXPaymentScreenState extends State<PIXPaymentScreen> {
           width: double.infinity,
           padding: const EdgeInsets.all(16.0),
           decoration: BoxDecoration(
-            color: AppTheme.info.withOpacity(0.1),
+            color: AppTheme.info.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12.0),
           ),
           child: Column(
@@ -515,7 +515,7 @@ class _PIXPaymentScreenState extends State<PIXPaymentScreen> {
           width: double.infinity,
           padding: const EdgeInsets.all(16.0),
           decoration: BoxDecoration(
-            color: AppTheme.warning.withOpacity(0.1),
+            color: AppTheme.warning.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12.0),
           ),
           child: Row(

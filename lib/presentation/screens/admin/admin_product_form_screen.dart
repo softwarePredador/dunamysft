@@ -265,7 +265,7 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
         width: 100,
         padding: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
-          color: AppTheme.adminAccent.withOpacity(0.1),
+          color: AppTheme.adminAccent.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: AppTheme.adminAccent),
         ),
@@ -566,8 +566,8 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
                                   color: AppTheme.secondaryBackground,
                                   borderRadius: BorderRadius.circular(16),
                                   border: Border.all(
-                                    color: AppTheme.adminAccent.withOpacity(
-                                      0.5,
+                                    color: AppTheme.adminAccent.withValues(
+                                      alpha: 0.5,
                                     ),
                                     width: 2,
                                   ),
@@ -671,7 +671,7 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
                                       shape: BoxShape.circle,
                                       boxShadow: [
                                         BoxShadow(
-                                          color: Colors.black.withOpacity(0.2),
+                                          color: Colors.black.withValues(alpha: 0.2),
                                           blurRadius: 4,
                                           offset: const Offset(0, 2),
                                         ),
@@ -743,7 +743,7 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
                           borderRadius: BorderRadius.circular(16),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
+                              color: Colors.black.withValues(alpha: 0.05),
                               blurRadius: 10,
                               offset: const Offset(0, 2),
                             ),
@@ -803,7 +803,7 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
                               ),
                               decoration: BoxDecoration(
                                 border: Border.all(
-                                  color: AppTheme.primaryText.withOpacity(0.3),
+                                  color: AppTheme.primaryText.withValues(alpha: 0.3),
                                 ),
                                 borderRadius: BorderRadius.circular(12),
                               ),
@@ -844,7 +844,7 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
                           borderRadius: BorderRadius.circular(16),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
+                              color: Colors.black.withValues(alpha: 0.05),
                               blurRadius: 10,
                               offset: const Offset(0, 2),
                             ),
@@ -928,8 +928,8 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
                               ),
                               decoration: BoxDecoration(
                                 color: _isAvailable
-                                    ? AppTheme.adminAccent.withOpacity(0.1)
-                                    : Colors.red.withOpacity(0.1),
+                                    ? AppTheme.adminAccent.withValues(alpha: 0.1)
+                                    : Colors.red.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
                                   color: _isAvailable
@@ -993,7 +993,7 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
                           borderRadius: BorderRadius.circular(16),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
+                              color: Colors.black.withValues(alpha: 0.05),
                               blurRadius: 10,
                               offset: const Offset(0, 2),
                             ),
@@ -1143,7 +1143,7 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
             decoration: BoxDecoration(
               color: AppTheme.primaryBackground,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppTheme.primaryText.withOpacity(0.1)),
+              border: Border.all(color: AppTheme.primaryText.withValues(alpha: 0.1)),
             ),
             child: Row(
               children: [
@@ -1162,13 +1162,13 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                         borderSide: BorderSide(
-                          color: AppTheme.primaryText.withOpacity(0.3),
+                          color: AppTheme.primaryText.withValues(alpha: 0.3),
                         ),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                         borderSide: BorderSide(
-                          color: AppTheme.primaryText.withOpacity(0.3),
+                          color: AppTheme.primaryText.withValues(alpha: 0.3),
                         ),
                       ),
                       focusedBorder: OutlineInputBorder(
@@ -1210,13 +1210,13 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                         borderSide: BorderSide(
-                          color: AppTheme.primaryText.withOpacity(0.3),
+                          color: AppTheme.primaryText.withValues(alpha: 0.3),
                         ),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                         borderSide: BorderSide(
-                          color: AppTheme.primaryText.withOpacity(0.3),
+                          color: AppTheme.primaryText.withValues(alpha: 0.3),
                         ),
                       ),
                       focusedBorder: OutlineInputBorder(
@@ -1243,7 +1243,7 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
                   child: Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Colors.red.withOpacity(0.1),
+                      color: Colors.red.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: const Icon(
@@ -1269,7 +1269,7 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
             color: AppTheme.primaryBackground,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: AppTheme.primaryText.withOpacity(0.1),
+              color: AppTheme.primaryText.withValues(alpha: 0.1),
               style: BorderStyle.solid,
             ),
           ),

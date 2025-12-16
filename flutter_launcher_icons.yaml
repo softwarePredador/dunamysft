@@ -1,0 +1,38 @@
+# Flutter Launcher Icons Configuration
+# Run: dart run flutter_launcher_icons
+
+flutter_launcher_icons:
+  # Android settings
+  android: true
+  ios: true
+  
+  # Path to the icon image (1024x1024 recommended)
+  image_path: "assets/images/app_launcher_icon.png"
+  
+  # Minimum SDK version for adaptive icons
+  min_sdk_android: 21
+  
+  # Android adaptive icon settings
+  adaptive_icon_background: "#000000"
+  adaptive_icon_foreground: "assets/images/app_launcher_icon.png"
+  
+  # Remove alpha channel for iOS (required by App Store)
+  remove_alpha_ios: true
+  
+  # Web favicon
+  web:
+    generate: true
+    image_path: "assets/images/app_launcher_icon.png"
+    background_color: "#000000"
+    theme_color: "#F7C843"
+  
+  # Windows
+  windows:
+    generate: true
+    image_path: "assets/images/app_launcher_icon.png"
+    icon_size: 48
+  
+  # macOS
+  macos:
+    generate: true
+    image_path: "assets/images/app_launcher_icon.png"

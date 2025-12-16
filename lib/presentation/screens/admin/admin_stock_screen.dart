@@ -249,7 +249,7 @@ class _StockCardState extends State<_StockCard> {
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: stockColor.withOpacity(0.2),
+                        color: stockColor.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(

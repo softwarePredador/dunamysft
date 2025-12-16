@@ -65,7 +65,7 @@ class CustomTextField extends StatelessWidget {
             hintStyle: TextStyle(
               fontFamily: 'Poppins',
               fontSize: 14,
-              color: AppTheme.secondaryText.withOpacity(0.6),
+              color: AppTheme.secondaryText.withValues(alpha: 0.6),
             ),
             prefixIcon: prefixIcon != null 
                 ? Icon(prefixIcon, color: AppTheme.secondaryText) 
@@ -76,13 +76,13 @@ class CustomTextField extends StatelessWidget {
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
-                color: AppTheme.secondaryText.withOpacity(0.2),
+                color: AppTheme.secondaryText.withValues(alpha: 0.2),
               ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
-                color: AppTheme.secondaryText.withOpacity(0.2),
+                color: AppTheme.secondaryText.withValues(alpha: 0.2),
               ),
             ),
             focusedBorder: OutlineInputBorder(
@@ -108,7 +108,7 @@ class CustomTextField extends StatelessWidget {
             disabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
-                color: AppTheme.secondaryText.withOpacity(0.1),
+                color: AppTheme.secondaryText.withValues(alpha: 0.1),
               ),
             ),
           ),

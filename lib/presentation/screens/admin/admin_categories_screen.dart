@@ -298,7 +298,7 @@ class _CategoryCard extends StatelessWidget {
           width: 60,
           height: 60,
           decoration: BoxDecoration(
-            color: AppTheme.adminAccent.withOpacity(0.2),
+            color: AppTheme.adminAccent.withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(8),
           ),
           child: photoUrl.isNotEmpty

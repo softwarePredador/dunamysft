@@ -393,7 +393,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
               borderRadius: BorderRadius.circular(13.0),
               border: Border.all(
                 color: _isPickup
-                    ? AppTheme.bordaCinza.withOpacity(0.5)
+                    ? AppTheme.bordaCinza.withValues(alpha: 0.5)
                     : AppTheme.bordaCinza,
                 width: 1.0,
               ),
@@ -417,7 +417,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                     hintText: '000',
                     hintStyle: GoogleFonts.inter(
                       fontSize: 40.0,
-                      color: Colors.grey.withOpacity(0.5),
+                      color: Colors.grey.withValues(alpha: 0.5),
                     ),
                   ),
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -520,9 +520,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
           padding: const EdgeInsets.all(12.0),
           margin: const EdgeInsets.only(top: 10.0, bottom: 20.0),
           decoration: BoxDecoration(
-            color: AppTheme.amarelo.withOpacity(0.1),
+            color: AppTheme.amarelo.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8.0),
-            border: Border.all(color: AppTheme.amarelo.withOpacity(0.3)),
+            border: Border.all(color: AppTheme.amarelo.withValues(alpha: 0.3)),
           ),
           child: Row(
             children: [
@@ -713,7 +713,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(12.0),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10.0),
+          BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10.0),
         ],
       ),
       child: Column(
@@ -796,7 +796,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
               size: 12.0,
               color: isSelected
                   ? AppTheme.amarelo
-                  : AppTheme.secondaryText.withOpacity(0.36),
+                  : AppTheme.secondaryText.withValues(alpha: 0.36),
             ),
             const SizedBox(width: 6.0),
             Text(

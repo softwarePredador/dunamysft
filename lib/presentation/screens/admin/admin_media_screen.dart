@@ -518,20 +518,20 @@ class _MediaItem extends StatelessWidget {
                     placeholder: (context, url) => Container(
                       width: 100,
                       height: 120,
-                      color: AppTheme.secondaryText.withOpacity(0.2),
+                      color: AppTheme.secondaryText.withValues(alpha: 0.2),
                       child: const Center(child: CircularProgressIndicator()),
                     ),
                     errorWidget: (context, url, error) => Container(
                       width: 100,
                       height: 120,
-                      color: AppTheme.secondaryText.withOpacity(0.2),
+                      color: AppTheme.secondaryText.withValues(alpha: 0.2),
                       child: const Icon(Icons.broken_image),
                     ),
                   )
                 : Container(
                     width: 100,
                     height: 120,
-                    color: AppTheme.secondaryText.withOpacity(0.2),
+                    color: AppTheme.secondaryText.withValues(alpha: 0.2),
                     child: const Icon(Icons.image),
                   ),
           ),

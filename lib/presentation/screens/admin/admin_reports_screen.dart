@@ -348,7 +348,7 @@ class _AdminReportsScreenState extends State<AdminReportsScreen> {
                   width: double.infinity,
                   height: 50,
                   decoration: BoxDecoration(
-                    color: AppTheme.primaryText.withOpacity(0.1),
+                    color: AppTheme.primaryText.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(16),
                   ),
                   padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -395,7 +395,7 @@ class _AdminReportsScreenState extends State<AdminReportsScreen> {
                   width: double.infinity,
                   height: 50,
                   decoration: BoxDecoration(
-                    color: AppTheme.primaryText.withOpacity(0.1),
+                    color: AppTheme.primaryText.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(16),
                   ),
                   padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -497,7 +497,7 @@ class _AdminReportsScreenState extends State<AdminReportsScreen> {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: AppTheme.adminAccent.withOpacity(0.1),
+                      color: AppTheme.adminAccent.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Column(

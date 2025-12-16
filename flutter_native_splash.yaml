@@ -1,0 +1,37 @@
+# Flutter Native Splash Configuration
+# Run: dart run flutter_native_splash:create
+
+flutter_native_splash:
+  # Background color for the splash screen
+  color: "#000000"
+  
+  # Optional background image
+  # background_image: "assets/images/splash_background.png"
+  
+  # Image to display on splash screen
+  image: assets/images/app_launcher_icon.png
+  
+  # Branding image (shown at bottom)
+  # branding: assets/images/branding.png
+  # branding_mode: bottom
+  
+  # Color for the background of the icon (iOS only)
+  color_dark: "#000000"
+  image_dark: assets/images/app_launcher_icon.png
+  
+  # Android 12+ specific settings
+  android_12:
+    color: "#000000"
+    image: assets/images/app_launcher_icon.png
+    icon_background_color: "#000000"
+    color_dark: "#000000"
+    image_dark: assets/images/app_launcher_icon.png
+    icon_background_color_dark: "#000000"
+
+  # Platforms to generate splash for
+  android: true
+  ios: true
+  web: true
+  
+  # Fullscreen mode (hides status bar on Android)
+  fullscreen: true
