@@ -350,20 +350,31 @@ class _CartItemCard extends StatelessWidget {
                         ),
                   ),
                   const SizedBox(height: 4),
+                  // Preço base
                   Text(
                     'R\$ ${cartItem.price.toStringAsFixed(2)}',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: AppTheme.primaryColors,
                         ),
                   ),
+                  // Preço dos adicionais (se houver)
+                  if (cartItem.additionalPrice > 0) ...[
+                    Text(
+                      '+ Adicionais: R\$ ${cartItem.additionalPrice.toStringAsFixed(2)}',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: AppTheme.amarelo,
+                            fontWeight: FontWeight.w500,
+                          ),
+                    ),
+                  ],
                   if (cartItem.additionals.isNotEmpty) ...[
                     const SizedBox(height: 4),
                     Text(
-                      'Adicionais: ${cartItem.additionals.join(", ")}',
+                      cartItem.additionals.join(", "),
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: AppTheme.secondaryText,
                           ),
-                      maxLines: 1,
+                      maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ],

@@ -49,26 +49,26 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
       final snapshot = await FirebaseFirestore.instance
           .collection('item_additional')
           .where('item', isEqualTo: menuRef)
-          .where('price', isGreaterThan: 0)
           .get();
 
-      final additionals = snapshot.docs.map((doc) {
+      final List<Map<String, dynamic>> additionals = [];
+      
+      for (var doc in snapshot.docs) {
         final data = doc.data();
-        // Helper para converter para double
-        double toDouble(dynamic value) {
-          if (value == null) return 0.0;
-          if (value is double) return value;
-          if (value is int) return value.toDouble();
-          return 0.0;
-        }
-        final price = toDouble(data['price']);
-        return {
+        final price = _toDouble(data['price']);
+        final name = data['name']?.toString() ?? '';
+        
+        // Ignorar adicionais sem nome ou com preço zero/negativo
+        if (name.isEmpty || price <= 0) continue;
+        
+        additionals.add({
           'id': doc.id,
-          'name': data['name']?.toString() ?? '',
+          'name': name,
           'price': price,
-          'namePrice': data['name_price']?.toString() ?? '${data['name']} - R\$ ${price.toStringAsFixed(2).replaceAll('.', ',')}',
-        };
-      }).toList();
+          'namePrice': data['name_price']?.toString() ?? 
+              '$name - R\$ ${price.toStringAsFixed(2).replaceAll('.', ',')}',
+        });
+      }
 
       if (mounted) {
         setState(() {
@@ -77,12 +77,21 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
         });
       }
     } catch (e) {
+      debugPrint('Erro ao carregar adicionais: $e');
       if (mounted) {
         setState(() {
           _loadingAdditionals = false;
         });
       }
     }
+  }
+
+  double _toDouble(dynamic value) {
+    if (value == null) return 0.0;
+    if (value is double) return value;
+    if (value is int) return value.toDouble();
+    if (value is String) return double.tryParse(value) ?? 0.0;
+    return 0.0;
   }
 
   @override
@@ -123,6 +132,7 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
       menuItemPhoto: widget.item.photo,
       price: widget.item.price,
       quantity: _quantity,
+      additionalPrice: _totalAdditional, // Soma do preço dos adicionais
       observation: _observationController.text,
       additionals: _selectedAdditionals,
     );
@@ -277,15 +287,17 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
                       spacing: 8.0,
                       runSpacing: 8.0,
                       children: _availableAdditionals.map((additional) {
-                        final isSelected = _selectedAdditionals.contains(additional['name']);
+                        final name = additional['name'] as String? ?? '';
+                        final price = (additional['price'] as num?)?.toDouble() ?? 0.0;
+                        final namePrice = additional['namePrice'] as String? ?? 
+                            '$name - R\$ ${price.toStringAsFixed(2).replaceAll('.', ',')}';
+                        final isSelected = _selectedAdditionals.contains(name);
                         return FilterChip(
-                          label: Text(
-                            additional['namePrice'] ?? '${additional['name']} - R\$ ${additional['price'].toStringAsFixed(2).replaceAll('.', ',')}',
-                          ),
+                          label: Text(namePrice),
                           selected: isSelected,
                           onSelected: (selected) => _updateAdditionalSelection(
-                            additional['name'],
-                            additional['price'],
+                            name,
+                            price,
                             selected,
                           ),
                           selectedColor: AppTheme.amarelo,

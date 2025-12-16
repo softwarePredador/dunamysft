@@ -8,6 +8,7 @@ class ProductCartModel {
   final String menuItemPhoto;
   final int quantity;
   final double price;
+  final double additionalPrice; // Preço total dos adicionais
   final String? observation;
   final List<String> additionals;
   final DateTime? createdAt;
@@ -20,6 +21,7 @@ class ProductCartModel {
     this.menuItemPhoto = '',
     required this.quantity,
     required this.price,
+    this.additionalPrice = 0.0,
     this.observation,
     this.additionals = const [],
     this.createdAt,
@@ -35,7 +37,8 @@ class ProductCartModel {
       menuItemPhoto: data['menuItemPhoto'] ?? '',
       quantity: data['quantity'] ?? 1,
       price: (data['price'] ?? 0.0).toDouble(),
-      observation: data['observation'],
+      additionalPrice: (data['additionalPrice'] ?? data['productAditional'] ?? 0.0).toDouble(),
+      observation: data['observation'] ?? data['obs'],
       additionals: List<String>.from(data['additionals'] ?? []),
       createdAt: (data['created_at'] as Timestamp?)?.toDate(),
     );
@@ -49,14 +52,22 @@ class ProductCartModel {
       'menuItemPhoto': menuItemPhoto,
       'quantity': quantity,
       'price': price,
+      'additionalPrice': additionalPrice,
+      'productAditional': price + additionalPrice, // Compatível com FlutterFlow
+      'total': (price + additionalPrice) * quantity, // Total final
       'observation': observation,
+      'obs': observation, // Compatível com FlutterFlow
       'additionals': additionals,
       'created_at': createdAt != null ? Timestamp.fromDate(createdAt!) : FieldValue.serverTimestamp(),
     };
   }
 
-  double get total => price * quantity;
-  double get totalPrice => price * quantity;
+  /// Preço unitário com adicionais
+  double get unitPriceWithAdditionals => price + additionalPrice;
+  
+  /// Total do item (preço unitário com adicionais * quantidade)
+  double get total => unitPriceWithAdditionals * quantity;
+  double get totalPrice => unitPriceWithAdditionals * quantity;
 
   ProductCartModel copyWith({
     String? id,
@@ -66,6 +77,7 @@ class ProductCartModel {
     String? menuItemPhoto,
     int? quantity,
     double? price,
+    double? additionalPrice,
     String? observation,
     List<String>? additionals,
     DateTime? createdAt,
@@ -78,6 +90,7 @@ class ProductCartModel {
       menuItemPhoto: menuItemPhoto ?? this.menuItemPhoto,
       quantity: quantity ?? this.quantity,
       price: price ?? this.price,
+      additionalPrice: additionalPrice ?? this.additionalPrice,
       observation: observation ?? this.observation,
       additionals: additionals ?? this.additionals,
       createdAt: createdAt ?? this.createdAt,

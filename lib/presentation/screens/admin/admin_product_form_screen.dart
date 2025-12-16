@@ -39,9 +39,39 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
   File? _selectedImage;
 
   List<Map<String, dynamic>> _categories = [];
-  List<Map<String, TextEditingController>> _additionals = [];
+  
+  // Lista dinâmica de adicionais
+  final List<Map<String, dynamic>> _additionals = [];
+  bool _loadingAdditionals = false;
 
   final ImagePicker _imagePicker = ImagePicker();
+
+  void _addAdditionalField() {
+    setState(() {
+      _additionals.add({
+        'id': null, // null para novos, id do doc para existentes
+        'nameController': TextEditingController(),
+        'priceController': TextEditingController(),
+        'isNew': true,
+        'toDelete': false,
+      });
+    });
+  }
+
+  void _removeAdditionalField(int index) {
+    setState(() {
+      final additional = _additionals[index];
+      // Se já existe no banco, marcar para deletar
+      if (additional['id'] != null) {
+        additional['toDelete'] = true;
+      } else {
+        // Se é novo, apenas remover da lista
+        additional['nameController']?.dispose();
+        additional['priceController']?.dispose();
+        _additionals.removeAt(index);
+      }
+    });
+  }
 
   @override
   void initState() {
@@ -50,6 +80,54 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
     _loadCategories();
     if (widget.productId != null) {
       _loadProduct();
+      _loadAdditionals();
+    } else {
+      // Para novo produto, começar com um campo de adicional vazio
+      _addAdditionalField();
+    }
+  }
+
+  Future<void> _loadAdditionals() async {
+    if (widget.productId == null) return;
+    
+    setState(() => _loadingAdditionals = true);
+    
+    try {
+      final menuRef = FirebaseFirestore.instance.collection('menu').doc(widget.productId);
+      final snapshot = await FirebaseFirestore.instance
+          .collection('item_additional')
+          .where('item', isEqualTo: menuRef)
+          .get();
+
+      for (var doc in snapshot.docs) {
+        final data = doc.data();
+        final price = data['price'];
+        // Ignorar adicionais vazios (sem nome e preço)
+        if ((data['name'] == null || data['name'].toString().isEmpty) && 
+            (price == null || price == 0)) {
+          continue;
+        }
+        _additionals.add({
+          'id': doc.id,
+          'nameController': TextEditingController(text: data['name'] ?? ''),
+          'priceController': TextEditingController(
+            text: price != null ? price.toString() : '',
+          ),
+          'isNew': false,
+          'toDelete': false,
+        });
+      }
+      
+      // Se não tem nenhum adicional, adicionar um campo vazio
+      if (_additionals.isEmpty) {
+        _addAdditionalField();
+      }
+    } catch (e) {
+      debugPrint('Erro ao carregar adicionais: $e');
+    } finally {
+      if (mounted) {
+        setState(() => _loadingAdditionals = false);
+      }
     }
   }
 
@@ -270,17 +348,21 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
         'updated_at': FieldValue.serverTimestamp(),
       };
 
+      DocumentReference productRef;
+      
       if (widget.productId != null) {
         // Update
-        await FirebaseFirestore.instance
-            .collection('menu')
-            .doc(widget.productId)
-            .update(data);
+        productRef = FirebaseFirestore.instance.collection('menu').doc(widget.productId);
+        await productRef.update(data);
       } else {
         // Create
         data['created_at'] = FieldValue.serverTimestamp();
-        await FirebaseFirestore.instance.collection('menu').add(data);
+        final docRef = await FirebaseFirestore.instance.collection('menu').add(data);
+        productRef = docRef;
       }
+
+      // Salvar adicionais
+      await _saveAdditionals(productRef);
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -303,6 +385,48 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
         setState(() => _isSaving = false);
       }
     }
+  }
+
+  Future<void> _saveAdditionals(DocumentReference productRef) async {
+    final batch = FirebaseFirestore.instance.batch();
+    final itemAdditionalCollection = FirebaseFirestore.instance.collection('item_additional');
+
+    for (var additional in _additionals) {
+      final name = (additional['nameController'] as TextEditingController).text.trim();
+      final priceText = (additional['priceController'] as TextEditingController).text.trim();
+      final price = double.tryParse(priceText) ?? 0.0;
+      final existingId = additional['id'] as String?;
+      final toDelete = additional['toDelete'] as bool;
+
+      // Se marcado para deletar
+      if (toDelete && existingId != null) {
+        batch.delete(itemAdditionalCollection.doc(existingId));
+        continue;
+      }
+
+      // Se está marcado para deletar mas não tem id, ignorar
+      if (toDelete) continue;
+
+      // Se nome e preço estão vazios, ignorar
+      if (name.isEmpty && price == 0) continue;
+
+      final additionalData = {
+        'name': name,
+        'price': price,
+        'item': productRef,
+        'name_price': name.isNotEmpty ? '$name R\$ ${price.toStringAsFixed(2)}' : '',
+      };
+
+      if (existingId != null) {
+        // Atualizar existente
+        batch.update(itemAdditionalCollection.doc(existingId), additionalData);
+      } else {
+        // Criar novo
+        batch.set(itemAdditionalCollection.doc(), additionalData);
+      }
+    }
+
+    await batch.commit();
   }
 
   Future<void> _deleteProduct() async {
@@ -358,8 +482,8 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
     _stockController.dispose();
     _photoUrlController.dispose();
     for (var additional in _additionals) {
-      additional['name']?.dispose();
-      additional['price']?.dispose();
+      (additional['nameController'] as TextEditingController?)?.dispose();
+      (additional['priceController'] as TextEditingController?)?.dispose();
     }
     super.dispose();
   }
@@ -787,6 +911,82 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
                           ],
                         ),
                       ),
+                      const SizedBox(height: 20),
+
+                      // Card de Adicionais
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: AppTheme.secondaryBackground,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 10,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  children: [
+                                    Icon(Icons.add_box, size: 20, color: AppTheme.amarelo),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      'Adicionais do Produto',
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                        color: AppTheme.primaryText,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                IconButton(
+                                  onPressed: _addAdditionalField,
+                                  icon: Container(
+                                    padding: const EdgeInsets.all(4),
+                                    decoration: BoxDecoration(
+                                      color: AppTheme.amarelo,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Icon(
+                                      Icons.add,
+                                      color: Colors.white,
+                                      size: 20,
+                                    ),
+                                  ),
+                                  tooltip: 'Adicionar item',
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              'Ex: Queijo extra, Bacon, Molho especial',
+                              style: GoogleFonts.inter(
+                                fontSize: 12,
+                                color: AppTheme.secondaryText,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            
+                            if (_loadingAdditionals)
+                              const Center(
+                                child: Padding(
+                                  padding: EdgeInsets.all(20),
+                                  child: CircularProgressIndicator(),
+                                ),
+                              )
+                            else
+                              ..._buildAdditionalFields(),
+                          ],
+                        ),
+                      ),
                       const SizedBox(height: 30),
 
                       // Save Button
@@ -841,6 +1041,167 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
         ),
       ],
     );
+  }
+
+  List<Widget> _buildAdditionalFields() {
+    final List<Widget> fields = [];
+    
+    for (int i = 0; i < _additionals.length; i++) {
+      final additional = _additionals[i];
+      
+      // Não mostrar os marcados para deletar
+      if (additional['toDelete'] == true) continue;
+      
+      fields.add(
+        Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: AppTheme.primaryBackground,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: AppTheme.primaryText.withOpacity(0.1),
+              ),
+            ),
+            child: Row(
+              children: [
+                // Nome do adicional
+                Expanded(
+                  flex: 3,
+                  child: TextFormField(
+                    controller: additional['nameController'] as TextEditingController,
+                    decoration: InputDecoration(
+                      hintText: 'Nome do adicional',
+                      hintStyle: GoogleFonts.inter(
+                        fontSize: 14,
+                        color: AppTheme.secondaryText,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: AppTheme.primaryText.withOpacity(0.3)),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: AppTheme.primaryText.withOpacity(0.3)),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: const BorderSide(color: AppTheme.amarelo, width: 2),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      isDense: true,
+                    ),
+                    style: GoogleFonts.inter(fontSize: 14),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                // Preço do adicional
+                Expanded(
+                  flex: 2,
+                  child: TextFormField(
+                    controller: additional['priceController'] as TextEditingController,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      hintText: '0.00',
+                      prefixText: 'R\$ ',
+                      prefixStyle: GoogleFonts.inter(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: AppTheme.primaryText,
+                      ),
+                      hintStyle: GoogleFonts.inter(
+                        fontSize: 14,
+                        color: AppTheme.secondaryText,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: AppTheme.primaryText.withOpacity(0.3)),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: AppTheme.primaryText.withOpacity(0.3)),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: const BorderSide(color: AppTheme.amarelo, width: 2),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      isDense: true,
+                    ),
+                    style: GoogleFonts.inter(fontSize: 14),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                // Botão remover
+                InkWell(
+                  onTap: () => _removeAdditionalField(i),
+                  borderRadius: BorderRadius.circular(8),
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.red.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(
+                      Icons.delete_outline,
+                      color: Colors.red,
+                      size: 20,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+    
+    // Mensagem se não tem adicionais
+    if (fields.isEmpty) {
+      fields.add(
+        Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: AppTheme.primaryBackground,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: AppTheme.primaryText.withOpacity(0.1),
+              style: BorderStyle.solid,
+            ),
+          ),
+          child: Center(
+            child: Column(
+              children: [
+                Icon(
+                  Icons.add_circle_outline,
+                  size: 40,
+                  color: AppTheme.secondaryText,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Nenhum adicional cadastrado',
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    color: AppTheme.secondaryText,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Toque no + para adicionar',
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    color: AppTheme.secondaryText,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+    
+    return fields;
   }
 
   InputDecoration _inputDecoration(String hint) {

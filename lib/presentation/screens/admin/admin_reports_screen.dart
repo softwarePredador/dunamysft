@@ -74,15 +74,11 @@ class _AdminReportsScreenState extends State<AdminReportsScreen> {
 
   Future<void> _generateReport() async {
     if (_startDate == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Selecione a Data Início')),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Selecione a Data Início')));
       return;
     }
     if (_endDate == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Selecione a Data Fim')),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Selecione a Data Fim')));
       return;
     }
 
@@ -101,26 +97,19 @@ class _AdminReportsScreenState extends State<AdminReportsScreen> {
 
       final orders = snapshot.docs.map((doc) {
         final data = doc.data();
-        return {
-          'id': doc.id,
-          ...data,
-        };
+        return {'id': doc.id, ...data};
       }).toList();
 
       setState(() => _reportData = orders);
 
       if (orders.isEmpty) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Nenhum pedido encontrado no período')),
-          );
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Nenhum pedido encontrado no período')));
         }
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro ao gerar relatório: $e')),
-        );
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Erro ao gerar relatório: $e')));
       }
     } finally {
       if (mounted) {
@@ -131,52 +120,129 @@ class _AdminReportsScreenState extends State<AdminReportsScreen> {
 
   Future<void> _exportCSV() async {
     if (_reportData == null || _reportData!.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Nenhum dado para exportar')),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Nenhum dado para exportar')));
       return;
     }
 
     try {
       final dateFormat = DateFormat('dd/MM/yyyy HH:mm');
       final buffer = StringBuffer();
-      
-      // Header
-      buffer.writeln('ID,Quarto,Cliente,Total,Status,Pagamento,Data');
-      
+
+      // BOM UTF-8 para Excel reconhecer acentos corretamente
+      buffer.write('\uFEFF');
+
+      // Header com separador ; (padrão pt-BR Excel)
+      buffer.writeln('Codigo;Quarto;Cliente;CPF;Total;Entrega;Status;Pagamento;Status Pagamento;Data');
+
       // Data
       for (final order in _reportData!) {
         final createdAt = order['created_at'] as Timestamp?;
         final dateStr = createdAt != null ? dateFormat.format(createdAt.toDate()) : '';
-        
+
+        // Tratamento seguro de campos
+        final codigo = order['codigo'] ?? '';
+        final room = _escapeCsvField(order['room']?.toString() ?? '');
+        final customerName = _escapeCsvField(order['customerName']?.toString() ?? '');
+        final customerCpf = _escapeCsvField(order['customerCpf']?.toString() ?? '');
+        final total = (order['total'] as num?)?.toDouble() ?? 0.0;
+        final totalFormatted = total.toStringAsFixed(2).replaceAll('.', ','); // Formato BR
+        final retirar = order['retirar'] == true;
+        final deliveryType = retirar ? 'Retirada' : 'Entrega';
+        final status = _translateStatus(order['status']?.toString() ?? '');
+        final paymentMethod = _translatePayment(order['paymentMethod']?.toString() ?? order['payment']?.toString() ?? '');
+        final paymentStatus = _translatePaymentStatus(order['paymentStatus']?.toString() ?? '');
+
         buffer.writeln(
-          '${order['id']},'
-          '${order['room'] ?? ''},'
-          '"${order['customer_name'] ?? ''}",'
-          '${order['total'] ?? 0},'
-          '${order['status'] ?? ''},'
-          '${order['payment_method'] ?? ''},'
-          '$dateStr'
+          '$codigo;'
+          '$room;'
+          '$customerName;'
+          '$customerCpf;'
+          '$totalFormatted;'
+          '$deliveryType;'
+          '$status;'
+          '$paymentMethod;'
+          '$paymentStatus;'
+          '$dateStr',
         );
       }
 
-      // Salvar arquivo
+      // Salvar arquivo com data no nome
       final directory = await getTemporaryDirectory();
-      final file = File('${directory.path}/relatorio_pedidos.csv');
+      final fileName = 'relatorio_pedidos_${DateFormat('yyyyMMdd_HHmm').format(DateTime.now())}.csv';
+      final file = File('${directory.path}/$fileName');
       await file.writeAsString(buffer.toString());
 
       // Compartilhar
       await Share.shareXFiles(
         [XFile(file.path)],
-        subject: 'Relatório de Pedidos',
-        text: 'Relatório de pedidos do Hotel Dunamys',
+        subject: 'Relatório de Pedidos - Hotel Dunamys',
+        text: 'Relatório de pedidos de ${DateFormat('dd/MM/yyyy').format(_startDate!)} a ${DateFormat('dd/MM/yyyy').format(_endDate!)}',
       );
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro ao exportar: $e')),
-        );
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Erro ao exportar: $e')));
       }
+    }
+  }
+
+  String _escapeCsvField(String value) {
+    // Se contiver ; ou " ou quebra de linha, precisa escapar
+    if (value.contains(';') || value.contains('"') || value.contains('\n')) {
+      return '"${value.replaceAll('"', '""')}"';
+    }
+    return value;
+  }
+
+  String _translateStatus(String status) {
+    switch (status.toLowerCase()) {
+      case 'pending':
+        return 'Pendente';
+      case 'preparando':
+        return 'Preparando';
+      case 'pronto':
+        return 'Pronto';
+      case 'entregue':
+        return 'Entregue';
+      case 'cancelado':
+        return 'Cancelado';
+      default:
+        return status;
+    }
+  }
+
+  String _translatePayment(String payment) {
+    switch (payment.toLowerCase()) {
+      case 'pix':
+        return 'PIX';
+      case 'credit':
+      case 'credito':
+        return 'Crédito';
+      case 'debit':
+      case 'debito':
+        return 'Débito';
+      case 'cash':
+      case 'dinheiro':
+        return 'Dinheiro';
+      default:
+        return payment;
+    }
+  }
+
+  String _translatePaymentStatus(String status) {
+    if (status.isEmpty) return '-';
+    switch (status.toLowerCase()) {
+      case 'approved':
+      case 'paid':
+        return 'Aprovado';
+      case 'pending':
+        return 'Pendente';
+      case 'denied':
+      case 'rejected':
+        return 'Negado';
+      case 'refunded':
+        return 'Estornado';
+      default:
+        return status;
     }
   }
 
@@ -190,11 +256,7 @@ class _AdminReportsScreenState extends State<AdminReportsScreen> {
         backgroundColor: AppTheme.primaryBackground,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_circle_left_sharp,
-            color: AppTheme.amarelo,
-            size: 35,
-          ),
+          icon: const Icon(Icons.arrow_circle_left_sharp, color: AppTheme.amarelo, size: 35),
           onPressed: () {
             if (context.canPop()) {
               context.pop();
@@ -205,15 +267,12 @@ class _AdminReportsScreenState extends State<AdminReportsScreen> {
         ),
         title: Text(
           'Relatórios',
-          style: GoogleFonts.poppins(
-            color: AppTheme.primaryText,
-            fontWeight: FontWeight.w500,
-          ),
+          style: GoogleFonts.poppins(color: AppTheme.primaryText, fontWeight: FontWeight.w500),
         ),
         centerTitle: true,
       ),
       body: SafeArea(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 20.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -221,11 +280,7 @@ class _AdminReportsScreenState extends State<AdminReportsScreen> {
               const SizedBox(height: 20),
               Text(
                 'Selecione o Período',
-                style: GoogleFonts.poppins(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w500,
-                  color: AppTheme.primaryText,
-                ),
+                style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w500, color: AppTheme.primaryText),
               ),
               const SizedBox(height: 30),
 
@@ -236,10 +291,7 @@ class _AdminReportsScreenState extends State<AdminReportsScreen> {
                 child: Container(
                   width: double.infinity,
                   height: 50,
-                  decoration: BoxDecoration(
-                    color: AppTheme.primaryText.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
+                  decoration: BoxDecoration(color: AppTheme.primaryText.withOpacity(0.1), borderRadius: BorderRadius.circular(16)),
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -250,20 +302,13 @@ class _AdminReportsScreenState extends State<AdminReportsScreen> {
                           const SizedBox(width: 10),
                           Text(
                             'Data Início',
-                            style: GoogleFonts.inter(
-                              fontWeight: FontWeight.w500,
-                              color: AppTheme.primaryText,
-                            ),
+                            style: GoogleFonts.inter(fontWeight: FontWeight.w500, color: AppTheme.primaryText),
                           ),
                         ],
                       ),
                       Text(
                         _startDate != null ? dateFormat.format(_startDate!) : '--/--/----',
-                        style: GoogleFonts.inter(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: AppTheme.primaryText,
-                        ),
+                        style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w600, color: AppTheme.primaryText),
                       ),
                     ],
                   ),
@@ -278,10 +323,7 @@ class _AdminReportsScreenState extends State<AdminReportsScreen> {
                 child: Container(
                   width: double.infinity,
                   height: 50,
-                  decoration: BoxDecoration(
-                    color: AppTheme.primaryText.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
+                  decoration: BoxDecoration(color: AppTheme.primaryText.withOpacity(0.1), borderRadius: BorderRadius.circular(16)),
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -292,20 +334,13 @@ class _AdminReportsScreenState extends State<AdminReportsScreen> {
                           const SizedBox(width: 10),
                           Text(
                             'Data Fim',
-                            style: GoogleFonts.inter(
-                              fontWeight: FontWeight.w500,
-                              color: AppTheme.primaryText,
-                            ),
+                            style: GoogleFonts.inter(fontWeight: FontWeight.w500, color: AppTheme.primaryText),
                           ),
                         ],
                       ),
                       Text(
                         _endDate != null ? dateFormat.format(_endDate!) : '--/--/----',
-                        style: GoogleFonts.inter(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: AppTheme.primaryText,
-                        ),
+                        style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w600, color: AppTheme.primaryText),
                       ),
                     ],
                   ),
@@ -321,20 +356,13 @@ class _AdminReportsScreenState extends State<AdminReportsScreen> {
                   child: Container(
                     width: 220,
                     height: 60,
-                    decoration: BoxDecoration(
-                      color: AppTheme.primaryText,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
+                    decoration: BoxDecoration(color: AppTheme.primaryText, borderRadius: BorderRadius.circular(20)),
                     child: Center(
                       child: _isLoading
                           ? const CircularProgressIndicator(color: Colors.white)
                           : Text(
                               'Gerar Relatório',
-                              style: GoogleFonts.inter(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                                color: AppTheme.secondaryBackground,
-                              ),
+                              style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w500, color: AppTheme.secondaryBackground),
                             ),
                     ),
                   ),
@@ -346,17 +374,13 @@ class _AdminReportsScreenState extends State<AdminReportsScreen> {
                 const SizedBox(height: 30),
                 const Divider(),
                 const SizedBox(height: 10),
-                
+
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
                       'Resultado: ${_reportData!.length} pedidos',
-                      style: GoogleFonts.poppins(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: AppTheme.primaryText,
-                      ),
+                      style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w500, color: AppTheme.primaryText),
                     ),
                     if (_reportData!.isNotEmpty)
                       IconButton(
@@ -372,31 +396,16 @@ class _AdminReportsScreenState extends State<AdminReportsScreen> {
                 if (_reportData!.isNotEmpty)
                   Container(
                     padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: AppTheme.amarelo.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                    decoration: BoxDecoration(color: AppTheme.amarelo.withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
                     child: Column(
                       children: [
-                        _buildSummaryRow(
-                          'Total Vendido',
-                          'R\$ ${_calculateTotal().toStringAsFixed(2)}',
-                        ),
+                        _buildSummaryRow('Total Vendido', 'R\$ ${_calculateTotal().toStringAsFixed(2)}'),
                         const SizedBox(height: 8),
-                        _buildSummaryRow(
-                          'Ticket Médio',
-                          'R\$ ${_calculateAverage().toStringAsFixed(2)}',
-                        ),
+                        _buildSummaryRow('Ticket Médio', 'R\$ ${_calculateAverage().toStringAsFixed(2)}'),
                         const SizedBox(height: 8),
-                        _buildSummaryRow(
-                          'Finalizados',
-                          '${_countByStatus('entregue')}',
-                        ),
+                        _buildSummaryRow('Finalizados', '${_countByStatus('entregue')}'),
                         const SizedBox(height: 8),
-                        _buildSummaryRow(
-                          'Cancelados',
-                          '${_countByStatus('cancelado')}',
-                        ),
+                        _buildSummaryRow('Cancelados', '${_countByStatus('cancelado')}'),
                       ],
                     ),
                   ),
@@ -404,28 +413,27 @@ class _AdminReportsScreenState extends State<AdminReportsScreen> {
                 const SizedBox(height: 20),
 
                 // Lista de pedidos
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: _reportData!.length,
-                    itemBuilder: (context, index) {
-                      final order = _reportData![index];
-                      final createdAt = order['created_at'] as Timestamp?;
-                      final dateStr = createdAt != null 
-                          ? DateFormat('dd/MM HH:mm').format(createdAt.toDate())
-                          : '';
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: _reportData!.length,
+                  itemBuilder: (context, index) {
+                    final order = _reportData![index];
+                    final createdAt = order['created_at'] as Timestamp?;
+                    final dateStr = createdAt != null ? DateFormat('dd/MM HH:mm').format(createdAt.toDate()) : '';
 
-                      return ListTile(
-                        title: Text('Quarto ${order['room'] ?? 'N/A'}'),
-                        subtitle: Text(dateStr),
-                        trailing: Text(
-                          'R\$ ${(order['total'] as num?)?.toStringAsFixed(2) ?? '0.00'}',
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        onTap: () => context.push('/admin/orders/${order['id']}'),
-                      );
-                    },
-                  ),
+                    return ListTile(
+                      title: Text('Quarto ${order['room'] ?? 'N/A'}'),
+                      subtitle: Text(dateStr),
+                      trailing: Text(
+                        'R\$ ${(order['total'] as num?)?.toStringAsFixed(2) ?? '0.00'}',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      onTap: () => context.push('/admin/orders/${order['id']}'),
+                    );
+                  },
                 ),
+                const SizedBox(height: 30),
               ],
             ],
           ),
@@ -438,20 +446,10 @@ class _AdminReportsScreenState extends State<AdminReportsScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          label,
-          style: GoogleFonts.inter(
-            fontSize: 14,
-            color: AppTheme.primaryText,
-          ),
-        ),
+        Text(label, style: GoogleFonts.inter(fontSize: 14, color: AppTheme.primaryText)),
         Text(
           value,
-          style: GoogleFonts.inter(
-            fontSize: 14,
-            fontWeight: FontWeight.bold,
-            color: AppTheme.primaryText,
-          ),
+          style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.bold, color: AppTheme.primaryText),
         ),
       ],
     );

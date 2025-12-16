@@ -51,6 +51,7 @@ class CartProvider with ChangeNotifier {
     required String menuItemPhoto,
     required double price,
     required int quantity,
+    double additionalPrice = 0.0,
     String? observation,
     List<String>? additionals,
   }) async {
@@ -62,6 +63,7 @@ class CartProvider with ChangeNotifier {
       menuItemPhoto: menuItemPhoto,
       quantity: quantity,
       price: price,
+      additionalPrice: additionalPrice,
       observation: observation,
       additionals: additionals ?? [],
       createdAt: DateTime.now(),
