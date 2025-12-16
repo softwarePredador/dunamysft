@@ -217,3 +217,196 @@ exports.checkPayment = functions.https.onRequest(async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 });
+
+/**
+ * Cloud Function para enviar Push Notification para um usuário específico
+ * Chamada via httpsCallable do Flutter
+ */
+exports.sendPushNotification = functions.https.onCall(async (data, context) => {
+  const { userId, title, body, data: notificationData } = data;
+
+  if (!userId || !title || !body) {
+    throw new functions.https.HttpsError(
+      "invalid-argument",
+      "Missing required fields: userId, title, body"
+    );
+  }
+
+  try {
+    // Busca tokens FCM do usuário
+    const userDoc = await firestore.collection("users").doc(userId).get();
+
+    if (!userDoc.exists) {
+      console.log("User not found:", userId);
+      return { success: false, error: "User not found" };
+    }
+
+    const userData = userDoc.data();
+    const tokens = userData.fcm_tokens || [];
+
+    if (tokens.length === 0) {
+      console.log("No FCM tokens for user:", userId);
+      return { success: false, error: "No FCM tokens" };
+    }
+
+    // Prepara a mensagem
+    const message = {
+      notification: {
+        title: title,
+        body: body,
+      },
+      data: notificationData || {},
+      tokens: tokens,
+    };
+
+    // Envia para todos os tokens do usuário
+    const response = await admin.messaging().sendEachForMulticast(message);
+
+    console.log(`Notification sent: ${response.successCount} success, ${response.failureCount} failures`);
+
+    // Remove tokens inválidos
+    if (response.failureCount > 0) {
+      const tokensToRemove = [];
+      response.responses.forEach((resp, idx) => {
+        if (!resp.success) {
+          const errorCode = resp.error?.code;
+          if (
+            errorCode === "messaging/invalid-registration-token" ||
+            errorCode === "messaging/registration-token-not-registered"
+          ) {
+            tokensToRemove.push(tokens[idx]);
+          }
+        }
+      });
+
+      if (tokensToRemove.length > 0) {
+        await firestore.collection("users").doc(userId).update({
+          fcm_tokens: admin.firestore.FieldValue.arrayRemove(...tokensToRemove),
+        });
+        console.log("Removed invalid tokens:", tokensToRemove);
+      }
+    }
+
+    return {
+      success: true,
+      successCount: response.successCount,
+      failureCount: response.failureCount,
+    };
+  } catch (error) {
+    console.error("Error sending notification:", error);
+    throw new functions.https.HttpsError("internal", error.message);
+  }
+});
+
+/**
+ * Cloud Function para adicionar token FCM ao usuário
+ * Chamada via httpsCallable do Flutter
+ */
+exports.addFcmToken = functions.https.onCall(async (data, context) => {
+  // Verifica autenticação
+  if (!context.auth) {
+    throw new functions.https.HttpsError(
+      "unauthenticated",
+      "User must be authenticated"
+    );
+  }
+
+  const { token } = data;
+  const userId = context.auth.uid;
+
+  if (!token) {
+    throw new functions.https.HttpsError("invalid-argument", "Missing token");
+  }
+
+  try {
+    await firestore.collection("users").doc(userId).set(
+      {
+        fcm_tokens: admin.firestore.FieldValue.arrayUnion(token),
+      },
+      { merge: true }
+    );
+
+    console.log("FCM token added for user:", userId);
+    return { success: true };
+  } catch (error) {
+    console.error("Error adding FCM token:", error);
+    throw new functions.https.HttpsError("internal", error.message);
+  }
+});
+
+/**
+ * Trigger: Envia notificação quando status do pedido é alterado
+ */
+exports.onOrderStatusChange = functions.firestore
+  .document("order/{orderId}")
+  .onUpdate(async (change, context) => {
+    const before = change.before.data();
+    const after = change.after.data();
+    const orderId = context.params.orderId;
+
+    // Verifica se o status mudou
+    if (before.status === after.status) {
+      return null;
+    }
+
+    const userId = after.userId || after.userRef?.id;
+    if (!userId) {
+      console.log("No userId in order:", orderId);
+      return null;
+    }
+
+    // Busca tokens do usuário
+    const userDoc = await firestore.collection("users").doc(userId).get();
+    if (!userDoc.exists) {
+      console.log("User not found:", userId);
+      return null;
+    }
+
+    const tokens = userDoc.data().fcm_tokens || [];
+    if (tokens.length === 0) {
+      console.log("No FCM tokens for user:", userId);
+      return null;
+    }
+
+    // Define mensagem baseada no status
+    let title, body;
+    switch (after.status) {
+      case "confirmed":
+        title = "Pedido Confirmado! 🎉";
+        body = "Seu pedido foi confirmado e está sendo preparado.";
+        break;
+      case "preparing":
+        title = "Preparando seu Pedido 👨‍🍳";
+        body = "Seu pedido está sendo preparado com carinho.";
+        break;
+      case "ready":
+        title = "Pedido Pronto! 🍽️";
+        body = "Seu pedido está pronto e será entregue em breve.";
+        break;
+      case "delivered":
+        title = "Pedido Entregue! ✅";
+        body = "Seu pedido foi entregue. Bom apetite!";
+        break;
+      case "cancelled":
+        title = "Pedido Cancelado 😔";
+        body = "Seu pedido foi cancelado.";
+        break;
+      default:
+        return null;
+    }
+
+    const message = {
+      notification: { title, body },
+      data: { orderId, type: "order_update", status: after.status },
+      tokens: tokens,
+    };
+
+    try {
+      const response = await admin.messaging().sendEachForMulticast(message);
+      console.log(`Order ${orderId} status notification sent: ${response.successCount} success`);
+    } catch (error) {
+      console.error("Error sending order notification:", error);
+    }
+
+    return null;
+  });

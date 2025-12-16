@@ -175,6 +175,12 @@ class _ProfileContentState extends State<_ProfileContent> {
     return Column(
       children: [
         _ProfileMenuItem(
+          icon: Icons.edit_outlined,
+          title: 'Editar Perfil',
+          onTap: () => context.push('/profile/edit'),
+        ),
+        const Divider(height: 1),
+        _ProfileMenuItem(
           icon: Icons.shopping_bag_outlined,
           title: 'Meus Pedidos',
           onTap: () => context.push('/orders'),

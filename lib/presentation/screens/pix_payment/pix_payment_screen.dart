@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lottie/lottie.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 import '../../../core/theme/app_theme.dart';
@@ -257,7 +258,14 @@ class _PIXPaymentScreenState extends State<PIXPaymentScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const SizedBox(height: 100),
-          const CircularProgressIndicator(color: AppTheme.amarelo),
+          SizedBox(
+            width: 120,
+            height: 120,
+            child: Lottie.asset(
+              'assets/rive_animations/loading_payment.json',
+              repeat: true,
+            ),
+          ),
           const SizedBox(height: 24),
           Text(
             'Gerando QR Code PIX...',

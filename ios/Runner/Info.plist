@@ -13,13 +13,36 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>dunamys</string>
+	<string>Hotel Dunamys</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
 	<string>$(FLUTTER_BUILD_NAME)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.1005245374810-359ciru2vqjv45id6csndaht0ruq5ndg</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>hoteldunamys.com</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>hoteldunamys</string>
+			</array>
+		</dict>
+	</array>
+	<key>FlutterDeepLinkingEnabled</key>
+	<true/>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
@@ -45,9 +68,20 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<false/>
 	<key>NSCameraUsageDescription</key>
-	<string>Precisamos acessar sua câmera para tirar fotos dos produtos</string>
+	<string>Necessário permissão para camera</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Permissão necessária para gravar áudio</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Precisamos acessar sua galeria para selecionar fotos dos produtos</string>
+	<string>Necessário permissão para galeria</string>
+	<key>PermissionGroupNotification</key>
+	<string>Notificações necessárias para acompanhar seus pedidos</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>remote-notification</string>
+	</array>
 </dict>
 </plist>

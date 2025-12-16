@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -128,6 +129,18 @@ class _CartScreenState extends State<CartScreen> {
                                 'Itens adicionados',
                                 style: GoogleFonts.inter(fontWeight: FontWeight.w500, fontSize: 16.0, color: AppTheme.primaryText),
                               ),
+                              InkWell(
+                                onTap: () => _showClearCartDialog(context, user!.uid),
+                                child: Text(
+                                  'Limpar',
+                                  style: GoogleFonts.inter(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 14.0,
+                                    color: AppTheme.secondaryText,
+                                    decoration: TextDecoration.underline,
+                                  ),
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -149,6 +162,23 @@ class _CartScreenState extends State<CartScreen> {
                             );
                           },
                         ),
+                        // Botão adicionar mais itens
+                        Center(
+                          child: TextButton(
+                            onPressed: () => context.go('/home'),
+                            child: Text(
+                              'adicionar mais itens?',
+                              style: GoogleFonts.inter(
+                                fontSize: 14.0,
+                                color: AppTheme.secondaryText,
+                                decoration: TextDecoration.underline,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        // Seção "Peça também"
+                        _buildPecaTambemSection(context),
                         const SizedBox(height: 20),
                         // Total and Continue button
                         _buildBottomBar(context, cartProvider),
@@ -214,6 +244,132 @@ class _CartScreenState extends State<CartScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildPecaTambemSection(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: double.infinity,
+          height: 30.0,
+          color: AppTheme.primaryBackground,
+          child: Text(
+            'Peça Também',
+            style: GoogleFonts.poppins(
+              fontWeight: FontWeight.w500,
+              fontSize: 14.0,
+              color: AppTheme.primaryText,
+            ),
+          ),
+        ),
+        Container(
+          width: double.infinity,
+          height: 145.0,
+          color: AppTheme.primaryBackground,
+          child: StreamBuilder<QuerySnapshot>(
+            stream: FirebaseFirestore.instance
+                .collection('menu')
+                .where('excluded', isEqualTo: false)
+                .limit(5)
+                .snapshots(),
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) {
+                return const Center(
+                  child: SizedBox(
+                    width: 50.0,
+                    height: 50.0,
+                    child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primaryText),
+                    ),
+                  ),
+                );
+              }
+
+              final menuItems = snapshot.data!.docs;
+
+              if (menuItems.isEmpty) {
+                return const SizedBox.shrink();
+              }
+
+              return ListView.builder(
+                padding: EdgeInsets.zero,
+                shrinkWrap: true,
+                scrollDirection: Axis.horizontal,
+                itemCount: menuItems.length,
+                itemBuilder: (context, index) {
+                  final doc = menuItems[index];
+                  final data = doc.data() as Map<String, dynamic>;
+                  final name = data['name'] ?? '';
+                  final photo = data['photo'] ?? '';
+                  final price = (data['price'] ?? 0.0).toDouble();
+
+                  return Padding(
+                    padding: const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 20.0, 0.0),
+                    child: InkWell(
+                      onTap: () {
+                        context.push('/item-details/${doc.id}', extra: price);
+                      },
+                      child: Container(
+                        width: 100.0,
+                        decoration: BoxDecoration(
+                          color: AppTheme.primaryBackground,
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.max,
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(8.0),
+                              child: photo.isNotEmpty
+                                  ? Image.network(
+                                      photo,
+                                      width: 102.0,
+                                      height: 100.0,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (context, error, stackTrace) => Container(
+                                        width: 102.0,
+                                        height: 100.0,
+                                        color: AppTheme.grayPaletteGray20,
+                                        child: const Icon(Icons.fastfood, color: AppTheme.grayPaletteGray60),
+                                      ),
+                                    )
+                                  : Container(
+                                      width: 102.0,
+                                      height: 100.0,
+                                      color: AppTheme.grayPaletteGray20,
+                                      child: const Icon(Icons.fastfood, color: AppTheme.grayPaletteGray60),
+                                    ),
+                            ),
+                            Text(
+                              name,
+                              style: GoogleFonts.poppins(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 14.0,
+                                color: AppTheme.primaryText,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            Text(
+                              'R\$ ${price.toStringAsFixed(2).replaceAll('.', ',')}',
+                              style: GoogleFonts.inter(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 14.0,
+                                color: AppTheme.amarelo,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 

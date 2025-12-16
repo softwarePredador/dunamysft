@@ -141,7 +141,7 @@ class _OrderCard extends StatelessWidget {
       child: InkWell(
         onTap: () {
           // Navigate to order details
-          // context.push('/orders/${order.id}');
+          context.push('/orders/${order.id}');
         },
         borderRadius: BorderRadius.circular(12),
         child: Padding(

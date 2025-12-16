@@ -127,40 +127,51 @@ class _FAQScreenState extends State<FAQScreen> {
   }
 }
 
-class _FAQItem extends StatefulWidget {
+class _FAQItem extends StatelessWidget {
   final FAQModel faq;
 
   const _FAQItem({required this.faq});
 
   @override
-  State<_FAQItem> createState() => _FAQItemState();
-}
-
-class _FAQItemState extends State<_FAQItem> {
-  bool _isExpanded = false;
-
-  @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      elevation: 1,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Theme(
-        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-        child: ExpansionTile(
-          title: Text(widget.faq.question, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
-          trailing: Icon(_isExpanded ? Icons.expand_less : Icons.expand_more, color: AppTheme.amarelo),
-          onExpansionChanged: (expanded) {
-            setState(() {
-              _isExpanded = expanded;
-            });
-          },
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: AppTheme.secondaryBackground,
+        borderRadius: BorderRadius.circular(8.0),
+        border: Border.all(
+          color: const Color(0xFFCCCCCC),
+          width: 1.0,
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(widget.faq.answer, style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppTheme.secondaryText)),
+              padding: const EdgeInsetsDirectional.fromSTEB(0.0, 16.0, 0.0, 16.0),
+              child: Text(
+                faq.question,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+              ),
+            ),
+            Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(0.0),
+              ),
+              child: Padding(
+                padding: const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 16.0),
+                child: Text(
+                  faq.answer,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: AppTheme.secondaryText,
+                      ),
+                ),
               ),
             ),
           ],

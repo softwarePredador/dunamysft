@@ -17,8 +17,6 @@ class NavbarWidget extends StatelessWidget {
 
     // Tamanhos proporcionais
     final navbarHeight = screenHeight * 0.14; // ~115 em tela 820
-    final iconWidth = screenWidth * 0.2; // ~80 em tela 400
-    final iconHeight = screenHeight * 0.073; // ~60 em tela 820
     final centerButtonSize = screenWidth * 0.16; // ~64 em tela 400
     final bgHeight = screenHeight * 0.091; // ~75 em tela 820
 
@@ -30,16 +28,8 @@ class NavbarWidget extends StatelessWidget {
           Align(
             alignment: const AlignmentDirectional(0.0, 1.0),
             child: ClipRRect(
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(8.0),
-                topRight: Radius.circular(8.0),
-              ),
-              child: SvgPicture.asset(
-                'assets/images/navbar_4_bg_white.svg',
-                width: double.infinity,
-                height: bgHeight,
-                fit: BoxFit.cover,
-              ),
+              borderRadius: const BorderRadius.only(topLeft: Radius.circular(8.0), topRight: Radius.circular(8.0)),
+              child: SvgPicture.asset('assets/images/navbar_4_bg_white.svg', width: double.infinity, height: bgHeight, fit: BoxFit.cover),
             ),
           ),
 
@@ -59,8 +49,9 @@ class NavbarWidget extends StatelessWidget {
                   // Menu Item - Abre o EndDrawer (igual FlutterFlow)
                   Expanded(
                     flex: 2,
-                    child: _NavbarItem(
-                      imagePath: 'assets/images/login1_(2).png',
+                    child: _NavbarIconItem(
+                      icon: Icons.more_horiz,
+                      label: 'Menu',
                       onTap: () {
                         // Tenta abrir o EndDrawer se disponível
                         if (onMenuTap != null) {
@@ -81,13 +72,10 @@ class NavbarWidget extends StatelessWidget {
 
                   const SizedBox(width: 8.0),
 
-                  // Cart Item
+                  // Cart Item (Carrinho - itens adicionados)
                   Expanded(
                     flex: 2,
-                    child: _NavbarItem(
-                      imagePath: 'assets/images/Group_132.png',
-                      onTap: () => context.push('/cart'),
-                    ),
+                    child: _NavbarIconItem(icon: Icons.shopping_cart_outlined, label: 'Carrinho', onTap: () => context.push('/cart')),
                   ),
 
                   const Spacer(flex: 3), // Space for the center button
@@ -97,19 +85,17 @@ class NavbarWidget extends StatelessWidget {
                   // Profile Item
                   Expanded(
                     flex: 2,
-                    child: _NavbarItem(
-                      imagePath: 'assets/images/Group_133.png',
-                      onTap: () => context.push('/profile'),
-                    ),
+                    child: _NavbarIconItem(icon: Icons.person_outline, label: 'Perfil', onTap: () => context.push('/profile')),
                   ),
 
                   const SizedBox(width: 8.0),
 
-                  // More/Redirect Item
+                  // More/Redirect Item (Reservas)
                   Expanded(
                     flex: 2,
-                    child: _NavbarItem(
-                      imagePath: 'assets/images/Group_134.png',
+                    child: _NavbarIconItem(
+                      icon: Icons.event_outlined,
+                      label: 'Reservas',
                       onTap: () {
                         showDialog(
                           context: context,
@@ -119,11 +105,7 @@ class NavbarWidget extends StatelessWidget {
                               insetPadding: EdgeInsets.zero,
                               backgroundColor: Colors.transparent,
                               alignment: Alignment.center,
-                              child: const SizedBox(
-                                height: double.infinity,
-                                width: double.infinity,
-                                child: RedirectPageWidget(),
-                              ),
+                              child: const SizedBox(height: double.infinity, width: double.infinity, child: RedirectPageWidget()),
                             );
                           },
                         );
@@ -147,24 +129,14 @@ class NavbarWidget extends StatelessWidget {
                 height: centerButtonSize,
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [
-                      AppTheme.amareloGradientStart,
-                      AppTheme.amareloGradientEnd,
-                    ],
+                    colors: [AppTheme.amareloGradientStart, AppTheme.amareloGradientEnd],
                     stops: const [0.5, 1.0],
                     begin: const AlignmentDirectional(0.0, -1.0),
                     end: const AlignmentDirectional(0, 1.0),
                   ),
                   shape: BoxShape.circle,
                 ),
-                child: Center(
-                  child: Image.asset(
-                    'assets/images/95z4v_s.png',
-                    width: iconWidth,
-                    height: iconHeight,
-                    fit: BoxFit.none,
-                  ),
-                ),
+                child: const Center(child: Icon(Icons.home_rounded, color: Colors.white, size: 32)),
               ),
             ),
           ),
@@ -174,38 +146,34 @@ class NavbarWidget extends StatelessWidget {
   }
 }
 
-class _NavbarItem extends StatelessWidget {
-  final String imagePath;
+/// Widget de ícone vetorial para a navbar (alta qualidade)
+class _NavbarIconItem extends StatelessWidget {
+  final IconData icon;
+  final String label;
   final VoidCallback onTap;
 
-  const _NavbarItem({required this.imagePath, required this.onTap});
+  const _NavbarIconItem({required this.icon, required this.label, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
-
-    // Tamanhos proporcionais
-    final iconWidth = screenWidth * 0.2; // ~80 em tela 400
-    final iconHeight = screenHeight * 0.073; // ~60 em tela 820
-
     return InkWell(
       onTap: onTap,
       splashColor: Colors.transparent,
       highlightColor: Colors.transparent,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8.0),
-            child: Image.asset(
-              imagePath,
-              width: iconWidth,
-              height: iconHeight,
-              fit: BoxFit.cover,
+      child: Padding(
+        padding: const EdgeInsets.only(top: 12.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, color: AppTheme.primaryText, size: 28),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: const TextStyle(color: AppTheme.primaryText, fontSize: 11, fontWeight: FontWeight.w500),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
