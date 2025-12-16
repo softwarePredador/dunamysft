@@ -45,7 +45,13 @@ class _ItemCategoryScreenState extends State<ItemCategoryScreen> {
               color: AppTheme.amarelo,
               size: 35.0,
             ),
-            onPressed: () => context.pop(),
+            onPressed: () {
+              if (context.canPop()) {
+                context.pop();
+              } else {
+                context.go('/home');
+              }
+            },
           ),
           actions: const [],
         ),

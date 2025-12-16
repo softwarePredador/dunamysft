@@ -42,8 +42,8 @@ Estes componentes aparecem em múltiplas telas e são essenciais para a navegaç
 - [x] **Perfil (`perfil_user`):** Edição de dados.
 - [x] **FAQ (`faqpage`):** Perguntas frequentes.
 - [x] **Feedback (`feedback`):** Avaliação.
-- [ ] **SAC (`sac`):** Suporte.
-- [ ] **Mapas (`maps`):** Localização.
+- [x] **SAC (`sac`):** Suporte via WhatsApp.
+- [x] **Mapas (`maps`):** Localização com Google Maps.
 
 ### D. Funcionalidades Específicas
 - [ ] **Reservas de Quarto (`room`):** Visualização e seleção.
@@ -62,6 +62,9 @@ Estes componentes aparecem em múltiplas telas e são essenciais para a navegaç
 - [x] Migrar lógica de `FFAppState` para Providers/Cubits.
 - [x] Garantir persistência de carrinho e sessão.
 - [x] Integração completa com Firebase (Auth, Firestore, Storage).
+- [x] **Pagamentos Cielo:** Integração PIX e Cartão (Débito/Crédito).
+- [x] **OrderProducts:** Salvar itens do pedido na collection `order_products`.
+- [x] **Cloud Functions:** Webhook e verificação automática de pagamentos.
 
 ## 📊 Resumo do Progresso
 
@@ -81,6 +84,8 @@ Estes componentes aparecem em múltiplas telas e são essenciais para a navegaç
 | FAQ | ✅ | `lib/presentation/screens/faq/` |
 | Feedback | ✅ | `lib/presentation/screens/feedback/` |
 | Profile | ✅ | `lib/presentation/screens/profile/` |
+| SAC | ✅ | `lib/presentation/screens/sac/` |
+| Maps | ✅ | `lib/presentation/screens/maps/` |
 
 ### Telas Administrativas Implementadas
 | Tela | Status | Localização |
@@ -119,6 +124,8 @@ Estes componentes aparecem em múltiplas telas e são essenciais para a navegaç
 /faq           -> FAQScreen
 /feedback      -> FeedbackScreen
 /profile       -> ProfileScreen
+/sac           -> SACScreen
+/maps          -> MapsScreen
 
 // Rotas Administrativas
 /admin                      -> AdminDashboardScreen
@@ -136,8 +143,11 @@ Estes componentes aparecem em múltiplas telas e são essenciais para a navegaç
 ```
 
 ### Próximos Passos
-1. ⏳ Implementar telas SAC e Mapas
-2. ⏳ Implementar reservas de quarto
-3. ⏳ Adicionar gestão de mídia (fotos/vídeos)
-4. ⏳ Implementar relatórios de pedidos
-5. ⏳ Refinar integrações com API de pagamento
+1. ⏳ Implementar reservas de quarto
+2. ⏳ Adicionar gestão de mídia (fotos/vídeos)
+3. ⏳ Implementar relatórios de pedidos
+4. ⏳ Verificar suporte a vídeo no Carrossel
+5. ✅ ~~Implementar telas SAC e Mapas~~ (Concluído)
+6. ✅ ~~Integração Cielo (PIX/Cartão)~~ (Concluído)
+7. ✅ ~~OrderProducts no Firebase~~ (Concluído)
+8. ✅ ~~Cloud Functions para Webhooks~~ (Concluído)

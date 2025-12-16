@@ -16,6 +16,10 @@ class OrderModel {
   final bool finished;
   final String customerName;
   final String customerCpf;
+  // Campos de pagamento Cielo
+  final String? paymentId;
+  final String? paymentStatus;
+  final DateTime? paidAt;
 
   OrderModel({
     required this.id,
@@ -33,6 +37,9 @@ class OrderModel {
     this.finished = false,
     this.customerName = '',
     this.customerCpf = '',
+    this.paymentId,
+    this.paymentStatus,
+    this.paidAt,
   });
 
   factory OrderModel.fromFirestore(DocumentSnapshot doc) {
@@ -53,6 +60,9 @@ class OrderModel {
       finished: data['finished'] ?? false,
       customerName: data['customerName'] ?? '',
       customerCpf: data['customerCpf'] ?? '',
+      paymentId: data['paymentId'],
+      paymentStatus: data['paymentStatus'],
+      paidAt: (data['paidAt'] as Timestamp?)?.toDate(),
     );
   }
 
@@ -72,6 +82,9 @@ class OrderModel {
       'finished': finished,
       'customerName': customerName,
       'customerCpf': customerCpf,
+      if (paymentId != null) 'paymentId': paymentId,
+      if (paymentStatus != null) 'paymentStatus': paymentStatus,
+      if (paidAt != null) 'paidAt': Timestamp.fromDate(paidAt!),
     };
   }
 
@@ -91,6 +104,9 @@ class OrderModel {
     bool? finished,
     String? customerName,
     String? customerCpf,
+    String? paymentId,
+    String? paymentStatus,
+    DateTime? paidAt,
   }) {
     return OrderModel(
       id: id ?? this.id,
@@ -108,6 +124,12 @@ class OrderModel {
       finished: finished ?? this.finished,
       customerName: customerName ?? this.customerName,
       customerCpf: customerCpf ?? this.customerCpf,
+      paymentId: paymentId ?? this.paymentId,
+      paymentStatus: paymentStatus ?? this.paymentStatus,
+      paidAt: paidAt ?? this.paidAt,
     );
   }
+
+  /// Verifica se o pedido foi pago
+  bool get isPaid => paymentStatus == 'paid' || paymentStatus == 'confirmed';
 }

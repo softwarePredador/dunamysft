@@ -30,8 +30,10 @@ class OrderDoneScreen extends StatelessWidget {
                 builder: (context, snapshot) {
                   final order = snapshot.data;
                   
-                  return Column(
-                    children: [
+                  return SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
                       // Title
                       Text(
                         'Pedido confirmado!',
@@ -137,7 +139,7 @@ class OrderDoneScreen extends StatelessWidget {
                           ),
                         ),
 
-                      const Spacer(),
+                      const SizedBox(height: 30.0),
 
                       // Buttons
                       Row(
@@ -184,6 +186,7 @@ class OrderDoneScreen extends StatelessWidget {
                         ],
                       ),
                     ],
+                  ),
                   );
                 },
               ),

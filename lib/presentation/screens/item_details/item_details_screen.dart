@@ -160,7 +160,13 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
               color: AppTheme.amarelo,
               size: 35.0,
             ),
-            onPressed: () => context.pop(),
+            onPressed: () {
+              if (context.canPop()) {
+                context.pop();
+              } else {
+                context.go('/home');
+              }
+            },
           ),
         ),
       ),

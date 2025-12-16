@@ -58,10 +58,27 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
 
     return Scaffold(
       backgroundColor: AppTheme.primaryBackground,
-      appBar: AppBar(
-        backgroundColor: AppTheme.secondaryBackground,
-        elevation: 0,
-        title: const Text('Meus Pedidos'),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(MediaQuery.of(context).size.height * 0.055),
+        child: AppBar(
+          backgroundColor: AppTheme.primaryBackground,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(
+              Icons.arrow_circle_left_sharp,
+              color: AppTheme.amarelo,
+              size: 35.0,
+            ),
+            onPressed: () {
+              if (context.canPop()) {
+                context.pop();
+              } else {
+                context.go('/home');
+              }
+            },
+          ),
+          title: const Text('Meus Pedidos'),
+        ),
       ),
       body: Consumer<OrderProvider>(
         builder: (context, orderProvider, child) {

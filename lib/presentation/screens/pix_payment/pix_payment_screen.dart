@@ -7,6 +7,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../data/services/payment_service.dart';
+import '../../../data/services/order_service.dart';
 
 class PIXPaymentScreen extends StatefulWidget {
   final String orderId;
@@ -28,13 +29,15 @@ class PIXPaymentScreen extends StatefulWidget {
 
 class _PIXPaymentScreenState extends State<PIXPaymentScreen> {
   final PaymentService _paymentService = PaymentService();
+  final OrderService _orderService = OrderService();
   
   bool _isLoading = true;
   String? _pixCode;
   String? _paymentId;
   String? _errorMessage;
   Timer? _statusTimer;
-  int _expirationMinutes = 30;
+  StreamSubscription? _orderSubscription;
+  final int _expirationMinutes = 30;
 
   @override
   void initState() {
@@ -45,6 +48,7 @@ class _PIXPaymentScreenState extends State<PIXPaymentScreen> {
   @override
   void dispose() {
     _statusTimer?.cancel();
+    _orderSubscription?.cancel();
     super.dispose();
   }
 
@@ -68,8 +72,20 @@ class _PIXPaymentScreenState extends State<PIXPaymentScreen> {
           _isLoading = false;
         });
         
+        // Salva o paymentId no pedido
+        if (result.paymentId != null) {
+          await _orderService.updatePaymentInfo(
+            orderId: widget.orderId,
+            paymentId: result.paymentId!,
+            paymentStatus: 'pending',
+          );
+        }
+        
         // Inicia polling do status a cada 5 segundos
         _startStatusPolling();
+        
+        // Inicia listener real-time do pedido (para webhook futuro)
+        _startOrderListener();
       } else {
         setState(() {
           _errorMessage = result.errorMessage ?? 'Erro ao gerar PIX';
@@ -77,6 +93,19 @@ class _PIXPaymentScreenState extends State<PIXPaymentScreen> {
         });
       }
     }
+  }
+
+  /// Listener real-time do pedido - útil quando webhook atualizar o status
+  void _startOrderListener() {
+    _orderSubscription?.cancel();
+    _orderSubscription = _orderService.streamOrder(widget.orderId).listen((order) {
+      if (order != null && order.isPaid && mounted) {
+        _statusTimer?.cancel();
+        _orderSubscription?.cancel();
+        _showSnackBar('Pagamento confirmado!', isSuccess: true);
+        context.push('/order-done/${widget.orderId}');
+      }
+    });
   }
 
   void _startStatusPolling() {
@@ -87,11 +116,27 @@ class _PIXPaymentScreenState extends State<PIXPaymentScreen> {
         
         if (status.isPaid && mounted) {
           timer.cancel();
+          
+          // Atualiza status no Firebase
+          await _orderService.updatePaymentInfo(
+            orderId: widget.orderId,
+            paymentId: _paymentId!,
+            paymentStatus: 'paid',
+          );
+          
           // Pagamento confirmado! Vai para tela de sucesso
           _showSnackBar('Pagamento confirmado!', isSuccess: true);
           context.push('/order-done/${widget.orderId}');
         } else if (status.isCancelled && mounted) {
           timer.cancel();
+          
+          // Atualiza status no Firebase
+          await _orderService.updatePaymentInfo(
+            orderId: widget.orderId,
+            paymentId: _paymentId!,
+            paymentStatus: 'cancelled',
+          );
+          
           setState(() {
             _errorMessage = 'Pagamento cancelado ou expirado';
           });
@@ -129,7 +174,13 @@ class _PIXPaymentScreenState extends State<PIXPaymentScreen> {
             color: AppTheme.amarelo,
             size: 35.0,
           ),
-          onPressed: () => context.pop(),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/home');
+            }
+          },
         ),
         title: Text(
           'Pagamento PIX',

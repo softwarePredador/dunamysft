@@ -77,7 +77,13 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
             color: AppTheme.primaryText,
             size: 35,
           ),
-          onPressed: () => context.pop(),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/admin/orders');
+            }
+          },
         ),
       ),
       body: SafeArea(

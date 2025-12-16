@@ -114,7 +114,13 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
             color: AppTheme.amarelo,
             size: 35.0,
           ),
-          onPressed: () => context.pop(),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/home');
+            }
+          },
         ),
       ),
       body: Stack(

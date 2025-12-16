@@ -157,6 +157,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
       }
 
       // Para cartão, processa pagamento ANTES de criar pedido
+      String? cardPaymentId;
       if (_selectedPaymentType != 'Pix') {
         // Detecta bandeira se não detectada ainda
         String brand = _detectedBrand ?? 
@@ -183,15 +184,17 @@ class _PaymentScreenState extends State<PaymentScreen> {
           return;
         }
         
-        // Pagamento aprovado, salva paymentId
-        debugPrint('Cartão aprovado! PaymentId: ${cardResult.paymentId}');
+        // Pagamento aprovado, salva paymentId para usar depois
+        cardPaymentId = cardResult.paymentId;
+        debugPrint('Cartão aprovado! PaymentId: $cardPaymentId');
       }
 
       // Cria ordem com todos os dados
+      final totalPrice = cartProvider.totalPrice; // Salva antes de limpar
       final orderId = await orderProvider.createOrder(
         userId: user.uid,
         items: cartProvider.cartItems,
-        total: cartProvider.totalPrice,
+        total: totalPrice,
         paymentMethod: paymentMethod,
         deliveryType: _isPickup ? 'pickup' : 'delivery',
         room: _isPickup ? '' : _roomController.text,
@@ -204,6 +207,15 @@ class _PaymentScreenState extends State<PaymentScreen> {
       );
 
       if (orderId != null && mounted) {
+        // Se foi cartão, atualiza status para pago
+        if (_selectedPaymentType != 'Pix' && cardPaymentId != null) {
+          await orderProvider.updatePaymentInfo(
+            orderId: orderId,
+            paymentId: cardPaymentId,
+            paymentStatus: 'paid',
+          );
+        }
+        
         // Limpar carrinho
         await cartProvider.clearCart(user.uid);
         
@@ -222,7 +234,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
           // Para PIX, gera QR code na tela de PIX (passando dados)
           context.push('/pix-payment', extra: {
             'orderId': orderId,
-            'total': cartProvider.totalPrice,
+            'total': totalPrice, // Usa o valor salvo
             'nome': _nomeController.text,
             'cpf': _cpfController.text,
           });
@@ -416,6 +428,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 ),
               ),
               child: Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Checkbox(
                     value: _isPickup,
@@ -423,10 +436,12 @@ class _PaymentScreenState extends State<PaymentScreen> {
                     activeColor: AppTheme.amarelo,
                     shape: const CircleBorder(),
                   ),
-                  Text(
-                    'prefiro retirar na recepção',
-                    style: GoogleFonts.inter(
-                      fontSize: 14.0,
+                  Flexible(
+                    child: Text(
+                      'prefiro retirar na recepção',
+                      style: GoogleFonts.inter(
+                        fontSize: 14.0,
+                      ),
                     ),
                   ),
                 ],

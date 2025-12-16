@@ -225,7 +225,13 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
             color: AppTheme.primaryText,
             size: 35,
           ),
-          onPressed: () => context.pop(),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/admin/products');
+            }
+          },
         ),
         title: Text(
           isEditing ? 'Editar Produto' : 'Novo Produto',

@@ -1,0 +1,60 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Regras básicas - ajuste conforme necessário
+    
+    // Users podem ler/escrever seus próprios dados
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Orders - usuários podem criar e ler seus próprios pedidos
+    match /order/{orderId} {
+      allow read: if request.auth != null && 
+        (resource.data.user == /databases/$(database)/documents/users/$(request.auth.uid) ||
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true);
+      allow create: if request.auth != null;
+      allow update: if request.auth != null && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+    }
+    
+    // Order products - leitura permitida para dono do pedido
+    match /order_products/{itemId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+    }
+    
+    // Menu items - todos podem ler
+    match /menu/{menuId} {
+      allow read: if true;
+      allow write: if request.auth != null && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+    }
+    
+    // Categories - todos podem ler
+    match /category/{categoryId} {
+      allow read: if true;
+      allow write: if request.auth != null && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+    }
+    
+    // Cart - usuários podem gerenciar seu próprio carrinho
+    match /cart_user/{cartId} {
+      allow read, write: if request.auth != null;
+    }
+    
+    // Feedback - usuários podem criar, admin pode ler/deletar
+    match /Feedback/{feedbackId} {
+      allow create: if request.auth != null;
+      allow read, delete: if request.auth != null && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+    }
+    
+    // FAQ - todos podem ler
+    match /faq/{faqId} {
+      allow read: if true;
+      allow write: if request.auth != null && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+    }
+  }
+}

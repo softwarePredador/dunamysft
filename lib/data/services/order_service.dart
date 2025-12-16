@@ -94,6 +94,43 @@ class OrderService {
     }
   }
 
+  /// Atualiza informações de pagamento do pedido
+  /// Usado quando pagamento PIX é confirmado
+  Future<bool> updatePaymentInfo({
+    required String orderId,
+    required String paymentId,
+    required String paymentStatus,
+  }) async {
+    try {
+      final updates = <String, dynamic>{
+        'paymentId': paymentId,
+        'paymentStatus': paymentStatus,
+      };
+      
+      // Se pago, adiciona data de pagamento
+      if (paymentStatus == 'paid' || paymentStatus == 'confirmed') {
+        updates['paidAt'] = FieldValue.serverTimestamp();
+        updates['status'] = 'confirmed'; // Atualiza status do pedido também
+      }
+      
+      await _firestore.collection(_collection).doc(orderId).update(updates);
+      debugPrint('Payment info updated for order $orderId: $paymentStatus');
+      return true;
+    } catch (e) {
+      debugPrint('Error updating payment info: $e');
+      return false;
+    }
+  }
+
+  /// Stream para escutar mudanças em um pedido específico (real-time)
+  Stream<OrderModel?> streamOrder(String orderId) {
+    return _firestore
+        .collection(_collection)
+        .doc(orderId)
+        .snapshots()
+        .map((doc) => doc.exists ? OrderModel.fromFirestore(doc) : null);
+  }
+
   // Generate order code
   Future<int> generateOrderCode() async {
     try {

@@ -128,4 +128,22 @@ class OrderProvider with ChangeNotifier {
   Future<OrderModel?> getOrderById(String id) async {
     return await _orderService.getOrder(id);
   }
+
+  // Update payment info (for card payments and PIX confirmation)
+  Future<bool> updatePaymentInfo({
+    required String orderId,
+    required String paymentId,
+    required String paymentStatus,
+  }) async {
+    return await _orderService.updatePaymentInfo(
+      orderId: orderId,
+      paymentId: paymentId,
+      paymentStatus: paymentStatus,
+    );
+  }
+
+  // Stream order updates (for real-time payment confirmation)
+  Stream<OrderModel?> streamOrder(String orderId) {
+    return _orderService.streamOrder(orderId);
+  }
 }

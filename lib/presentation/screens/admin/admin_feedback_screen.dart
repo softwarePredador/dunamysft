@@ -26,7 +26,13 @@ class AdminFeedbackScreen extends StatelessWidget {
             color: AppTheme.primaryText,
             size: 35,
           ),
-          onPressed: () => context.pop(),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/admin');
+            }
+          },
         ),
         title: Text(
           'Feedback dos Clientes',
