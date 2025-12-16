@@ -9,6 +9,7 @@ import '../../../data/models/feedback_model.dart';
 import '../../../data/services/auth_service.dart';
 import '../../../data/services/feedback_service.dart';
 import '../../widgets/navbar_widget.dart';
+import '../../widgets/end_drawer_widget.dart';
 
 class FeedbackScreen extends StatefulWidget {
   const FeedbackScreen({super.key});
@@ -18,6 +19,7 @@ class FeedbackScreen extends StatefulWidget {
 }
 
 class _FeedbackScreenState extends State<FeedbackScreen> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   double _rating = 0.0;
   String? _selectedChip;
   final TextEditingController _commentController = TextEditingController();
@@ -104,7 +106,9 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: AppTheme.primaryBackground,
+      endDrawer: const EndDrawerWidget(),
       appBar: AppBar(
         backgroundColor: AppTheme.primaryBackground,
         elevation: 0,
@@ -293,9 +297,11 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
           ),
 
           // Navbar
-          const Align(
+          Align(
             alignment: Alignment.bottomCenter,
-            child: NavbarWidget(),
+            child: NavbarWidget(
+              onMenuTap: () => _scaffoldKey.currentState?.openEndDrawer(),
+            ),
           ),
         ],
       ),

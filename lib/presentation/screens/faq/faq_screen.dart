@@ -104,30 +104,43 @@ class _FAQScreenState extends State<FAQScreen> {
                       final faqs = faqProvider.faqs;
 
           if (faqs.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.help_outline, size: 64, color: AppTheme.grayPaletteGray60),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Nenhuma pergunta disponível',
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                ],
-              ),
-            );
-          }
+                        return Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(Icons.help_outline, size: 64, color: AppTheme.grayPaletteGray60),
+                              const SizedBox(height: 16),
+                              Text(
+                                'Nenhuma pergunta disponível',
+                                style: Theme.of(context).textTheme.titleMedium,
+                              ),
+                            ],
+                          ),
+                        );
+                      }
 
-          return ListView.builder(
-            padding: const EdgeInsets.all(16),
-            itemCount: faqs.length,
-            itemBuilder: (context, index) {
-              final faq = faqs[index];
-              return _FAQItem(faq: faq);
-            },
-          );
-        },
+                      return ListView.builder(
+                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
+                        itemCount: faqs.length,
+                        itemBuilder: (context, index) {
+                          final faq = faqs[index];
+                          return _FAQItem(faq: faq);
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Navbar
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: NavbarWidget(
+              onMenuTap: () => _scaffoldKey.currentState?.openEndDrawer(),
+            ),
+          ),
+        ],
       ),
     );
   }

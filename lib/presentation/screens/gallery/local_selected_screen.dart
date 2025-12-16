@@ -6,6 +6,8 @@ import '../../../core/theme/app_theme.dart';
 import '../../../data/models/local_dunamys_model.dart';
 import '../../../data/models/gallery_local_model.dart';
 import '../../../data/services/gallery_service.dart';
+import '../../widgets/navbar_widget.dart';
+import '../../widgets/end_drawer_widget.dart';
 
 class LocalSelectedScreen extends StatefulWidget {
   final LocalDunamysModel local;
@@ -21,91 +23,118 @@ class LocalSelectedScreen extends StatefulWidget {
 
 class _LocalSelectedScreenState extends State<LocalSelectedScreen> {
   final GalleryService _galleryService = GalleryService();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: AppTheme.primaryBackground,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(50.0),
-        child: AppBar(
-          backgroundColor: AppTheme.primaryBackground,
-          automaticallyImplyLeading: false,
-          leading: IconButton(
-            icon: const Icon(
-              Icons.arrow_circle_left_sharp,
-              color: AppTheme.amarelo,
-              size: 35.0,
-            ),
-            onPressed: () {
-              if (context.canPop()) {
-                context.pop();
-              } else {
-                context.go('/gallery');
-              }
-            },
-          ),
-          title: Text(
-            widget.local.name,
-            style: GoogleFonts.poppins(
-              fontWeight: FontWeight.w500,
-              fontSize: 18.0,
-              color: AppTheme.primaryText,
-            ),
-          ),
-          centerTitle: true,
-          elevation: 0,
-        ),
-      ),
-      body: StreamBuilder<List<GalleryLocalModel>>(
-        stream: _galleryService.getGalleryByLocal(widget.local.reference),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(
-                    Icons.photo_library_outlined,
-                    size: 64.0,
-                    color: AppTheme.grayPaletteGray60,
+      endDrawer: const EndDrawerWidget(),
+      body: Stack(
+        children: [
+          SafeArea(
+            child: Column(
+              children: [
+                // AppBar customizado
+                Container(
+                  height: 50.0,
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(
+                          Icons.arrow_circle_left_sharp,
+                          color: AppTheme.amarelo,
+                          size: 35.0,
+                        ),
+                        onPressed: () {
+                          if (context.canPop()) {
+                            context.pop();
+                          } else {
+                            context.go('/gallery');
+                          }
+                        },
+                      ),
+                      Expanded(
+                        child: Text(
+                          widget.local.name,
+                          style: GoogleFonts.poppins(
+                            fontWeight: FontWeight.w500,
+                            fontSize: 18.0,
+                            color: AppTheme.primaryText,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      const SizedBox(width: 48.0), // Balance for back button
+                    ],
                   ),
-                  const SizedBox(height: 16.0),
-                  Text(
-                    'Nenhuma mídia disponível',
-                    style: GoogleFonts.poppins(
-                      fontSize: 16.0,
-                      color: AppTheme.secondaryText,
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }
+                ),
+                // Content
+                Expanded(
+                  child: StreamBuilder<List<GalleryLocalModel>>(
+                    stream: _galleryService.getGalleryByLocal(widget.local.reference),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
 
-          final items = snapshot.data!;
-          return GridView.builder(
-            padding: const EdgeInsets.all(16.0),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 12.0,
-              mainAxisSpacing: 12.0,
-              childAspectRatio: 1.0,
+                      if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                        return Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(
+                                Icons.photo_library_outlined,
+                                size: 64.0,
+                                color: AppTheme.grayPaletteGray60,
+                              ),
+                              const SizedBox(height: 16.0),
+                              Text(
+                                'Nenhuma mídia disponível',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 16.0,
+                                  color: AppTheme.secondaryText,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+
+                      final items = snapshot.data!;
+                      return GridView.builder(
+                        padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 100.0),
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 12.0,
+                          mainAxisSpacing: 12.0,
+                          childAspectRatio: 1.0,
+                        ),
+                        itemCount: items.length,
+                        itemBuilder: (context, index) {
+                          final item = items[index];
+                          return _GalleryItemCard(
+                            item: item,
+                            onTap: () => _openMedia(context, item),
+                          );
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ],
             ),
-            itemCount: items.length,
-            itemBuilder: (context, index) {
-              final item = items[index];
-              return _GalleryItemCard(
-                item: item,
-                onTap: () => _openMedia(context, item),
-              );
-            },
-          );
-        },
+          ),
+          // Navbar
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: NavbarWidget(
+              onMenuTap: () => _scaffoldKey.currentState?.openEndDrawer(),
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -78,9 +78,11 @@ class _GalleryScreenState extends State<GalleryScreen> {
           ),
 
           // Navbar
-          const Align(
+          Align(
             alignment: Alignment.bottomCenter,
-            child: NavbarWidget(),
+            child: NavbarWidget(
+              onMenuTap: () => _scaffoldKey.currentState?.openEndDrawer(),
+            ),
           ),
         ],
       ),

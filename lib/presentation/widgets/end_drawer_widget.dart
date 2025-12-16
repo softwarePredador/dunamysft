@@ -140,37 +140,37 @@ class EndDrawerWidget extends StatelessWidget {
 
               const Divider(thickness: 2.0),
 
-              // Admin Button - only for admin users
-              if (currentUserEmail == 'hoteldunamys25@gmail.com' || currentUserEmail == 'rafaelhalder@gmail.com')
-                Padding(
-                  padding: const EdgeInsetsDirectional.fromSTEB(0.0, 20.0, 0.0, 0.0),
-                  child: InkWell(
-                    onTap: () {
-                      Navigator.of(context).pop();
-                      context.push('/admin');
-                    },
-                    child: Container(
-                      width: 130.0,
-                      height: 40.0,
-                      decoration: BoxDecoration(
-                        color: AppTheme.primaryBackground,
-                        borderRadius: BorderRadius.circular(65.0),
-                        border: Border.all(
-                          color: AppTheme.primaryText,
-                        ),
+              // Admin Button - temporariamente habilitado para todos
+              // TODO: Restaurar condição: if (currentUserEmail == 'hoteldunamys25@gmail.com' || currentUserEmail == 'rafaelhalder@gmail.com')
+              Padding(
+                padding: const EdgeInsetsDirectional.fromSTEB(0.0, 20.0, 0.0, 0.0),
+                child: InkWell(
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    context.push('/admin');
+                  },
+                  child: Container(
+                    width: 130.0,
+                    height: 40.0,
+                    decoration: BoxDecoration(
+                      color: AppTheme.primaryBackground,
+                      borderRadius: BorderRadius.circular(65.0),
+                      border: Border.all(
+                        color: AppTheme.primaryText,
                       ),
-                      child: Center(
-                        child: Text(
-                          'Administrador',
-                          style: GoogleFonts.inter(
-                            color: AppTheme.primaryText,
-                            fontWeight: FontWeight.w400,
-                          ),
+                    ),
+                    child: Center(
+                      child: Text(
+                        'Administrador',
+                        style: GoogleFonts.inter(
+                          color: AppTheme.primaryText,
+                          fontWeight: FontWeight.w400,
                         ),
                       ),
                     ),
                   ),
                 ),
+              ),
                 
               const Spacer(),
               
