@@ -1,3 +1,17 @@
 {
-  
+  "environment": "sandbox",
+  "cielo": {
+    "sandbox": {
+      "merchantId": "8937bd5b-9796-494d-9fe5-f76b3e4da633",
+      "merchantKey": "XKGHUBSBKIRXKAVPSKWLVXYCLVJUGTNZLIHPUSYV",
+      "salesUrl": "https://apisandbox.cieloecommerce.cielo.com.br/1/sales/",
+      "queryUrl": "https://apiquerysandbox.cieloecommerce.cielo.com.br/1/sales/"
+    },
+    "production": {
+      "merchantId": "SEU_MERCHANT_ID_PRODUCAO",
+      "merchantKey": "SUA_MERCHANT_KEY_PRODUCAO",
+      "salesUrl": "https://api.cieloecommerce.cielo.com.br/1/sales/",
+      "queryUrl": "https://apiquery.cieloecommerce.cielo.com.br/1/sales/"
+    }
+  }
 }

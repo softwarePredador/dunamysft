@@ -1,15 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
-
-/// Credenciais Cielo Sandbox
-/// ATENÇÃO: Em produção, usar variáveis de ambiente ou backend seguro
-class CieloCredentials {
-  static const String merchantId = '8937bd5b-9796-494d-9fe5-f76b3e4da633';
-  static const String merchantKey = 'XKGHUBSBKIRXKAVPSKWLVXYCLVJUGTNZLIHPUSYV';
-  static const String salesUrl = 'https://apisandbox.cieloecommerce.cielo.com.br/1/sales/';
-  static const String queryUrl = 'https://apiquerysandbox.cieloecommerce.cielo.com.br/1/sales/';
-}
+import 'environment_service.dart';
 
 /// Resposta de pagamento PIX
 class PixPaymentResponse {
@@ -73,15 +65,26 @@ class PaymentStatusResponse {
 /// Service para integração com Cielo
 class PaymentService {
   final http.Client _client;
+  final EnvironmentService _envService = EnvironmentService();
 
   PaymentService({http.Client? client}) : _client = client ?? http.Client();
 
-  Map<String, String> get _headers => {
-    'Content-Type': 'application/json',
-    'MerchantId': CieloCredentials.merchantId,
-    'MerchantKey': CieloCredentials.merchantKey,
-    'accept': 'application/json',
-  };
+  /// Headers dinâmicos baseados no ambiente
+  Map<String, String> get _headers {
+    final cielo = _envService.cielo;
+    return {
+      'Content-Type': 'application/json',
+      'MerchantId': cielo.merchantId,
+      'MerchantKey': cielo.merchantKey,
+      'accept': 'application/json',
+    };
+  }
+
+  /// URL de vendas baseada no ambiente
+  String get _salesUrl => _envService.cielo.salesUrl;
+
+  /// URL de consulta baseada no ambiente
+  String get _queryUrl => _envService.cielo.queryUrl;
 
   /// Gera pagamento PIX
   /// [valor] deve estar em reais (ex: 100.50)
@@ -114,7 +117,7 @@ class PaymentService {
       debugPrint('PIX Request: $body');
 
       final response = await _client.post(
-        Uri.parse(CieloCredentials.salesUrl),
+        Uri.parse(_salesUrl),
         headers: _headers,
         body: body,
       );
@@ -210,7 +213,7 @@ class PaymentService {
       debugPrint('Card Request: $body');
 
       final response = await _client.post(
-        Uri.parse(CieloCredentials.salesUrl),
+        Uri.parse(_salesUrl),
         headers: _headers,
         body: body,
       );
@@ -260,7 +263,7 @@ class PaymentService {
   Future<PaymentStatusResponse> checkPaymentStatus(String paymentId) async {
     try {
       final response = await _client.get(
-        Uri.parse('${CieloCredentials.queryUrl}$paymentId'),
+        Uri.parse('$_queryUrl$paymentId'),
         headers: _headers,
       );
 
@@ -300,7 +303,7 @@ class PaymentService {
       if (bin.length < 6) return null;
 
       final response = await _client.get(
-        Uri.parse('${CieloCredentials.queryUrl.replaceFirst('/sales/', '/cardBin/')}${bin.substring(0, 6)}'),
+        Uri.parse('${_queryUrl.replaceFirst('/sales/', '/cardBin/')}${bin.substring(0, 6)}'),
         headers: _headers,
       );
 

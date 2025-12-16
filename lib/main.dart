@@ -50,6 +50,7 @@ import 'presentation/providers/faq_provider.dart';
 import 'presentation/providers/home_provider.dart';
 import 'presentation/providers/app_state_provider.dart';
 import 'data/repositories/home_repository_impl.dart';
+import 'data/services/environment_service.dart';
 
 void main() async {
   // Configura URL Strategy para web (remove # da URL)
@@ -88,6 +89,9 @@ void main() async {
   // Inicializa o AppStateProvider
   final appState = AppStateProvider();
   await appState.initialize();
+
+  // Inicializa o EnvironmentService (configurações de ambiente)
+  await EnvironmentService().initialize();
 
   runApp(
     MultiProvider(

@@ -5,8 +5,17 @@ admin.initializeApp();
 
 const firestore = admin.firestore();
 
-// Credenciais Cielo - em produção, usar variáveis de ambiente
-const CIELO_MERCHANT_ID = "8937bd5b-9796-494d-9fe5-f76b3e4da633";
+// Configuração de ambiente - usa variáveis do Firebase Config ou valores padrão (sandbox)
+const IS_PRODUCTION = functions.config().cielo?.environment === "production";
+
+// Credenciais Cielo - usa firebase functions:config:set para configurar em produção
+const CIELO_MERCHANT_ID = functions.config().cielo?.merchant_id || "8937bd5b-9796-494d-9fe5-f76b3e4da633";
+const CIELO_MERCHANT_KEY = functions.config().cielo?.merchant_key || "XKGHUBSBKIRXKAVPSKWLVXYCLVJUGTNZLIHPUSYV";
+
+// URLs da Cielo baseadas no ambiente
+const CIELO_QUERY_URL = IS_PRODUCTION
+  ? "https://apiquery.cieloecommerce.cielo.com.br/1/sales/"
+  : "https://apiquerysandbox.cieloecommerce.cielo.com.br/1/sales/";
 
 /**
  * Webhook para receber notificações de pagamento da Cielo
@@ -69,12 +78,12 @@ exports.cieloWebhook = functions.https.onRequest(async (req, res) => {
     // Consulta status na Cielo para confirmar
     const axios = require("axios");
     const cieloResponse = await axios.get(
-      `https://apiquerysandbox.cieloecommerce.cielo.com.br/1/sales/${PaymentId}`,
+      `${CIELO_QUERY_URL}${PaymentId}`,
       {
         headers: {
           "Content-Type": "application/json",
           "MerchantId": CIELO_MERCHANT_ID,
-          "MerchantKey": functions.config().cielo?.merchant_key || "XKGHUBSBKIRXKAVPSKWLVXYCLVJUGTNZLIHPUSYV",
+          "MerchantKey": CIELO_MERCHANT_KEY,
         },
       }
     );
@@ -148,12 +157,12 @@ exports.checkPendingPayments = functions.pubsub
 
         try {
           const cieloResponse = await axios.get(
-            `https://apiquerysandbox.cieloecommerce.cielo.com.br/1/sales/${paymentId}`,
+            `${CIELO_QUERY_URL}${paymentId}`,
             {
               headers: {
                 "Content-Type": "application/json",
                 "MerchantId": CIELO_MERCHANT_ID,
-                "MerchantKey": functions.config().cielo?.merchant_key || "XKGHUBSBKIRXKAVPSKWLVXYCLVJUGTNZLIHPUSYV",
+                "MerchantKey": CIELO_MERCHANT_KEY,
               },
             }
           );
@@ -198,12 +207,12 @@ exports.checkPayment = functions.https.onRequest(async (req, res) => {
   try {
     const axios = require("axios");
     const cieloResponse = await axios.get(
-      `https://apiquerysandbox.cieloecommerce.cielo.com.br/1/sales/${paymentId}`,
+      `${CIELO_QUERY_URL}${paymentId}`,
       {
         headers: {
           "Content-Type": "application/json",
           "MerchantId": CIELO_MERCHANT_ID,
-          "MerchantKey": functions.config().cielo?.merchant_key || "XKGHUBSBKIRXKAVPSKWLVXYCLVJUGTNZLIHPUSYV",
+          "MerchantKey": CIELO_MERCHANT_KEY,
         },
       }
     );
