@@ -128,7 +128,7 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
                   ),
                   const SizedBox(height: 24),
                   ElevatedButton(
-                    onPressed: () => context.go('/menu'),
+                    onPressed: () => context.go('/home'),
                     child: const Text('Ver Cardápio'),
                   ),
                 ],

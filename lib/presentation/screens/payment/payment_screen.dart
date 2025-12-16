@@ -292,7 +292,11 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 if (_currentStep == 2) {
                   setState(() => _currentStep = 1);
                 } else {
-                  context.pop();
+                  if (context.canPop()) {
+                    context.pop();
+                  } else {
+                    context.go('/home');
+                  }
                 }
               },
             ),

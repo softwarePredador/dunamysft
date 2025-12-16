@@ -37,22 +37,39 @@ class ProfileScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: AppTheme.primaryBackground,
-      appBar: AppBar(
-        backgroundColor: AppTheme.secondaryBackground,
-        elevation: 0,
-        title: const Text('Meu Perfil'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () async {
-              await authService.signOut();
-              if (context.mounted) {
-                context.go('/login');
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(MediaQuery.of(context).size.height * 0.055),
+        child: AppBar(
+          backgroundColor: AppTheme.primaryBackground,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(
+              Icons.arrow_circle_left_sharp,
+              color: AppTheme.amarelo,
+              size: 35.0,
+            ),
+            onPressed: () {
+              if (context.canPop()) {
+                context.pop();
+              } else {
+                context.go('/home');
               }
             },
-            tooltip: 'Sair',
           ),
-        ],
+          title: const Text('Meu Perfil'),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.logout),
+              onPressed: () async {
+                await authService.signOut();
+                if (context.mounted) {
+                  context.go('/login');
+                }
+              },
+              tooltip: 'Sair',
+            ),
+          ],
+        ),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -117,7 +134,7 @@ class ProfileScreen extends StatelessWidget {
         _ProfileMenuItem(
           icon: Icons.restaurant_menu,
           title: 'Cardápio',
-          onTap: () => context.go('/menu'),
+          onTap: () => context.go('/home'),
         ),
         const Divider(height: 1),
         _ProfileMenuItem(

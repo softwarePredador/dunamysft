@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../data/models/faq_model.dart';
 import '../../providers/faq_provider.dart';
+import '../../widgets/navbar_widget.dart';
+import '../../widgets/end_drawer_widget.dart';
 
 class FAQScreen extends StatefulWidget {
   const FAQScreen({super.key});
@@ -12,6 +15,8 @@ class FAQScreen extends StatefulWidget {
 }
 
 class _FAQScreenState extends State<FAQScreen> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   @override
   void initState() {
     super.initState();
@@ -24,41 +29,79 @@ class _FAQScreenState extends State<FAQScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: AppTheme.primaryBackground,
-      appBar: AppBar(
-        backgroundColor: AppTheme.secondaryBackground,
-        elevation: 0,
-        title: const Text('Perguntas Frequentes'),
-      ),
-      body: Consumer<FAQProvider>(
-        builder: (context, faqProvider, child) {
-          if (faqProvider.isLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          if (faqProvider.error.isNotEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.error_outline, size: 64, color: AppTheme.error),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Erro ao carregar perguntas',
-                    style: Theme.of(context).textTheme.titleMedium,
+      endDrawer: const EndDrawerWidget(),
+      body: Stack(
+        children: [
+          SafeArea(
+            child: Column(
+              children: [
+                // AppBar customizado
+                Container(
+                  height: 50.0,
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(
+                          Icons.arrow_circle_left_sharp,
+                          color: AppTheme.amarelo,
+                          size: 35.0,
+                        ),
+                        onPressed: () {
+                          if (context.canPop()) {
+                            context.pop();
+                          } else {
+                            context.go('/home');
+                          }
+                        },
+                      ),
+                      const Expanded(
+                        child: Text(
+                          'Perguntas Frequentes',
+                          style: TextStyle(
+                            fontSize: 18.0,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      const SizedBox(width: 48.0), // Balance for back button
+                    ],
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    faqProvider.error,
-                    style: Theme.of(context).textTheme.bodySmall,
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            );
-          }
+                ),
+                // Content
+                Expanded(
+                  child: Consumer<FAQProvider>(
+                    builder: (context, faqProvider, child) {
+                      if (faqProvider.isLoading) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
 
-          final faqs = faqProvider.faqs;
+                      if (faqProvider.error.isNotEmpty) {
+                        return Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(Icons.error_outline, size: 64, color: AppTheme.error),
+                              const SizedBox(height: 16),
+                              Text(
+                                'Erro ao carregar perguntas',
+                                style: Theme.of(context).textTheme.titleMedium,
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                faqProvider.error,
+                                style: Theme.of(context).textTheme.bodySmall,
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+
+                      final faqs = faqProvider.faqs;
 
           if (faqs.isEmpty) {
             return Center(

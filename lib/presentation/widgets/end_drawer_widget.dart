@@ -121,11 +121,8 @@ class EndDrawerWidget extends StatelessWidget {
                 iconPath: 'assets/images/k7eg7_8.png',
                 label: 'Galeria de imagens',
                 onTap: () {
-                  // TODO: Implement Gallery screen
                   Navigator.of(context).pop();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Em breve!')),
-                  );
+                  context.push('/gallery');
                 },
               ),
               _buildMenuItem(

@@ -6,10 +6,10 @@ import 'package:provider/provider.dart';
 import 'core/theme/app_theme.dart';
 import 'data/services/auth_service.dart';
 import 'data/models/menu_item_model.dart';
+import 'data/models/local_dunamys_model.dart';
 import 'presentation/screens/splash/splash_screen.dart';
 import 'presentation/screens/login/login_screen.dart';
 import 'presentation/screens/home/home_screen.dart';
-import 'presentation/screens/menu/menu_screen.dart';
 import 'presentation/screens/cart/cart_screen.dart';
 import 'presentation/screens/orders/my_orders_screen.dart';
 import 'presentation/screens/faq/faq_screen.dart';
@@ -22,6 +22,8 @@ import 'presentation/screens/order_done/order_done_screen.dart';
 import 'presentation/screens/feedback/feedback_screen.dart';
 import 'presentation/screens/sac/sac_screen.dart';
 import 'presentation/screens/maps/maps_screen.dart';
+import 'presentation/screens/gallery/gallery_screen.dart';
+import 'presentation/screens/gallery/local_selected_screen.dart';
 // Admin screens
 import 'presentation/screens/admin/admin_dashboard_screen.dart';
 import 'presentation/screens/admin/admin_orders_screen.dart';
@@ -95,10 +97,6 @@ final _router = GoRouter(
       builder: (context, state) => const HomeScreen(),
     ),
     GoRoute(
-      path: '/menu',
-      builder: (context, state) => const MenuScreen(),
-    ),
-    GoRoute(
       path: '/category/:categoryId',
       builder: (context, state) {
         final categoryId = state.pathParameters['categoryId']!;
@@ -162,6 +160,17 @@ final _router = GoRouter(
     GoRoute(
       path: '/maps',
       builder: (context, state) => const MapsScreen(),
+    ),
+    GoRoute(
+      path: '/gallery',
+      builder: (context, state) => const GalleryScreen(),
+    ),
+    GoRoute(
+      path: '/gallery/local',
+      builder: (context, state) {
+        final local = state.extra as LocalDunamysModel;
+        return LocalSelectedScreen(local: local);
+      },
     ),
     // Admin routes
     GoRoute(
