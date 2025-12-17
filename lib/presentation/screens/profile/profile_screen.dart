@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/l10n/app_localizations.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../data/services/auth_service.dart';
+import '../../providers/locale_provider.dart';
 import '../../widgets/navbar_widget.dart';
 import '../../widgets/end_drawer_widget.dart';
 
@@ -15,9 +17,10 @@ class ProfileScreen extends StatelessWidget {
     final user = authService.currentUser;
 
     if (user == null) {
+      final l10n = AppLocalizations.tr(context);
       return Scaffold(
         appBar: AppBar(
-          title: const Text('Perfil'),
+          title: Text(l10n.profile),
         ),
         body: Center(
           child: Column(
@@ -25,11 +28,11 @@ class ProfileScreen extends StatelessWidget {
             children: [
               const Icon(Icons.person_outline, size: 64, color: AppTheme.grayPaletteGray60),
               const SizedBox(height: 16),
-              const Text('Faça login para ver seu perfil'),
+              Text(l10n.get('login_to_see_profile')),
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () => context.go('/login'),
-                child: const Text('Fazer Login'),
+                child: Text(l10n.login),
               ),
             ],
           ),
@@ -103,7 +106,7 @@ class _ProfileContentState extends State<_ProfileContent> {
                             context.go('/login');
                           }
                         },
-                        tooltip: 'Sair',
+                        tooltip: AppLocalizations.tr(context).logout,
                       ),
                     ],
                   ),
@@ -172,44 +175,47 @@ class _ProfileContentState extends State<_ProfileContent> {
   }
 
   Widget _buildMenuSection(BuildContext context) {
+    final l10n = AppLocalizations.tr(context);
     return Column(
       children: [
         _ProfileMenuItem(
           icon: Icons.edit_outlined,
-          title: 'Editar Perfil',
+          title: l10n.editProfile,
           onTap: () => context.push('/profile/edit'),
         ),
         const Divider(height: 1),
         _ProfileMenuItem(
           icon: Icons.shopping_bag_outlined,
-          title: 'Meus Pedidos',
+          title: l10n.myOrders,
           onTap: () => context.push('/orders'),
         ),
         _ProfileMenuItem(
           icon: Icons.shopping_cart_outlined,
-          title: 'Carrinho',
+          title: l10n.cart,
           onTap: () => context.push('/cart'),
         ),
         _ProfileMenuItem(
           icon: Icons.restaurant_menu,
-          title: 'Cardápio',
+          title: l10n.menu,
           onTap: () => context.go('/home'),
         ),
         const Divider(height: 1),
         _ProfileMenuItem(
           icon: Icons.help_outline,
-          title: 'Perguntas Frequentes',
+          title: l10n.faq,
           onTap: () => context.push('/faq'),
         ),
         _ProfileMenuItem(
           icon: Icons.feedback_outlined,
-          title: 'Enviar Feedback',
+          title: l10n.get('send_feedback'),
           onTap: () => context.push('/feedback'),
         ),
         const Divider(height: 1),
+        _buildLanguageMenuItem(context),
+        const Divider(height: 1),
         _ProfileMenuItem(
           icon: Icons.info_outline,
-          title: 'Sobre',
+          title: l10n.get('about'),
           onTap: () {
             _showAboutDialog(context);
           },
@@ -218,21 +224,45 @@ class _ProfileContentState extends State<_ProfileContent> {
     );
   }
 
+  Widget _buildLanguageMenuItem(BuildContext context) {
+    return Consumer<LocaleProvider>(
+      builder: (context, localeProvider, _) {
+        final flag = _getFlag(localeProvider.locale.languageCode);
+        return ListTile(
+          leading: Text(flag, style: const TextStyle(fontSize: 24)),
+          title: Text(AppLocalizations.tr(context).language),
+          subtitle: Text(localeProvider.currentLanguageName),
+          trailing: const Icon(Icons.chevron_right, color: AppTheme.secondaryText),
+          onTap: () => context.push('/settings/language'),
+        );
+      },
+    );
+  }
+
+  String _getFlag(String code) {
+    switch (code) {
+      case 'en': return '🇺🇸';
+      case 'es': return '🇪🇸';
+      default: return '🇧🇷';
+    }
+  }
+
   void _showAboutDialog(BuildContext context) {
+    final l10n = AppLocalizations.tr(context);
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Sobre o App'),
+        title: Text(l10n.get('about_app')),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text('Hotel Dunamys'),
             const SizedBox(height: 8),
-            const Text('Versão 1.0.0'),
+            Text(l10n.get('version') + ' 1.0.0'),
             const SizedBox(height: 16),
             Text(
-              'Aplicativo desenvolvido para gerenciar pedidos e serviços do Hotel Dunamys.',
+              l10n.get('about_description'),
               style: Theme.of(context).textTheme.bodySmall,
             ),
           ],
@@ -240,7 +270,7 @@ class _ProfileContentState extends State<_ProfileContent> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Fechar'),
+            child: Text(l10n.get('close')),
           ),
         ],
       ),

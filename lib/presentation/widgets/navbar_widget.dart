@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import '../../core/l10n/app_localizations.dart';
 import '../../core/theme/app_theme.dart';
 import 'redirect_page_widget.dart';
 
@@ -51,7 +52,7 @@ class NavbarWidget extends StatelessWidget {
                     flex: 2,
                     child: _NavbarIconItem(
                       icon: Icons.more_horiz,
-                      label: 'Menu',
+                      label: AppLocalizations.tr(context).menu,
                       onTap: () {
                         // Tenta abrir o EndDrawer se disponível
                         if (onMenuTap != null) {
@@ -75,7 +76,7 @@ class NavbarWidget extends StatelessWidget {
                   // Cart Item (Carrinho - itens adicionados)
                   Expanded(
                     flex: 2,
-                    child: _NavbarIconItem(icon: Icons.shopping_cart_outlined, label: 'Carrinho', onTap: () => context.push('/cart')),
+                    child: _NavbarIconItem(icon: Icons.shopping_cart_outlined, label: AppLocalizations.tr(context).cart, onTap: () => context.push('/cart')),
                   ),
 
                   const Spacer(flex: 3), // Space for the center button
@@ -85,7 +86,7 @@ class NavbarWidget extends StatelessWidget {
                   // Profile Item
                   Expanded(
                     flex: 2,
-                    child: _NavbarIconItem(icon: Icons.person_outline, label: 'Perfil', onTap: () => context.push('/profile')),
+                    child: _NavbarIconItem(icon: Icons.person_outline, label: AppLocalizations.tr(context).profile, onTap: () => context.push('/profile')),
                   ),
 
                   const SizedBox(width: 8.0),
@@ -95,7 +96,7 @@ class NavbarWidget extends StatelessWidget {
                     flex: 2,
                     child: _NavbarIconItem(
                       icon: Icons.event_outlined,
-                      label: 'Reservas',
+                      label: AppLocalizations.tr(context).get('reservations'),
                       onTap: () {
                         showDialog(
                           context: context,

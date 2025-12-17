@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
+import '../../../core/l10n/app_localizations.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../widgets/navbar_widget.dart';
 
@@ -73,7 +74,7 @@ class SACScreen extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(top: 20.0),
                   child: Text(
-                    'SAC',
+                    AppLocalizations.tr(context).get('customer_service'),
                     style: GoogleFonts.poppins(
                       fontWeight: FontWeight.w500,
                       fontSize: 16.0,
@@ -86,7 +87,7 @@ class SACScreen extends StatelessWidget {
 
                 // Telefones
                 Text(
-                  'Telefones',
+                  AppLocalizations.tr(context).get('phones'),
                   style: GoogleFonts.inter(
                     fontSize: 12.0,
                     color: AppTheme.secondaryText,
@@ -113,7 +114,7 @@ class SACScreen extends StatelessWidget {
 
                 // Redes Sociais
                 Text(
-                  'Nossas redes sociais',
+                  AppLocalizations.tr(context).get('social_media'),
                   style: GoogleFonts.inter(
                     fontSize: 12.0,
                     color: AppTheme.secondaryText,

@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'core/theme/app_theme.dart';
+import 'core/l10n/app_localizations.dart';
 import 'data/services/auth_service.dart';
 import 'data/services/push_notification_service.dart';
 import 'data/models/menu_item_model.dart';
@@ -30,6 +32,7 @@ import 'presentation/screens/sac/sac_screen.dart';
 import 'presentation/screens/maps/maps_screen.dart';
 import 'presentation/screens/gallery/gallery_screen.dart';
 import 'presentation/screens/gallery/local_selected_screen.dart';
+import 'presentation/screens/settings/language_screen.dart';
 // Admin screens
 import 'presentation/screens/admin/admin_dashboard_screen.dart';
 import 'presentation/screens/admin/admin_orders_screen.dart';
@@ -49,6 +52,7 @@ import 'presentation/providers/order_provider.dart';
 import 'presentation/providers/faq_provider.dart';
 import 'presentation/providers/home_provider.dart';
 import 'presentation/providers/app_state_provider.dart';
+import 'presentation/providers/locale_provider.dart';
 import 'data/repositories/home_repository_impl.dart';
 import 'data/services/environment_service.dart';
 
@@ -90,6 +94,10 @@ void main() async {
   final appState = AppStateProvider();
   await appState.initialize();
 
+  // Inicializa o LocaleProvider (idioma)
+  final localeProvider = LocaleProvider();
+  await localeProvider.initialize();
+
   // Inicializa o EnvironmentService (configurações de ambiente)
   await EnvironmentService().initialize();
 
@@ -97,6 +105,7 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider.value(value: appState),
+        ChangeNotifierProvider.value(value: localeProvider),
         Provider<AuthService>(create: (_) => FirebaseAuthService()),
         ChangeNotifierProvider(create: (_) => MenuProvider()),
         ChangeNotifierProvider(create: (_) => CategoryProvider()),
@@ -205,6 +214,8 @@ final _router = GoRouter(
     GoRoute(path: '/admin/faq', builder: (context, state) => const AdminFAQScreen()),
     GoRoute(path: '/admin/media', builder: (context, state) => const AdminMediaScreen()),
     GoRoute(path: '/admin/reports', builder: (context, state) => const AdminReportsScreen()),
+    // Settings
+    GoRoute(path: '/settings/language', builder: (context, state) => const LanguageScreen()),
   ],
 );
 
@@ -213,6 +224,24 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(title: 'Dunamys', theme: AppTheme.lightTheme, routerConfig: _router, debugShowCheckedModeBanner: false);
+    return Consumer<LocaleProvider>(
+      builder: (context, localeProvider, child) {
+        return MaterialApp.router(
+          title: 'Dunamys',
+          theme: AppTheme.lightTheme,
+          routerConfig: _router,
+          debugShowCheckedModeBanner: false,
+          // Configuração de localização
+          locale: localeProvider.locale,
+          supportedLocales: AppLocalizations.supportedLocales,
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+        );
+      },
+    );
   }
 }

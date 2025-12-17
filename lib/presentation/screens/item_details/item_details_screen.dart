@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
+import '../../../core/l10n/app_localizations.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../data/models/menu_item_model.dart';
 import '../../../data/services/auth_service.dart';
@@ -118,7 +119,7 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
 
     if (user == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Faça login para adicionar ao carrinho')),
+        SnackBar(content: Text(AppLocalizations.tr(context).get('login_to_add_cart'))),
       );
       context.push('/login');
       return;
@@ -141,7 +142,7 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          'Adicionado com sucesso!',
+          AppLocalizations.tr(context).get('added_success'),
           style: GoogleFonts.poppins(color: Colors.white),
         ),
         duration: const Duration(milliseconds: 2050),
@@ -260,7 +261,7 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
 
                   // Additionals Section
                   Text(
-                    'Incluir itens?',
+                    AppLocalizations.tr(context).get('include_items'),
                     style: GoogleFonts.inter(
                       fontWeight: FontWeight.normal,
                       fontSize: 14.0,
@@ -278,7 +279,7 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
                     )
                   else if (_availableAdditionals.isEmpty)
                     Text(
-                      'Nenhum adicional disponível',
+                      AppLocalizations.tr(context).get('no_additionals'),
                       style: GoogleFonts.inter(
                         fontSize: 12.0,
                         color: AppTheme.grayPaletteGray60,
@@ -324,7 +325,7 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
 
                   // Observation Section
                   Text(
-                    'Alguma observação?',
+                    AppLocalizations.tr(context).get('any_observation'),
                     style: GoogleFonts.inter(
                       fontWeight: FontWeight.normal,
                       fontSize: 14.0,
@@ -344,7 +345,7 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
                       controller: _observationController,
                       maxLines: 3,
                       decoration: InputDecoration(
-                        hintText: 'Ex: Sem cebola, bem passado...',
+                        hintText: AppLocalizations.tr(context).get('observation_hint'),
                         hintStyle: GoogleFonts.inter(
                           color: AppTheme.grayPaletteGray60,
                         ),
@@ -431,8 +432,8 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
                       children: [
                         Text(
                           widget.item.isAvailable
-                              ? 'Adicionar'
-                              : 'Indisponível',
+                              ? AppLocalizations.tr(context).add
+                              : AppLocalizations.tr(context).get('unavailable'),
                           style: GoogleFonts.inter(
                             fontWeight: FontWeight.w500,
                             fontSize: 16.0,

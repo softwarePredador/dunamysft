@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import '../../../core/l10n/app_localizations.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../data/models/order_model.dart';
 import '../../../data/services/auth_service.dart';
@@ -34,17 +35,18 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
     final user = authService.currentUser;
 
     if (user == null) {
+      final l10n = AppLocalizations.tr(context);
       return Scaffold(
-        appBar: AppBar(title: const Text('Meus Pedidos')),
+        appBar: AppBar(title: Text(l10n.myOrders)),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Icon(Icons.receipt_long, size: 64, color: AppTheme.grayPaletteGray60),
               const SizedBox(height: 16),
-              const Text('Faça login para ver seus pedidos'),
+              Text(l10n.get('login_to_see_orders')),
               const SizedBox(height: 16),
-              ElevatedButton(onPressed: () => context.go('/login'), child: const Text('Fazer Login')),
+              ElevatedButton(onPressed: () => context.go('/login'), child: Text(l10n.login)),
             ],
           ),
         ),
@@ -68,7 +70,7 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
               }
             },
           ),
-          title: const Text('Meus Pedidos'),
+          title: Text(AppLocalizations.tr(context).myOrders),
         ),
       ),
       body: Consumer<OrderProvider>(
@@ -84,7 +86,7 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
                 children: [
                   const Icon(Icons.error_outline, size: 64, color: AppTheme.error),
                   const SizedBox(height: 16),
-                  Text('Erro ao carregar pedidos', style: Theme.of(context).textTheme.titleMedium),
+                  Text(AppLocalizations.tr(context).get('error_loading_orders'), style: Theme.of(context).textTheme.titleMedium),
                   const SizedBox(height: 8),
                   Text(orderProvider.error, style: Theme.of(context).textTheme.bodySmall, textAlign: TextAlign.center),
                 ],
@@ -95,17 +97,18 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
           final orders = orderProvider.orders;
 
           if (orders.isEmpty) {
+            final l10n = AppLocalizations.tr(context);
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Icon(Icons.receipt_long_outlined, size: 64, color: AppTheme.grayPaletteGray60),
                   const SizedBox(height: 16),
-                  Text('Nenhum pedido encontrado', style: Theme.of(context).textTheme.titleMedium),
+                  Text(l10n.get('no_orders_found'), style: Theme.of(context).textTheme.titleMedium),
                   const SizedBox(height: 8),
-                  const Text('Faça seu primeiro pedido', style: TextStyle(color: AppTheme.secondaryText)),
+                  Text(l10n.get('make_first_order'), style: const TextStyle(color: AppTheme.secondaryText)),
                   const SizedBox(height: 24),
-                  ElevatedButton(onPressed: () => context.go('/home'), child: const Text('Ver Cardápio')),
+                  ElevatedButton(onPressed: () => context.go('/home'), child: Text(l10n.get('view_menu'))),
                 ],
               ),
             );

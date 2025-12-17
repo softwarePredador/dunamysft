@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
+import '../../../core/l10n/app_localizations.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../data/models/feedback_model.dart';
 import '../../../data/services/auth_service.dart';
@@ -50,14 +51,14 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
 
     if (user == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Faça login para enviar feedback')),
+        SnackBar(content: Text(AppLocalizations.tr(context).get('login_to_feedback'))),
       );
       return;
     }
 
     if (_rating == 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Por favor, selecione uma avaliação')),
+        SnackBar(content: Text(AppLocalizations.tr(context).get('select_rating'))),
       );
       return;
     }
@@ -81,16 +82,16 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
       if (mounted) {
         if (success) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Obrigado pelo seu feedback!'),
+            SnackBar(
+              content: Text(AppLocalizations.tr(context).get('thanks_feedback')),
               backgroundColor: AppTheme.success,
             ),
           );
           context.go('/home');
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Erro ao enviar feedback. Tente novamente.'),
+            SnackBar(
+              content: Text(AppLocalizations.tr(context).get('error_sending_feedback')),
             ),
           );
         }
@@ -153,7 +154,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
 
                   // Question
                   Text(
-                    'Queremos saber como foi sua estadia no Dunamys Hotel?',
+                    AppLocalizations.tr(context).get('feedback_question'),
                     style: GoogleFonts.poppins(
                       fontWeight: FontWeight.w500,
                       fontSize: 22.0,
@@ -199,7 +200,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
 
                   // Rating Section
                   Text(
-                    'Como você avalia sua experiência?',
+                    AppLocalizations.tr(context).get('rate_experience'),
                     style: GoogleFonts.poppins(
                       fontWeight: FontWeight.w500,
                       fontSize: 16.0,
@@ -230,7 +231,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
 
                   // Comment Section
                   Text(
-                    'Gostaria de deixar um comentário?',
+                    AppLocalizations.tr(context).get('leave_comment'),
                     style: GoogleFonts.poppins(
                       fontWeight: FontWeight.w500,
                       fontSize: 16.0,
@@ -252,7 +253,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                       controller: _commentController,
                       maxLines: 5,
                       decoration: InputDecoration(
-                        hintText: 'Escreva seu comentário aqui...',
+                        hintText: AppLocalizations.tr(context).get('write_comment_here'),
                         hintStyle: GoogleFonts.inter(
                           color: AppTheme.grayPaletteGray60,
                         ),
@@ -287,7 +288,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                               ),
                             )
                           : Text(
-                              'Enviar Feedback',
+                              AppLocalizations.tr(context).get('send_feedback'),
                               style: GoogleFonts.poppins(
                                 fontWeight: FontWeight.w500,
                                 fontSize: 16.0,

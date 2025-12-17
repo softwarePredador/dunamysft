@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/l10n/app_localizations.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../data/models/product_cart_model.dart';
 import '../../../data/services/auth_service.dart';
@@ -40,16 +41,16 @@ class _CartScreenState extends State<CartScreen> {
 
     if (user == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Carrinho')),
+        appBar: AppBar(title: Text(AppLocalizations.tr(context).cart)),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Icon(Icons.shopping_cart, size: 64, color: AppTheme.grayPaletteGray60),
               const SizedBox(height: 16),
-              const Text('Faça login para ver seu carrinho'),
+              Text(AppLocalizations.tr(context).get('login_to_see_cart')),
               const SizedBox(height: 16),
-              ElevatedButton(onPressed: () => context.go('/login'), child: const Text('Fazer Login')),
+              ElevatedButton(onPressed: () => context.go('/login'), child: Text(AppLocalizations.tr(context).login)),
             ],
           ),
         ),
@@ -106,7 +107,7 @@ class _CartScreenState extends State<CartScreen> {
               if (cartItems.isEmpty) {
                 return Center(
                   child: Text(
-                    'Carrinho Vazio',
+                    AppLocalizations.tr(context).emptyCart,
                     style: GoogleFonts.inter(fontWeight: FontWeight.w500, fontSize: 16.0, color: AppTheme.primaryText),
                   ),
                 );
@@ -256,7 +257,7 @@ class _CartScreenState extends State<CartScreen> {
           height: 30.0,
           color: AppTheme.primaryBackground,
           child: Text(
-            'Peça Também',
+            AppLocalizations.tr(context).alsoOrder,
             style: GoogleFonts.poppins(
               fontWeight: FontWeight.w500,
               fontSize: 14.0,
@@ -271,8 +272,7 @@ class _CartScreenState extends State<CartScreen> {
           child: StreamBuilder<QuerySnapshot>(
             stream: FirebaseFirestore.instance
                 .collection('menu')
-                .where('excluded', isEqualTo: false)
-                .limit(5)
+                .limit(10)
                 .snapshots(),
             builder: (context, snapshot) {
               if (!snapshot.hasData) {
@@ -287,7 +287,12 @@ class _CartScreenState extends State<CartScreen> {
                 );
               }
 
-              final menuItems = snapshot.data!.docs;
+              // Filtrar excluídos no cliente
+              final menuItems = snapshot.data!.docs.where((doc) {
+                final data = doc.data() as Map<String, dynamic>;
+                final excluded = data['excluded'] ?? false;
+                return excluded != true;
+              }).take(5).toList();
 
               if (menuItems.isEmpty) {
                 return const SizedBox.shrink();

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../core/constants/assets.dart';
+import '../../../core/l10n/app_localizations.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../data/services/auth_service.dart';
 
@@ -65,7 +66,7 @@ class LoginScreen extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.fromLTRB(24.0, 15.0, 24.0, 0.0),
                         child: Text(
-                          'Olá, seja bem-vindo',
+                          AppLocalizations.tr(context).get('welcome_message'),
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontFamily: 'Poppins',
@@ -76,7 +77,7 @@ class LoginScreen extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        'Por favor, selecione uma das opções',
+                        AppLocalizations.tr(context).get('select_option'),
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontFamily: 'Poppins',
@@ -113,7 +114,7 @@ class LoginScreen extends StatelessWidget {
                             child: FaIcon(FontAwesomeIcons.google, size: 37.0),
                           ),
                           label: Text(
-                            'Entrar com Google',
+                            AppLocalizations.tr(context).get('login_google'),
                             style: TextStyle(
                               fontFamily: 'Poppins',
                               fontSize: 16.0,
@@ -150,7 +151,7 @@ class LoginScreen extends StatelessWidget {
                               child: Icon(Icons.apple, size: 45.0),
                             ),
                             label: Text(
-                              'Entrar com Apple',
+                              AppLocalizations.tr(context).get('login_apple'),
                               style: TextStyle(
                                 fontFamily: 'Poppins',
                                 fontSize: 16.0,

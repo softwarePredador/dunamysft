@@ -155,68 +155,70 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                           ),
 
                           // Timer Circle with Video Background
-                          Padding(
-                            padding: const EdgeInsetsDirectional.fromSTEB(0.0, 9.0, 0.0, 0.0),
-                            child: SizedBox(
-                              width: double.infinity,
-                              child: Align(
-                                alignment: Alignment.center,
-                                child: SizedBox(
-                                  width: 286.0,
-                                  height: 270.0,
-                                  child: Stack(
-                                    alignment: Alignment.center,
-                                    children: [
-                                      // Video Background (circular)
-                                      Container(
+                          _shouldShowWaitTime(_order!)
+                              ? Padding(
+                                  padding: const EdgeInsetsDirectional.fromSTEB(0.0, 9.0, 0.0, 0.0),
+                                  child: SizedBox(
+                                    width: double.infinity,
+                                    child: Align(
+                                      alignment: Alignment.center,
+                                      child: SizedBox(
                                         width: 286.0,
-                                        height: 286.0,
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          color: AppTheme.grayPaletteGray20,
-                                        ),
-                                        clipBehavior: Clip.antiAlias,
-                                        child: _isVideoInitialized
-                                            ? FittedBox(
-                                                fit: BoxFit.cover,
-                                                child: SizedBox(
-                                                  width: _videoController.value.size.width,
-                                                  height: _videoController.value.size.height,
-                                                  child: VideoPlayer(_videoController),
-                                                ),
-                                              )
-                                            : const Center(
-                                                child: CircularProgressIndicator(
-                                                  valueColor: AlwaysStoppedAnimation<Color>(AppTheme.amarelo),
+                                        height: 270.0,
+                                        child: Stack(
+                                          alignment: Alignment.center,
+                                          children: [
+                                            // Video Background (circular)
+                                            Container(
+                                              width: 286.0,
+                                              height: 286.0,
+                                              decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                color: AppTheme.grayPaletteGray20,
+                                              ),
+                                              clipBehavior: Clip.antiAlias,
+                                              child: _isVideoInitialized
+                                                  ? FittedBox(
+                                                      fit: BoxFit.cover,
+                                                      child: SizedBox(
+                                                        width: _videoController.value.size.width,
+                                                        height: _videoController.value.size.height,
+                                                        child: VideoPlayer(_videoController),
+                                                      ),
+                                                    )
+                                                  : const Center(
+                                                      child: CircularProgressIndicator(
+                                                        valueColor: AlwaysStoppedAnimation<Color>(AppTheme.amarelo),
+                                                      ),
+                                                    ),
+                                            ),
+                                            // Timer Overlay
+                                            Align(
+                                              alignment: Alignment.center,
+                                              child: Container(
+                                                width: double.infinity,
+                                                height: 100.0,
+                                                color: Colors.transparent,
+                                                child: Column(
+                                                  mainAxisSize: MainAxisSize.max,
+                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                  children: [
+                                                    Text(_getWaitTimeLabel(_order!), style: GoogleFonts.inter(fontSize: 16.0, color: AppTheme.primaryText)),
+                                                    Text(
+                                                      _timerDisplay,
+                                                      style: GoogleFonts.poppins(fontWeight: FontWeight.w500, fontSize: 40.0, color: AppTheme.amarelo),
+                                                    ),
+                                                  ],
                                                 ),
                                               ),
-                                      ),
-                                      // Timer Overlay
-                                      Align(
-                                        alignment: Alignment.center,
-                                        child: Container(
-                                          width: double.infinity,
-                                          height: 100.0,
-                                          color: Colors.transparent,
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.max,
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            children: [
-                                              Text('Tempo de espera', style: GoogleFonts.inter(fontSize: 16.0, color: AppTheme.primaryText)),
-                                              Text(
-                                                _timerDisplay,
-                                                style: GoogleFonts.poppins(fontWeight: FontWeight.w500, fontSize: 40.0, color: AppTheme.amarelo),
-                                              ),
-                                            ],
-                                          ),
+                                            ),
+                                          ],
                                         ),
                                       ),
-                                    ],
+                                    ),
                                   ),
-                                ),
-                              ),
-                            ),
-                          ),
+                                )
+                              : _buildStatusMessage(_order!),
 
                           // Total and Payment
                           SizedBox(
@@ -352,5 +354,89 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
       default:
         return payment.isNotEmpty ? payment : 'Não informado';
     }
+  }
+
+  /// Verifica se deve mostrar o tempo de espera
+  /// Mostra apenas quando:
+  /// - Status é "em preparo" / "preparing"
+  /// - OU status é "pronto" / "ready" E retirar == false (indo entregar no quarto)
+  bool _shouldShowWaitTime(OrderModel order) {
+    final status = order.status.toLowerCase();
+    
+    // Em preparo - sempre mostra
+    if (status == 'em preparo' || status == 'preparing') {
+      return true;
+    }
+    
+    // Pronto e vai entregar no quarto (não é retirar)
+    if ((status == 'pronto' || status == 'ready') && !order.retirar) {
+      return true;
+    }
+    
+    return false;
+  }
+
+  /// Retorna o texto do label baseado no status
+  String _getWaitTimeLabel(OrderModel order) {
+    final status = order.status.toLowerCase();
+    
+    if (status == 'em preparo' || status == 'preparing') {
+      return 'Tempo de preparo';
+    }
+    
+    if ((status == 'pronto' || status == 'ready') && !order.retirar) {
+      return 'Indo entregar';
+    }
+    
+    return 'Tempo de espera';
+  }
+
+  /// Widget para mostrar mensagem quando não há tempo de espera
+  Widget _buildStatusMessage(OrderModel order) {
+    final status = order.status.toLowerCase();
+    String message;
+    IconData icon;
+    Color color;
+
+    if (status == 'pendente' || status == 'pending') {
+      message = 'Aguardando confirmação';
+      icon = Icons.hourglass_empty;
+      color = AppTheme.statusPending;
+    } else if (status == 'pronto' || status == 'ready') {
+      // retirar == true (vai buscar no balcão)
+      message = 'Pronto para retirada!';
+      icon = Icons.check_circle;
+      color = AppTheme.statusReady;
+    } else if (status == 'entregue' || status == 'delivered') {
+      message = 'Pedido entregue!';
+      icon = Icons.done_all;
+      color = AppTheme.statusDelivered;
+    } else if (status == 'cancelado' || status == 'cancelled') {
+      message = 'Pedido cancelado';
+      icon = Icons.cancel;
+      color = Colors.red;
+    } else {
+      message = 'Status: ${order.status}';
+      icon = Icons.info;
+      color = AppTheme.secondaryText;
+    }
+
+    return Padding(
+      padding: const EdgeInsetsDirectional.fromSTEB(0.0, 30.0, 0.0, 30.0),
+      child: Column(
+        children: [
+          Icon(icon, size: 80, color: color),
+          const SizedBox(height: 16),
+          Text(
+            message,
+            style: GoogleFonts.poppins(
+              fontWeight: FontWeight.w500,
+              fontSize: 20.0,
+              color: color,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

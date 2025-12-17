@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../core/l10n/app_localizations.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../data/models/local_dunamys_model.dart';
 import '../../../data/models/gallery_local_model.dart';
@@ -43,7 +44,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
                 children: [
                   // Title
                   Text(
-                    'Galeria de fotos e vídeos',
+                    AppLocalizations.tr(context).get('photo_video_gallery'),
                     style: GoogleFonts.poppins(
                       fontWeight: FontWeight.w500,
                       fontSize: 16.0,
@@ -60,7 +61,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
 
                   // Seção "Explore por local"
                   Text(
-                    'Explore por local',
+                    AppLocalizations.tr(context).get('explore_by_location'),
                     style: GoogleFonts.poppins(
                       fontWeight: FontWeight.w500,
                       fontSize: 16.0,
@@ -108,8 +109,8 @@ class _GalleryScreenState extends State<GalleryScreen> {
               color: AppTheme.grayPaletteGray20,
               borderRadius: BorderRadius.circular(20.0),
             ),
-            child: const Center(
-              child: Text('Nenhuma imagem disponível'),
+            child: Center(
+              child: Text(AppLocalizations.tr(context).get('no_images_available')),
             ),
           );
         }

@@ -3,8 +3,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import '../../core/l10n/app_localizations.dart';
 import '../../core/theme/app_theme.dart';
 import '../../data/services/auth_service.dart';
+import '../providers/locale_provider.dart';
 
 class EndDrawerWidget extends StatelessWidget {
   const EndDrawerWidget({super.key});
@@ -39,7 +41,7 @@ class EndDrawerWidget extends StatelessWidget {
               Padding(
                 padding: const EdgeInsetsDirectional.fromSTEB(0.0, 10.0, 0.0, 0.0),
                 child: Text(
-                  'Menu',
+                  AppLocalizations.tr(context).menu,
                   style: GoogleFonts.poppins(
                     color: AppTheme.primaryText,
                     fontSize: 14.0,
@@ -48,13 +50,18 @@ class EndDrawerWidget extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(height: 30.0),
+              const SizedBox(height: 20.0),
 
-              // Menu Items
+              // Menu Items - Scrollable
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
               _buildMenuItem(
                 context,
                 iconPath: 'assets/images/vnimc_1.png',
-                label: 'Home / cardápio',
+                label: AppLocalizations.tr(context).get('home_menu'),
                 onTap: () {
                   Navigator.of(context).pop();
                   context.go('/home');
@@ -63,7 +70,7 @@ class EndDrawerWidget extends StatelessWidget {
               _buildMenuItem(
                 context,
                 iconPath: 'assets/images/3a9k2_3.png',
-                label: 'Perfil',
+                label: AppLocalizations.tr(context).profile,
                 onTap: () {
                   Navigator.of(context).pop();
                   context.push('/profile');
@@ -72,7 +79,7 @@ class EndDrawerWidget extends StatelessWidget {
               _buildMenuItem(
                 context,
                 iconPath: 'assets/images/49svh_2.png',
-                label: 'Pedidos',
+                label: AppLocalizations.tr(context).orders,
                 onTap: () {
                   Navigator.of(context).pop();
                   // Navigate to orders (shows both cart and order history)
@@ -82,7 +89,7 @@ class EndDrawerWidget extends StatelessWidget {
               _buildMenuItem(
                 context,
                 iconPath: 'assets/images/fijek_4.png',
-                label: 'Feedback',
+                label: AppLocalizations.tr(context).get('feedback'),
                 onTap: () {
                   Navigator.of(context).pop();
                   context.push('/feedback');
@@ -91,7 +98,7 @@ class EndDrawerWidget extends StatelessWidget {
               _buildMenuItem(
                 context,
                 iconPath: 'assets/images/2emqy_5.png',
-                label: 'Perguntas frequentes',
+                label: AppLocalizations.tr(context).get('faq'),
                 onTap: () {
                   Navigator.of(context).pop();
                   context.push('/faq');
@@ -100,7 +107,7 @@ class EndDrawerWidget extends StatelessWidget {
               _buildMenuItem(
                 context,
                 iconPath: 'assets/images/dfjsb_6.png',
-                label: 'SAC',
+                label: AppLocalizations.tr(context).get('customer_service'),
                 onTap: () {
                   Navigator.of(context).pop();
                   context.push('/sac');
@@ -109,7 +116,7 @@ class EndDrawerWidget extends StatelessWidget {
               _buildMenuItem(
                 context,
                 iconPath: 'assets/images/x7hc1_7.png',
-                label: 'Mapas e Direções',
+                label: AppLocalizations.tr(context).get('maps_directions'),
                 onTap: () {
                   Navigator.of(context).pop();
                   context.push('/maps');
@@ -118,7 +125,7 @@ class EndDrawerWidget extends StatelessWidget {
               _buildMenuItem(
                 context,
                 iconPath: 'assets/images/k7eg7_8.png',
-                label: 'Galeria de imagens',
+                label: AppLocalizations.tr(context).get('image_gallery'),
                 onTap: () {
                   Navigator.of(context).pop();
                   context.push('/gallery');
@@ -127,15 +134,16 @@ class EndDrawerWidget extends StatelessWidget {
               _buildMenuItem(
                 context,
                 iconPath: 'assets/images/nswz3_9.png',
-                label: 'Reservas pelo site',
+                label: AppLocalizations.tr(context).get('reservations'),
                 onTap: () {
                   Navigator.of(context).pop();
                   // TODO: Implement redirect to reservation site
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Em breve!')),
+                    SnackBar(content: Text(AppLocalizations.tr(context).get('coming_soon'))),
                   );
                 },
               ),
+              _buildLanguageMenuItem(context),
 
               const Divider(thickness: 2.0),
 
@@ -160,7 +168,7 @@ class EndDrawerWidget extends StatelessWidget {
                     ),
                     child: Center(
                       child: Text(
-                        'Administrador',
+                        AppLocalizations.tr(context).get('admin'),
                         style: GoogleFonts.inter(
                           color: AppTheme.primaryText,
                           fontWeight: FontWeight.w400,
@@ -170,8 +178,8 @@ class EndDrawerWidget extends StatelessWidget {
                   ),
                 ),
               ),
-                
-              const Spacer(),
+
+              const SizedBox(height: 20.0),
               
               // Logout Button
               if (user != null)
@@ -198,7 +206,7 @@ class EndDrawerWidget extends StatelessWidget {
                           const Icon(Icons.logout, color: AppTheme.error),
                           const SizedBox(width: 8.0),
                           Text(
-                            'Sair',
+                            AppLocalizations.tr(context).get('logout'),
                             style: GoogleFonts.poppins(
                               color: AppTheme.error,
                               fontWeight: FontWeight.w500,
@@ -209,6 +217,10 @@ class EndDrawerWidget extends StatelessWidget {
                     ),
                   ),
                 ),
+                    ],
+                  ),
+                ),
+              ),
             ],
           ),
         ),
@@ -260,5 +272,87 @@ class EndDrawerWidget extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  /// Menu item especial para idioma com indicador do idioma atual
+  Widget _buildLanguageMenuItem(BuildContext context) {
+    return Consumer<LocaleProvider>(
+      builder: (context, localeProvider, _) {
+        final currentLang = localeProvider.currentLanguageName;
+        final flag = _getFlag(localeProvider.locale.languageCode);
+        
+        return Padding(
+          padding: const EdgeInsetsDirectional.fromSTEB(0.0, 10.0, 0.0, 10.0),
+          child: InkWell(
+            onTap: () {
+              Navigator.of(context).pop();
+              context.push('/settings/language');
+            },
+            child: Container(
+              width: double.infinity,
+              height: 40.0,
+              decoration: const BoxDecoration(
+                color: Colors.transparent,
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  // Flag emoji
+                  SizedBox(
+                    width: 28,
+                    height: 28,
+                    child: Center(
+                      child: Text(
+                        flag,
+                        style: const TextStyle(fontSize: 22),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 0.0, 0.0),
+                    child: Text(
+                      AppLocalizations.tr(context).language,
+                      style: GoogleFonts.poppins(
+                        color: AppTheme.primaryText,
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                  const Spacer(),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: AppTheme.amarelo.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      currentLang,
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        color: AppTheme.primaryText,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  String _getFlag(String languageCode) {
+    switch (languageCode) {
+      case 'en':
+        return '🇺🇸';
+      case 'es':
+        return '🇪🇸';
+      case 'pt':
+      default:
+        return '🇧🇷';
+    }
   }
 }

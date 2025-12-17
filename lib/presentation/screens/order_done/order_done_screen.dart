@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 
+import '../../../core/l10n/app_localizations.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../providers/order_provider.dart';
 import '../../widgets/navbar_widget.dart';
@@ -78,7 +79,7 @@ class _OrderDoneScreenState extends State<OrderDoneScreen> {
                       Align(
                         alignment: Alignment.center,
                         child: Text(
-                          'Pedido confirmado!',
+                          AppLocalizations.tr(context).get('order_confirmed'),
                           style: GoogleFonts.poppins(fontWeight: FontWeight.w500, fontSize: 20.0, color: AppTheme.primaryText),
                         ),
                       ),
@@ -86,7 +87,7 @@ class _OrderDoneScreenState extends State<OrderDoneScreen> {
                       // Order Code
                       Align(
                         alignment: Alignment.center,
-                        child: Text('Código ${order?.codigo ?? ''}', style: GoogleFonts.inter(fontSize: 14.0, color: AppTheme.primaryText)),
+                        child: Text('${AppLocalizations.tr(context).get('code')} ${order?.codigo ?? ''}', style: GoogleFonts.inter(fontSize: 14.0, color: AppTheme.primaryText)),
                       ),
 
                       // Video Animation
@@ -123,7 +124,7 @@ class _OrderDoneScreenState extends State<OrderDoneScreen> {
                         child: Padding(
                           padding: const EdgeInsetsDirectional.fromSTEB(10.0, 0.0, 10.0, 0.0),
                           child: Text(
-                            'Seu pagamento foi confirmado e seu pedido está sendo preparado.',
+                            AppLocalizations.tr(context).get('payment_confirmed_preparing'),
                             textAlign: TextAlign.center,
                             style: GoogleFonts.inter(fontSize: 16.0, color: AppTheme.primaryText),
                           ),
@@ -139,7 +140,7 @@ class _OrderDoneScreenState extends State<OrderDoneScreen> {
                             mainAxisSize: MainAxisSize.max,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text('Tempo estimado: ', style: GoogleFonts.inter(fontSize: 16.0, color: AppTheme.primaryText)),
+                              Text('${AppLocalizations.tr(context).get('estimated_time')}: ', style: GoogleFonts.inter(fontSize: 16.0, color: AppTheme.primaryText)),
                               Text('25 min', style: GoogleFonts.inter(fontSize: 16.0, color: AppTheme.amarelo)),
                             ],
                           ),
@@ -166,7 +167,7 @@ class _OrderDoneScreenState extends State<OrderDoneScreen> {
                               ),
                               alignment: Alignment.center,
                               child: Text(
-                                'Ver meus pedidos',
+                                AppLocalizations.tr(context).get('view_my_orders'),
                                 style: GoogleFonts.inter(fontWeight: FontWeight.w500, fontSize: 16.0, color: AppTheme.primaryText),
                               ),
                             ),
@@ -182,10 +183,10 @@ class _OrderDoneScreenState extends State<OrderDoneScreen> {
                             // TODO: Implement send receipt by email
                             ScaffoldMessenger.of(
                               context,
-                            ).showSnackBar(const SnackBar(content: Text('Nota fiscal enviada para seu e-mail!'), backgroundColor: AppTheme.success));
+                            ).showSnackBar(SnackBar(content: Text(AppLocalizations.tr(context).get('receipt_sent')), backgroundColor: AppTheme.success));
                           },
                           child: Text(
-                            'Receber nota fiscal por e-mail?',
+                            AppLocalizations.tr(context).get('receive_receipt_email'),
                             style: GoogleFonts.inter(fontSize: 14.0, color: AppTheme.secondaryText, decoration: TextDecoration.underline),
                           ),
                         ),

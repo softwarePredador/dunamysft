@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import '../../../core/l10n/app_localizations.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../data/models/faq_model.dart';
 import '../../providers/faq_provider.dart';
@@ -53,10 +54,10 @@ class _FAQScreenState extends State<FAQScreen> {
                           }
                         },
                       ),
-                      const Expanded(
+                      Expanded(
                         child: Text(
-                          'Perguntas Frequentes',
-                          style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.w500),
+                          AppLocalizations.tr(context).faq,
+                          style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.w500),
                           textAlign: TextAlign.center,
                         ),
                       ),
@@ -79,7 +80,7 @@ class _FAQScreenState extends State<FAQScreen> {
                             children: [
                               const Icon(Icons.error_outline, size: 64, color: AppTheme.error),
                               const SizedBox(height: 16),
-                              Text('Erro ao carregar perguntas', style: Theme.of(context).textTheme.titleMedium),
+                              Text(AppLocalizations.tr(context).get('error_loading_faq'), style: Theme.of(context).textTheme.titleMedium),
                               const SizedBox(height: 8),
                               Text(faqProvider.error, style: Theme.of(context).textTheme.bodySmall, textAlign: TextAlign.center),
                             ],
@@ -96,7 +97,7 @@ class _FAQScreenState extends State<FAQScreen> {
                             children: [
                               const Icon(Icons.help_outline, size: 64, color: AppTheme.grayPaletteGray60),
                               const SizedBox(height: 16),
-                              Text('Nenhuma pergunta disponível', style: Theme.of(context).textTheme.titleMedium),
+                              Text(AppLocalizations.tr(context).get('no_faq_available'), style: Theme.of(context).textTheme.titleMedium),
                             ],
                           ),
                         );

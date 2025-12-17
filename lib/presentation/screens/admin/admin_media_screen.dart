@@ -6,8 +6,28 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/theme/app_theme.dart';
 
-class AdminMediaScreen extends StatelessWidget {
+class AdminMediaScreen extends StatefulWidget {
   const AdminMediaScreen({super.key});
+
+  @override
+  State<AdminMediaScreen> createState() => _AdminMediaScreenState();
+}
+
+class _AdminMediaScreenState extends State<AdminMediaScreen>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,78 +58,107 @@ class AdminMediaScreen extends StatelessWidget {
           ),
         ),
         centerTitle: true,
+        bottom: TabBar(
+          controller: _tabController,
+          labelColor: AppTheme.adminAccent,
+          unselectedLabelColor: AppTheme.secondaryText,
+          indicatorColor: AppTheme.adminAccent,
+          tabs: const [
+            Tab(icon: Icon(Icons.home), text: 'Carrossel Home'),
+            Tab(icon: Icon(Icons.location_on), text: 'Galeria Locais'),
+          ],
+        ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => _showAddLocalDialog(context),
+        onPressed: () {
+          if (_tabController.index == 0) {
+            _showAddHomeCarouselDialog(context);
+          } else {
+            _showAddLocalDialog(context);
+          }
+        },
         backgroundColor: AppTheme.adminAccent,
-        child: const Icon(Icons.add_location_alt, color: Colors.white),
-      ),
-      body: SafeArea(
-        child: StreamBuilder<QuerySnapshot>(
-          stream: FirebaseFirestore.instance
-              .collection('localDunamys')
-              .snapshots(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            }
-
-            if (snapshot.hasError) {
-              return Center(
-                child: Text('Erro ao carregar locais: ${snapshot.error}'),
-              );
-            }
-
-            final locals = snapshot.data?.docs ?? [];
-
-            if (locals.isEmpty) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.photo_library_outlined,
-                      size: 64,
-                      color: AppTheme.secondaryText,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Nenhum local cadastrado',
-                      style: GoogleFonts.poppins(
-                        fontSize: 16,
-                        color: AppTheme.secondaryText,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    ElevatedButton.icon(
-                      onPressed: () => _showAddLocalDialog(context),
-                      icon: const Icon(Icons.add),
-                      label: const Text('Adicionar Local'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTheme.adminAccent,
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            }
-
-            return ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: locals.length,
-              itemBuilder: (context, index) {
-                final local = locals[index];
-                final localData = local.data() as Map<String, dynamic>;
-                final localName = localData['name'] ?? 'Local';
-
-                return _LocalMediaSection(
-                  localId: local.id,
-                  localName: localName,
-                );
-              },
-            );
-          },
+        child: Icon(
+          _tabController.index == 0 ? Icons.add_photo_alternate : Icons.add_location_alt,
+          color: Colors.white,
         ),
+      ),
+      body: TabBarView(
+        controller: _tabController,
+        children: const [
+          _HomeCarouselTab(),
+          _LocalGalleryTab(),
+        ],
+      ),
+    );
+  }
+
+  void _showAddHomeCarouselDialog(BuildContext context) {
+    final imageController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Adicionar Imagem ao Carrossel'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: imageController,
+                decoration: InputDecoration(
+                  labelText: 'URL da Imagem *',
+                  hintText: 'Cole a URL da imagem',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Esta imagem aparecerá no carrossel da tela inicial.',
+                style: GoogleFonts.inter(
+                  fontSize: 12,
+                  color: AppTheme.secondaryText,
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              final imageUrl = imageController.text.trim();
+              if (imageUrl.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('URL da imagem é obrigatória')),
+                );
+                return;
+              }
+
+              await FirebaseFirestore.instance.collection('gallery_main').add({
+                'image': imageUrl,
+                'created_at': FieldValue.serverTimestamp(),
+              });
+
+              if (context.mounted) {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Imagem adicionada ao carrossel!')),
+                );
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.adminAccent,
+            ),
+            child: const Text('Adicionar'),
+          ),
+        ],
       ),
     );
   }
@@ -163,6 +212,251 @@ class AdminMediaScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+// ==================== TAB 1: CARROSSEL HOME ====================
+class _HomeCarouselTab extends StatelessWidget {
+  const _HomeCarouselTab();
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('gallery_main')
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (snapshot.hasError) {
+          return Center(
+            child: Text('Erro ao carregar: ${snapshot.error}'),
+          );
+        }
+
+        final items = snapshot.data?.docs ?? [];
+
+        if (items.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.photo_library_outlined,
+                  size: 64,
+                  color: AppTheme.secondaryText,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Nenhuma imagem no carrossel',
+                  style: GoogleFonts.poppins(
+                    fontSize: 16,
+                    color: AppTheme.secondaryText,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Toque no + para adicionar',
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    color: AppTheme.secondaryText,
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+
+        return GridView.builder(
+          padding: const EdgeInsets.all(16),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: 12,
+            mainAxisSpacing: 12,
+            childAspectRatio: 1.5,
+          ),
+          itemCount: items.length,
+          itemBuilder: (context, index) {
+            final doc = items[index];
+            final data = doc.data() as Map<String, dynamic>;
+            final imageUrl = data['image'] ?? '';
+
+            return _HomeCarouselItem(
+              docId: doc.id,
+              imageUrl: imageUrl,
+            );
+          },
+        );
+      },
+    );
+  }
+}
+
+class _HomeCarouselItem extends StatelessWidget {
+  final String docId;
+  final String imageUrl;
+
+  const _HomeCarouselItem({
+    required this.docId,
+    required this.imageUrl,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: imageUrl.isNotEmpty
+              ? CachedNetworkImage(
+                  imageUrl: imageUrl,
+                  width: double.infinity,
+                  height: double.infinity,
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) => Container(
+                    color: AppTheme.secondaryText.withValues(alpha: 0.2),
+                    child: const Center(child: CircularProgressIndicator()),
+                  ),
+                  errorWidget: (context, url, error) => Container(
+                    color: AppTheme.secondaryText.withValues(alpha: 0.2),
+                    child: const Icon(Icons.broken_image, size: 40),
+                  ),
+                )
+              : Container(
+                  color: AppTheme.secondaryText.withValues(alpha: 0.2),
+                  child: const Icon(Icons.image, size: 40),
+                ),
+        ),
+        // Delete button
+        Positioned(
+          top: 8,
+          right: 8,
+          child: InkWell(
+            onTap: () => _deleteImage(context),
+            child: Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: Colors.red.withValues(alpha: 0.9),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.delete,
+                color: Colors.white,
+                size: 18,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _deleteImage(BuildContext context) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Excluir Imagem'),
+        content: const Text('Deseja excluir esta imagem do carrossel?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Excluir'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      await FirebaseFirestore.instance
+          .collection('gallery_main')
+          .doc(docId)
+          .delete();
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Imagem excluída!')),
+        );
+      }
+    }
+  }
+}
+
+// ==================== TAB 2: GALERIA DE LOCAIS ====================
+class _LocalGalleryTab extends StatelessWidget {
+  const _LocalGalleryTab();
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('localDunamys')
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (snapshot.hasError) {
+          return Center(
+            child: Text('Erro ao carregar locais: ${snapshot.error}'),
+          );
+        }
+
+        final locals = snapshot.data?.docs ?? [];
+
+        if (locals.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.location_off,
+                  size: 64,
+                  color: AppTheme.secondaryText,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Nenhum local cadastrado',
+                  style: GoogleFonts.poppins(
+                    fontSize: 16,
+                    color: AppTheme.secondaryText,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Toque no + para adicionar',
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    color: AppTheme.secondaryText,
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+
+        return ListView.builder(
+          padding: const EdgeInsets.all(16),
+          itemCount: locals.length,
+          itemBuilder: (context, index) {
+            final local = locals[index];
+            final localData = local.data() as Map<String, dynamic>;
+            final localName = localData['name'] ?? 'Local';
+
+            return _LocalMediaSection(
+              localId: local.id,
+              localName: localName,
+            );
+          },
+        );
+      },
     );
   }
 }
@@ -240,7 +534,7 @@ class _LocalMediaSection extends StatelessWidget {
                         : ListView.separated(
                             scrollDirection: Axis.horizontal,
                             itemCount: items.length,
-                            separatorBuilder: (_, __) =>
+                            separatorBuilder: (_, _) =>
                                 const SizedBox(width: 10),
                             itemBuilder: (context, index) {
                               final item = items[index];

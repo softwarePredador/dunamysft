@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../data/services/auth_service.dart';
+import '../../providers/locale_provider.dart';
 
 class AdminDashboardScreen extends StatelessWidget {
   const AdminDashboardScreen({super.key});
@@ -112,6 +114,13 @@ class AdminDashboardScreen extends StatelessWidget {
                   title: 'FAQ',
                   onTap: () => context.push('/admin/faq'),
                 ),
+                
+                const SizedBox(height: 10),
+                const Divider(),
+                const SizedBox(height: 10),
+                
+                // Idioma
+                _buildLanguageItem(context),
 
                 const SizedBox(height: 30),
 
@@ -148,6 +157,68 @@ class AdminDashboardScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Widget _buildLanguageItem(BuildContext context) {
+    return Consumer<LocaleProvider>(
+      builder: (context, localeProvider, _) {
+        final flag = _getFlag(localeProvider.locale.languageCode);
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 10.0),
+          child: InkWell(
+            onTap: () => context.push('/settings/language'),
+            borderRadius: BorderRadius.circular(15),
+            child: Container(
+              width: 320,
+              height: 70,
+              decoration: BoxDecoration(
+                color: AppTheme.amarelo.withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(15),
+                border: Border.all(color: AppTheme.amarelo, width: 2),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(flag, style: const TextStyle(fontSize: 28)),
+                  const SizedBox(width: 12),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Idioma / Language',
+                        style: GoogleFonts.inter(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: AppTheme.primaryText,
+                        ),
+                      ),
+                      Text(
+                        localeProvider.currentLanguageName,
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          color: AppTheme.secondaryText,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(width: 12),
+                  const Icon(Icons.chevron_right, color: AppTheme.primaryText),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  String _getFlag(String code) {
+    switch (code) {
+      case 'en': return '🇺🇸';
+      case 'es': return '🇪🇸';
+      default: return '🇧🇷';
+    }
   }
 }
 

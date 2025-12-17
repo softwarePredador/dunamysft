@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
+import '../../../core/l10n/app_localizations.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../data/models/menu_item_model.dart';
 import '../../../data/services/auth_service.dart';
@@ -72,7 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Olá!',
+                              AppLocalizations.tr(context).hello,
                               style: GoogleFonts.poppins(
                                 fontWeight: FontWeight.w500,
                                 fontSize: 18.0,
@@ -80,7 +81,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                             ),
                             Text(
-                              user?.displayName ?? 'Visitante',
+                              user?.displayName ?? AppLocalizations.tr(context).visitor,
                               style: GoogleFonts.poppins(
                                 fontWeight: FontWeight.w500,
                                 fontSize: 18.0,
@@ -96,7 +97,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           Padding(
                             padding: const EdgeInsets.only(right: 15.0),
                             child: Text(
-                              'Seu pedido',
+                              AppLocalizations.tr(context).yourOrder,
                               style: GoogleFonts.inter(
                                 fontWeight: FontWeight.normal,
                                 fontSize: 12.0,
@@ -251,8 +252,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       return const Center(child: CircularProgressIndicator());
                     }
                     if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                      return const Center(
-                        child: Text('Nenhuma categoria encontrada.'),
+                      return Center(
+                        child: Text(AppLocalizations.tr(context).noResults),
                       );
                     }
 
@@ -329,7 +330,7 @@ class _CategorySection extends StatelessWidget {
                   child: Row(
                     children: [
                       Text(
-                        'ver todos',
+                        AppLocalizations.tr(context).seeAll,
                         style: AppTheme.lightTheme.textTheme.bodyMedium
                             ?.copyWith(
                               fontSize: 12.0,
